@@ -1118,12 +1118,25 @@ export default function PlayStorePage() {
     briefTopBatches.length >= 2 ? `${briefTopBatches[0]} students feel deprioritized versus ${briefTopBatches[1]}` : null,
     briefTopFaculty ? `repeated demand for ${briefTopFaculty.label}` : null,
   ].filter(Boolean).join(", and ");
-  const latestIssueEvidence = latestStudentIssue?.reviews.find((review) => review.text && String(review.text).length <= 160)?.text || latestStudentIssue?.reviews[0]?.text || "";
-  const executiveBrief = latestStudentIssue
-    ? `${latestStudentIssue.label} is the latest student issue right now - ${latestStudentIssue.count} low-rating reviews in the ${latestStudentIssue.windowLabel} say ${latestStudentIssue.summary.toLowerCase()}${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}${latestIssueEvidence ? ` Latest student wording: "${String(latestIssueEvidence).trim()}".` : ""}${topConcern ? ` Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).` : ""}`
+  const latestIssueEvidence = latestStudentIssue?.reviews.find((review) => review.text && String(review.text).length <= 140)?.text || latestStudentIssue?.reviews[0]?.text || "";
+  const briefingHeadline = latestStudentIssue
+    ? `${latestStudentIssue.label} is the latest student issue`
     : topConcern
-      ? `${briefTopLabel} is the single biggest source of negative reviews - ${briefTopCount} of ${briefTotal} (${briefPct}%) in the last 14 days${briefAccelerating ? `, and it is accelerating with ${brief7d} in just the last 7 days` : ""}. ${briefNatureLine}${briefSpecifics ? `: ${briefSpecifics}` : ""}. Complaints are landing on the current release (${currentVersion.version || "latest"}).`
-      : "No negative written reviews in the selected window - students are quiet right now.";
+      ? `${briefTopLabel} is leading negative review volume`
+      : "No active negative student issue in the selected window";
+  const briefingSummary = latestStudentIssue
+    ? `${latestStudentIssue.count} low-rating reviews in the ${latestStudentIssue.windowLabel} point to this issue.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
+    : topConcern
+      ? `${briefTopCount} of ${briefTotal} negative reviews (${briefPct}%) sit in this bucket${briefAccelerating ? `, with ${brief7d} arriving in the last 7 days` : ""}.`
+      : "Students are relatively quiet right now.";
+  const briefingContext = latestStudentIssue && topConcern
+    ? `Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
+    : topConcern
+      ? `${briefNatureLine}${briefSpecifics ? `: ${briefSpecifics}` : ""}. Complaints are landing on the current release (${currentVersion.version || "latest"}).`
+      : "";
+  const briefingQuote = latestStudentIssue && latestIssueEvidence
+    ? String(latestIssueEvidence).trim()
+    : "";
 
   const shareSnapshot = async () => {
     try {
@@ -1218,8 +1231,17 @@ export default function PlayStorePage() {
                 </span>
                 <span className="text-xs font-bold text-slate-500">Latest student issue first{data.livePulledAt ? ` · synced ${new Date(data.livePulledAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}` : ""}</span>
               </div>
-              <p className="max-w-4xl text-[15px] font-semibold leading-relaxed text-slate-800">{executiveBrief}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
+              <div className="max-w-4xl space-y-2">
+                <p className="text-base font-black leading-snug text-slate-900">{briefingHeadline}</p>
+                <p className="text-sm leading-relaxed text-slate-700">{briefingSummary}</p>
+                {briefingContext ? <p className="text-sm leading-relaxed text-slate-500">{briefingContext}</p> : null}
+                {briefingQuote ? (
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
+                    <span className="font-semibold text-slate-500">Student signal:</span> &nbsp;&ldquo;{briefingQuote}&rdquo;
+                  </div>
+                ) : null}
+              </div>
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 {latestStudentIssue ? <span className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-black text-red-700">{latestStudentIssue.label}</span> : null}
                 <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{latestStudentIssue ? `${latestStudentIssue.count} reports · ${latestStudentIssue.windowLabel}` : `${briefTopLabel || "No issue"} · ${briefPct}%`}</span>
                 <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{brief7d} negative · last 7 days</span>
