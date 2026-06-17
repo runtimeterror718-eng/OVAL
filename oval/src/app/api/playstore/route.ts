@@ -1,10 +1,16 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { promisify } from "util";
+import { execFile } from "child_process";
 import { NextResponse } from "next/server";
 import insights from "@/data/playstore-insights.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 
 export const dynamic = "force-dynamic";
+
+const execFileAsync = promisify(execFile);
+const HOURLY_REFRESH_MS = 60 * 60 * 1000;
+let liveRefreshPromise: Promise<void> | null = null;
 
 async function readJsonFile(relativePath: string): Promise<any | null> {
   try {
@@ -15,7 +21,50 @@ async function readJsonFile(relativePath: string): Promise<any | null> {
   }
 }
 
+function isStale(pulledAt?: string | null) {
+  if (!pulledAt) return true;
+  const lastPulled = new Date(pulledAt);
+  if (Number.isNaN(lastPulled.getTime())) return true;
+  return Date.now() - lastPulled.getTime() >= HOURLY_REFRESH_MS;
+}
+
+async function refreshLiveReviewsIfNeeded() {
+  const store = await readJsonFile("playstore-live-reviews.json");
+  if (!isStale(store?.lastPulledAt)) return;
+  if (liveRefreshPromise) {
+    await liveRefreshPromise;
+    return;
+  }
+
+  const repoRoot = path.resolve(process.cwd(), "..");
+  const scriptPath = path.join(repoRoot, "scripts", "pull_playstore_reviews.py");
+  const keyPath = path.join(repoRoot, "secrets", "playstore-service-account.json");
+
+  try {
+    await fs.access(scriptPath);
+    await fs.access(keyPath);
+  } catch {
+    return;
+  }
+
+  liveRefreshPromise = (async () => {
+    try {
+      await execFileAsync("python3", [scriptPath], {
+        cwd: repoRoot,
+        timeout: 120000,
+      });
+    } catch {
+      // keep serving the last successful snapshot if refresh fails
+    } finally {
+      liveRefreshPromise = null;
+    }
+  })();
+
+  await liveRefreshPromise;
+}
+
 export async function GET() {
+  await refreshLiveReviewsIfNeeded();
   const primary = (insights as any).apps?.[(insights as any).primaryPackage] || {};
   const liveStore = await readJsonFile("playstore-live-reviews.json");
   const pullLog = (await readJsonFile("playstore-pull-log.json")) || [];
@@ -120,6 +169,7 @@ export async function GET() {
     dateRange: { ...baseRange, to: effectiveTo },
     liveReviews,
     livePulledAt: liveStore?.lastPulledAt || null,
+    liveRefreshCadenceHours: 1,
     pullLog,
   });
 }

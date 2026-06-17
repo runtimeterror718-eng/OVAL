@@ -668,7 +668,7 @@ function CommentMarquee({ title, badge, reviews, tone, onOpen }: { title: string
 }
 
 export default function PlayStorePage() {
-  const { data, loading } = useLiveData<any>("/api/playstore", null);
+  const { data, loading } = useLiveData<any>("/api/playstore", null, { refreshMs: 60 * 60 * 1000, noStore: true });
   const [panel, setPanel] = useState<EvidencePanel | null>(null);
   const [timeWindow, setTimeWindow] = useState<"last30" | "sixMonths" | "all">("sixMonths");
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative" | "positive" | "unreplied" | "commercial">("all");

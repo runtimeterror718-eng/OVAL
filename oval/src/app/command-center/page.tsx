@@ -171,7 +171,7 @@ export default function CommandCenter() {
   const youtube = useLiveData<any>("/api/youtube", null);
   const google = useLiveData<any>("/api/google", null);
   const linkedin = useLiveData<any>("/api/linkedin", null);
-  const playstore = useLiveData<any>("/api/playstore", null);
+  const playstore = useLiveData<any>("/api/playstore", null, { refreshMs: 60 * 60 * 1000, noStore: true });
   const freshdesk = useLiveData<any>("/api/freshdesk", null);
   const reputationRadar = useLiveData<any>("/api/reputation-radar?hours=72", null);
 

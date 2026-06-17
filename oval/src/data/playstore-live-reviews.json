@@ -1,6 +1,6 @@
 {
  "package": "xyz.penpencil.physicswala",
- "lastPulledAt": "2026-06-17T08:35:16.277490+00:00",
+ "lastPulledAt": "2026-06-17T08:48:06.489981+00:00",
  "reviews": {
   "844b53fe-3476-41d9-91a6-36b559d5d0aa": {
    "reviewId": "844b53fe-3476-41d9-91a6-36b559d5d0aa",
@@ -34228,6 +34228,51 @@
    "version": "15.48.04",
    "thumbsUpCount": 0,
    "date": "2026-06-17T08:31:34+00:00",
+   "replied": false,
+   "replyText": null,
+   "replyDate": null
+  },
+  "6d416881-608f-4d9a-bb79-4f2574f91a93": {
+   "reviewId": "6d416881-608f-4d9a-bb79-4f2574f91a93",
+   "author": "Te'zeem",
+   "rating": 1,
+   "text": "horrible recent experience with the banners popping up ,sometimes not even getting the option to close it",
+   "language": "en",
+   "device": "a70q",
+   "androidOsVersion": 30,
+   "version": "15.19.10",
+   "thumbsUpCount": 0,
+   "date": "2026-06-17T08:36:06+00:00",
+   "replied": false,
+   "replyText": null,
+   "replyDate": null
+  },
+  "79aaa756-8e50-4c1f-9b81-9861b6de0aed": {
+   "reviewId": "79aaa756-8e50-4c1f-9b81-9861b6de0aed",
+   "author": "Rohit Kumar",
+   "rating": 5,
+   "text": "this app changed my life \ud83d\udc96",
+   "language": "en",
+   "device": "a03s",
+   "androidOsVersion": 33,
+   "version": null,
+   "thumbsUpCount": 0,
+   "date": "2026-06-17T08:44:10+00:00",
+   "replied": false,
+   "replyText": null,
+   "replyDate": null
+  },
+  "fa69d8ab-7e60-401a-8536-0acf547ff638": {
+   "reviewId": "fa69d8ab-7e60-401a-8536-0acf547ff638",
+   "author": "Sarika Shamim",
+   "rating": 2,
+   "text": "why can't I'm able to open the app...I'm \ud83d\ude21 pissed",
+   "language": "en",
+   "device": "REE2ADL1",
+   "androidOsVersion": 35,
+   "version": "15.50.04",
+   "thumbsUpCount": 0,
+   "date": "2026-06-17T08:47:28+00:00",
    "replied": false,
    "replyText": null,
    "replyDate": null

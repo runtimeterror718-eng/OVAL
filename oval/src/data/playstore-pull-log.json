@@ -1,5 +1,32 @@
 [
  {
+  "pulledAt": "2026-06-17T08:48:06.489981+00:00",
+  "status": "ok",
+  "fetched": 1345,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2285,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T08:45:42.581639+00:00",
+  "status": "ok",
+  "fetched": 1344,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2284,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T08:40:30.444548+00:00",
+  "status": "ok",
+  "fetched": 1344,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2283,
+  "message": null
+ },
+ {
   "pulledAt": "2026-06-17T08:35:16.277490+00:00",
   "status": "ok",
   "fetched": 1343,
@@ -870,33 +897,6 @@
   "new": 2,
   "updated": 0,
   "totalStored": 2094,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T08:33:46.522156+00:00",
-  "status": "ok",
-  "fetched": 1335,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2092,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T08:28:32.650178+00:00",
-  "status": "ok",
-  "fetched": 1334,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2090,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T08:23:20.839224+00:00",
-  "status": "ok",
-  "fetched": 1335,
-  "new": 16,
-  "updated": 8,
-  "totalStored": 2090,
   "message": null
  }
 ]
