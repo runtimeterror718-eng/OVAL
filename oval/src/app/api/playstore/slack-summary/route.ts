@@ -72,8 +72,15 @@ async function writeDedupeState(state: any) {
 
 function messageFingerprint(message: ReturnType<typeof buildPlaystoreSlackMessage>) {
   const body = JSON.stringify({
-    text: message.text,
-    blocks: message.blocks,
+    headline: message.meta?.headline,
+    summary: message.meta?.summary,
+    context: message.meta?.context,
+    severity: message.meta?.severity,
+    signalStrength: message.meta?.signalStrength,
+    impactedVersions: message.meta?.impactedVersions,
+    primaryBucket: message.meta?.primaryBucket,
+    currentVersion: message.meta?.currentVersion,
+    evidenceKeys: message.meta?.evidenceKeys || [],
   });
   return crypto.createHash("sha256").update(body).digest("hex");
 }
