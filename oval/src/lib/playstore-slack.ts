@@ -222,18 +222,23 @@ export function buildPlaystoreSlackMessage(payload: any) {
   const briefTopLabel = topConcern ? topConcern[0] : "";
   const briefPct = briefTotal ? Math.round((briefTopCount / briefTotal) * 100) : 0;
   const latestIssueEvidence = latestStudentIssue?.reviews.find((review) => review.text && String(review.text).length <= 140)?.text || latestStudentIssue?.reviews[0]?.text || "";
+  const recentNegativeComments = enrichedReviews
+    .filter((review) => Number(review.rating || 0) <= 2 && isWithinLatest7d(review.date) && review.text)
+    .sort((a, b) => String(b.postedAt || b.date || "").localeCompare(String(a.postedAt || a.date || "")))
+    .filter((review, index, rows) => rows.findIndex((row) => String(row.text || "").trim() === String(review.text || "").trim()) === index)
+    .slice(0, 5);
 
-  const headline = latestStudentIssue
+  const briefingHeadline = latestStudentIssue
     ? `${latestStudentIssue.label}`
     : topConcern
       ? `${briefTopLabel} is leading negative review volume`
       : "No active negative student issue in the selected window";
-  const summary = latestStudentIssue
+  const briefingSummary = latestStudentIssue
     ? `${latestStudentIssue.count} low-rating reviews in the ${latestStudentIssue.windowLabel} point to this issue.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
     : topConcern
       ? `${briefTopCount} of ${briefTotal} negative reviews (${briefPct}%) sit in this bucket.`
       : "Students are relatively quiet right now.";
-  const context = latestStudentIssue && topConcern
+  const briefingContext = latestStudentIssue && topConcern
     ? `Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
     : "";
 
@@ -244,12 +249,21 @@ export function buildPlaystoreSlackMessage(payload: any) {
   const currentRating = currentVersion.averageRating || averageRating;
   const lowRatingRate = primary.lowRatingRate || 0;
   const liveReviewCount = payload?.liveReviews?.length || 0;
+  const recentNegativeCommentLines = recentNegativeComments
+    .map((review) => {
+      const author = review.author || "Play Store user";
+      const version = review.version ? `v${review.version}` : "Unknown version";
+      const date = review.date || "Unknown date";
+      const text = String(review.text || "").replace(/\s+/g, " ").trim();
+      return `• *${author}* · ${version} · ${date}\n>${text}`;
+    })
+    .join("\n\n");
 
   const text = [
     `OVAL Play Store briefing`,
-    headline,
-    summary,
-    context,
+    briefingHeadline,
+    briefingSummary,
+    briefingContext,
   ].filter(Boolean).join(" — ");
 
   const blocks = [
@@ -269,7 +283,7 @@ export function buildPlaystoreSlackMessage(payload: any) {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Latest issue*\n*${headline}*\n${summary}${context ? `\n${context}` : ""}`,
+        text: `*Live briefing*\n*${briefingHeadline}*\n${briefingSummary}${briefingContext ? `\n${briefingContext}` : ""}`,
       },
     },
     latestIssueEvidence
@@ -278,6 +292,15 @@ export function buildPlaystoreSlackMessage(payload: any) {
           text: {
             type: "mrkdwn",
             text: `*Student signal*\n>${String(latestIssueEvidence).trim()}`,
+          },
+        }
+      : null,
+    recentNegativeCommentLines
+      ? {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*Recent negative comments*\n${recentNegativeCommentLines}`,
           },
         }
       : null,
@@ -303,9 +326,9 @@ export function buildPlaystoreSlackMessage(payload: any) {
     text,
     blocks,
     meta: {
-      headline,
-      summary,
-      context,
+      headline: briefingHeadline,
+      summary: briefingSummary,
+      context: briefingContext,
       syncedAt,
       liveReviewCount,
       currentVersion: currentVersionLabel,
