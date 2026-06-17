@@ -100,7 +100,7 @@ function issueWindowLabel(days: number) {
 }
 
 function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { label?: string | null } }>, endDate?: string | null): LiveIssue | null {
-  const windowDays = 3;
+  const windowDays = 1;
   const windowStart = daysBefore(endDate, windowDays - 1);
   const windowEnd = endDate ? new Date(`${endDate}T23:59:59`) : new Date();
   const recentNegatives = reviews.filter((review) => {
@@ -112,9 +112,9 @@ function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { l
 
   const rules = [
     {
-      label: "Admit card banner is blocking access",
-      summary: "Students say an admit-card popup or upload step is preventing them from opening the app or reaching lectures.",
-      pattern: /admit\s*card|roll\s*no|invalid error|banner|popup|pop up/i,
+      label: "Admit card / form popup is blocking access",
+      summary: "Students say an admit-card, roll-number, or exam-form popup is blocking the app, forcing the wrong flow, or preventing lectures from opening.",
+      pattern: /admit\s*card|roll\s*no|invalid error|banner|popup|pop up|form/i,
     },
     {
       label: "Students cannot access paid batch content",
@@ -134,7 +134,7 @@ function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { l
     {
       label: "Teacher and batch complaints are resurfacing",
       summary: "Students are flagging schedule changes, faculty dissatisfaction, or batch-experience mismatch in recent reviews.",
-      pattern: /teacher|faculty|schedule|3 class per day|class per day|offline class|batch/i,
+      pattern: /teacher|faculty|schedule|3 class per day|class per day|offline class/i,
     },
   ];
 
@@ -1125,7 +1125,7 @@ export default function PlayStorePage() {
       ? `${briefTopLabel} is leading negative review volume`
       : "No active negative student issue in the selected window";
   const briefingSummary = latestStudentIssue
-    ? `${latestStudentIssue.count} low-rating reviews in the ${latestStudentIssue.windowLabel} point to this issue.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
+    ? `${latestStudentIssue.count} low-rating reviews${latestStudentIssue.windowLabel === "today" ? " today" : ` in the ${latestStudentIssue.windowLabel}`} point to this issue.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
     : topConcern
       ? `${briefTopCount} of ${briefTotal} negative reviews (${briefPct}%) sit in this bucket${briefAccelerating ? `, with ${brief7d} arriving in the last 7 days` : ""}.`
       : "Students are relatively quiet right now.";
