@@ -193,14 +193,6 @@ export function buildPlaystoreSlackMessage(payload: any) {
   const latestStudentIssue = detectLatestStudentIssue(enrichedReviews, payload?.dateRange?.to);
 
   const latest7dEnd = payload?.dateRange?.to ? new Date(`${payload.dateRange.to}T23:59:59`) : new Date();
-  const latest7dStart = new Date(latest7dEnd);
-  latest7dStart.setDate(latest7dStart.getDate() - 7);
-  const isWithinLatest7d = (date?: string | null) => {
-    if (!date) return false;
-    const parsed = new Date(`${date}T12:00:00`);
-    return !Number.isNaN(parsed.getTime()) && parsed >= latest7dStart && parsed <= latest7dEnd;
-  };
-
   const marqueeStart = daysBefore(payload?.dateRange?.to, 13);
   const inMarqueeWindow = (date?: string | null) => {
     if (!date) return false;
@@ -208,7 +200,6 @@ export function buildPlaystoreSlackMessage(payload: any) {
     return !Number.isNaN(parsed.getTime()) && parsed >= marqueeStart && parsed <= latest7dEnd;
   };
 
-  const negative7dReviews = enrichedReviews.filter((review) => Number(review.rating || 0) <= 2 && isWithinLatest7d(review.date));
   const marqueeNegatives = enrichedReviews.filter((review) => Number(review.rating || 0) <= 2 && review.text && inMarqueeWindow(review.date));
   const concernCounts = marqueeNegatives.reduce((acc: Record<string, number>, review) => {
     const label = review.commercialRisk.label;
@@ -222,12 +213,7 @@ export function buildPlaystoreSlackMessage(payload: any) {
   const briefTopLabel = topConcern ? topConcern[0] : "";
   const briefPct = briefTotal ? Math.round((briefTopCount / briefTotal) * 100) : 0;
   const latestIssueEvidence = latestStudentIssue?.reviews.find((review) => review.text && String(review.text).length <= 140)?.text || latestStudentIssue?.reviews[0]?.text || "";
-  const recentNegativeComments = enrichedReviews
-    .filter((review) => Number(review.rating || 0) <= 2 && isWithinLatest7d(review.date) && review.text)
-    .sort((a, b) => String(b.postedAt || b.date || "").localeCompare(String(a.postedAt || a.date || "")))
-    .filter((review, index, rows) => rows.findIndex((row) => String(row.text || "").trim() === String(review.text || "").trim()) === index)
-    .slice(0, 5);
-
+  const incidentReviews = latestStudentIssue?.reviews?.slice(0, 5) || [];
   const briefingHeadline = latestStudentIssue
     ? `${latestStudentIssue.label}`
     : topConcern
@@ -241,49 +227,91 @@ export function buildPlaystoreSlackMessage(payload: any) {
   const briefingContext = latestStudentIssue && topConcern
     ? `Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
     : "";
+  const severity = latestStudentIssue?.count && latestStudentIssue.count >= 5 ? "High" : latestStudentIssue?.count && latestStudentIssue.count >= 3 ? "Medium" : "Watch";
+  const signalStrength = latestStudentIssue?.count && latestStudentIssue.count >= 5 ? "Strong" : latestStudentIssue?.count && latestStudentIssue.count >= 3 ? "Moderate" : "Weak";
+  const impactedVersions = latestStudentIssue?.versions?.length ? latestStudentIssue.versions.map((v) => `v${v}`).join(", ") : currentVersion.version ? `v${currentVersion.version}` : "latest";
+  const primaryBucket = latestStudentIssue ? "Access-blocking popup / form flow" : briefTopLabel || "General negative feedback";
+  const impactLine = latestStudentIssue
+    ? "Students are being blocked before lectures or core app entry."
+    : "Negative feedback is concentrated but not yet tied to a single access blocker.";
 
-  const topBuckets = sortedConcerns.slice(0, 3).map(([label, count]) => `• ${label}: ${count}`).join("\n") || "• No negative buckets active";
   const currentVersionLabel = currentVersion.version ? `v${currentVersion.version}` : "latest";
   const syncedAt = payload?.livePulledAt ? new Date(payload.livePulledAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Unknown";
   const averageRating = primary.averageRating || "--";
   const currentRating = currentVersion.averageRating || averageRating;
   const lowRatingRate = primary.lowRatingRate || 0;
   const liveReviewCount = payload?.liveReviews?.length || 0;
-  const recentNegativeCommentLines = recentNegativeComments
-    .map((review) => {
-      const author = review.author || "Play Store user";
-      const version = review.version ? `v${review.version}` : "Unknown version";
-      const date = review.date || "Unknown date";
-      const text = String(review.text || "").replace(/\s+/g, " ").trim();
-      return `• *${author}* · ${version} · ${date}\n>${text}`;
-    })
-    .join("\n\n");
+  const topBuckets = sortedConcerns.slice(0, 5).map(([label, count]) => `• ${label}: ${count}`).join("\n") || "• No negative buckets active";
+  const riskTable = [
+    "Area           | Risk   | Why it matters",
+    "Product        | High   | Users hit a blocker before reaching study flows",
+    "Tech / QA      | High   | Looks like popup gating, validation, or dismiss-state failure",
+    "Support        | High   | Access-blocker cases create urgent escalations fast",
+    "Leadership     | Medium | Trust damage can move faster than star rating",
+  ].join("\n");
+  const evidenceTable = [
+    "User              | Version   | Date       | Complaint",
+    ...incidentReviews.map((review) => {
+      const user = (review.author || "Play Store user").slice(0, 17).padEnd(17, " ");
+      const version = (`v${review.version || "Unknown"}`).slice(0, 9).padEnd(9, " ");
+      const date = String(review.date || "Unknown").slice(0, 10).padEnd(10, " ");
+      const complaint = String(review.text || "").replace(/\s+/g, " ").slice(0, 66);
+      return `${user} | ${version} | ${date} | ${complaint}`;
+    }),
+  ].join("\n");
+  const metricsSnapshot = [
+    `• Overall average rating: ${averageRating}★`,
+    `• Current release rating: ${currentRating}★`,
+    `• Current release review count: ${currentVersion.reviews || primary.releaseComparison?.current?.reviews || 0}`,
+    `• Low-rating rate overall: ${lowRatingRate}%`,
+    `• Release delta vs previous: ${primary.releaseComparison?.ratingDelta ?? "n/a"}★`,
+    `• Low-rating delta vs previous: ${primary.releaseComparison?.lowRatingRateDelta ?? "n/a"} pts`,
+    latestStudentIssue ? `• Current popup/form incident: ${latestStudentIssue.count} low-rating reviews ${latestStudentIssue.windowLabel}` : null,
+  ].filter(Boolean).join("\n");
+  const hypotheses = [
+    "1. Wrong audience targeting is triggering the form or admit-card popup for students who should not see it.",
+    "2. Dismiss-state is failing, so the banner returns and traps users on reopen.",
+    "3. Validation or submission logic is broken, causing invalid errors on roll-number or form input.",
+    "4. Remote-config or rollout mismatch is creating inconsistent behavior across app versions.",
+  ].join("\n");
 
   const text = [
-    `OVAL Play Store briefing`,
+    `Play Store Briefing`,
     briefingHeadline,
     briefingSummary,
-    briefingContext,
   ].filter(Boolean).join(" — ");
 
   const blocks = [
     {
       type: "header",
-      text: { type: "plain_text", text: "OVAL · Play Store briefing", emoji: true },
-    },
-    {
-      type: "context",
-      elements: [
-        { type: "mrkdwn", text: `*Synced:* ${syncedAt}` },
-        { type: "mrkdwn", text: `*Live reviews:* ${liveReviewCount}` },
-        { type: "mrkdwn", text: `*Current release:* ${currentVersionLabel}` },
-      ],
+      text: { type: "plain_text", text: "Play Store Briefing", emoji: true },
     },
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Live briefing*\n*${briefingHeadline}*\n${briefingSummary}${briefingContext ? `\n${briefingContext}` : ""}`,
+        text: `*1. Header*\nSync time: *${syncedAt}*\nLive reviews: *${liveReviewCount}*\nCurrent release: *${currentVersionLabel}*`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*2. Active Alert*\nSeverity: *${severity}*\nImpact: *${impactLine}*\nSignal strength: *${signalStrength}*\nImpacted versions: *${impactedVersions}*\nPrimary bucket: *${primaryBucket}*`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*3. What is happening?*\n${briefingHeadline}. ${briefingSummary}${briefingContext ? ` ${briefingContext}` : ""}`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*4. Why it matters*\n\`\`\`${riskTable}\`\`\``,
       },
     },
     latestIssueEvidence
@@ -291,33 +319,36 @@ export function buildPlaystoreSlackMessage(payload: any) {
           type: "section",
           text: {
             type: "mrkdwn",
-            text: `*Student signal*\n>${String(latestIssueEvidence).trim()}`,
-          },
-        }
-      : null,
-    recentNegativeCommentLines
-      ? {
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*Recent negative comments*\n${recentNegativeCommentLines}`,
+            text: `*Strong quote*\n>${String(latestIssueEvidence).trim()}`,
           },
         }
       : null,
     {
       type: "section",
-      fields: [
-        { type: "mrkdwn", text: `*Avg rating*\n${averageRating}★` },
-        { type: "mrkdwn", text: `*Current version rating*\n${currentRating}★` },
-        { type: "mrkdwn", text: `*7-day negatives*\n${negative7dReviews.length}` },
-        { type: "mrkdwn", text: `*Low-rating rate*\n${lowRatingRate}%` },
-      ],
+      text: {
+        type: "mrkdwn",
+        text: `*5. Evidence from recent reviews*\n\`\`\`${evidenceTable}\`\`\``,
+      },
     },
     {
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Top negative buckets (14 days)*\n${topBuckets}`,
+        text: `*6. Metrics snapshot*\n${metricsSnapshot}`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*7. Wider negative buckets*\n${topBuckets}`,
+      },
+    },
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: `*8. Likely root-cause hypotheses*\n${hypotheses}`,
       },
     },
   ].filter(Boolean);
