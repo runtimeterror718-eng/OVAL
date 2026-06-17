@@ -65,16 +65,22 @@ export function AnimatedNumber({ value, duration = 1.2, prefix = "", suffix = ""
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Fallback: if IntersectionObserver is unavailable, start immediately.
+    if (typeof IntersectionObserver === "undefined") { setStarted(true); return; }
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
-      { threshold: 0.3 }
+      ([entry]) => { if (entry.isIntersecting) setStarted(true); },
+      { threshold: 0 }
     );
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [started]);
+    // Safety net: if the observer never fires (already in view, layout quirks),
+    // start the animation anyway so the value is never stuck at 0.
+    const timer = setTimeout(() => setStarted(true), 200);
+    return () => { observer.disconnect(); clearTimeout(timer); };
+  }, []);
 
   useEffect(() => {
-    if (!started || !value) return;
+    if (!started) return;
+    if (!value) { setDisplayValue(0); return; }
 
     const startTime = Date.now();
     const tick = () => {
@@ -86,9 +92,12 @@ export function AnimatedNumber({ value, duration = 1.2, prefix = "", suffix = ""
     requestAnimationFrame(tick);
   }, [started, value, duration]);
 
+  // Until the animation starts, show the real value (never a stuck 0).
+  const shown = started ? displayValue : value;
+
   return (
     <span ref={ref}>
-      {prefix}{displayValue.toLocaleString("en-IN")}{suffix}
+      {prefix}{(shown || 0).toLocaleString("en-IN")}{suffix}
     </span>
   );
 }

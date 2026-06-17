@@ -16,6 +16,19 @@
   --sidebar-border: #E4E4E7;
 }
 
+@keyframes media-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.media-carousel-track {
+  animation: media-marquee 42s linear infinite;
+}
+
+.media-carousel-track:hover {
+  animation-play-state: paused;
+}
+
 .dark {
   --background: #0F0F1A;
   --foreground: #E4E4EC;
@@ -141,4 +154,12 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.4);
+}
+
+.media-carousel-track-reverse {
+  animation: media-marquee 46s linear infinite reverse;
+}
+
+.media-carousel-track-reverse:hover {
+  animation-play-state: paused;
 }

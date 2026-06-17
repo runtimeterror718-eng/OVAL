@@ -23,7 +23,7 @@ export async function GET() {
 
   const [mentionsRes, ragCompetitor] = await Promise.all([
     sb.from("mention_embeddings")
-      .select("content_text, platform, cluster_id, sentiment_label")
+      .select("content_text, platform, cluster_id, sentiment_label, source_url")
       .in("brand_id", brandIds)
       .not("content_text", "is", null)
       .limit(1500),
@@ -109,20 +109,87 @@ Also identify: Who is PW's biggest threat based on the data?`,
     })
     .sort((a, b) => b.mentions - a.mentions);
 
-  // Negative amplifiers using LLM-classified sentiment
-  const negativeAmplifiers: { text: string; platform: string; sentiment: string }[] = [];
-  for (const row of rows) {
-    if (row.sentiment_label === "negative") {
+  // Negative amplifiers using LLM-classified sentiment, with source URL lookup
+  const negCandidates = rows.filter(
+    (row: any) => row.sentiment_label === "negative" && (row.content_text || "").length > 30,
+  ).slice(0, 20);
+
+  const negativeAmplifiers = await Promise.all(
+    negCandidates.map(async (row: any) => {
       const text = row.content_text || "";
-      if (text.length > 30 && negativeAmplifiers.length < 20) {
-        negativeAmplifiers.push({
-          text: text.length > 300 ? text.slice(0, 300) + "..." : text,
-          platform: row.platform || "unknown",
-          sentiment: "negative",
-        });
+      const platform = row.platform || "unknown";
+      let sourceUrl = row.source_url || "";
+
+      // Fallback: try to find the URL from the platform-specific table using ilike substring match
+      if (!sourceUrl) {
+        try {
+          // Build a robust probe: strip non-content chars, take the longest distinctive word run
+          const stripped = text.replace(/^\[Transcript:\s*/i, "").replace(/[\n\r\t]+/g, " ").trim();
+          // Pick a ~40-char distinctive substring from the middle (better than start/end which may be cropped)
+          const words = stripped.split(/\s+/).filter((w: string) => w.length > 2);
+          const probe = words.slice(0, 8).join(" ").replace(/[%_]/g, " ").replace(/['"`]/g, "").trim();
+          const ilikePattern = `%${probe}%`;
+          if (probe.length > 10) {
+            if (platform === "reddit") {
+              const r1 = await sb.from("reddit_comments").select("permalink, post_url, post_id").ilike("comment_body", ilikePattern).limit(1);
+              sourceUrl = r1.data?.[0]?.permalink || r1.data?.[0]?.post_url || "";
+              if (!sourceUrl && r1.data?.[0]?.post_id) {
+                const r1b = await sb.from("reddit_posts").select("post_url").eq("post_id", r1.data[0].post_id).limit(1);
+                sourceUrl = r1b.data?.[0]?.post_url || "";
+              }
+              if (!sourceUrl) {
+                const r2 = await sb.from("reddit_posts").select("post_url").or(`post_title.ilike.${ilikePattern},post_body.ilike.${ilikePattern}`).limit(1);
+                sourceUrl = r2.data?.[0]?.post_url || "";
+              }
+            } else if (platform === "instagram") {
+              const r1 = await sb.from("instagram_comments").select("post_id").ilike("comment_text", ilikePattern).limit(1);
+              const postId = r1.data?.[0]?.post_id;
+              if (postId) {
+                const r2 = await sb.from("instagram_posts").select("post_url").eq("post_id", postId).limit(1);
+                sourceUrl = r2.data?.[0]?.post_url || "";
+              }
+              if (!sourceUrl) {
+                const r3 = await sb.from("instagram_posts").select("post_url").ilike("caption_text", ilikePattern).limit(1);
+                sourceUrl = r3.data?.[0]?.post_url || "";
+              }
+            } else if (platform === "youtube") {
+              const r1 = await sb.from("youtube_comments").select("video_id").ilike("comment_text", ilikePattern).limit(1);
+              const vid = r1.data?.[0]?.video_id;
+              if (vid) sourceUrl = `https://www.youtube.com/watch?v=${vid}`;
+              if (!sourceUrl) {
+                const r2 = await sb.from("youtube_videos").select("source_url, video_id").or(`video_title.ilike.${ilikePattern},video_description.ilike.${ilikePattern}`).limit(1);
+                sourceUrl = r2.data?.[0]?.source_url
+                  || (r2.data?.[0]?.video_id ? `https://www.youtube.com/watch?v=${r2.data[0].video_id}` : "");
+              }
+            } else if (platform === "twitter" || platform === "x") {
+              const { data } = await sb.from("twitter_tweets").select("tweet_url, tweet_id, author_handle").ilike("tweet_text", ilikePattern).limit(1);
+              sourceUrl = data?.[0]?.tweet_url
+                || (data?.[0]?.tweet_id && data?.[0]?.author_handle
+                    ? `https://x.com/${data[0].author_handle}/status/${data[0].tweet_id}`
+                    : "");
+            } else if (platform === "telegram") {
+              const { data } = await sb.from("telegram_messages").select("channel_username, message_id").ilike("message_text", ilikePattern).limit(1);
+              sourceUrl = (data?.[0]?.channel_username && data?.[0]?.message_id)
+                ? `https://t.me/${data[0].channel_username}/${data[0].message_id}`
+                : "";
+            } else if (platform === "google" || platform === "seo_news") {
+              const { data } = await sb.from("google_seo_results").select("organic_url").or(`organic_snippet.ilike.${ilikePattern},organic_title.ilike.${ilikePattern}`).limit(1);
+              sourceUrl = data?.[0]?.organic_url || "";
+            }
+          }
+        } catch {
+          /* lookup failed — leave sourceUrl empty */
+        }
       }
-    }
-  }
+
+      return {
+        text: text.length > 300 ? text.slice(0, 300) + "..." : text,
+        platform,
+        sentiment: "negative",
+        source_url: sourceUrl,
+      };
+    }),
+  );
 
   // Share of voice
   const shareOfVoice: Record<string, number> = { PW: totalMentions - competitorMentionCount };

@@ -2,172 +2,111 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { MessageCircle, ArrowUp, ExternalLink, Search } from "lucide-react";
+import { ArrowUp, ExternalLink, MessageCircle, Search } from "lucide-react";
 import RAGInsight from "@/components/dashboard/rag-insight";
 import IndiaMapComponent from "@/components/dashboard/india-map";
-import { useLiveData } from "@/lib/use-live-data";
-import { formatNumber, cn } from "@/lib/utils";
-import { AnimatedChart, AnimatedNumber } from "@/components/ui/animated-chart";
-import { MetricCard, MetricRow } from "@/components/ui/metric-card";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
-import { stagger, fadeUp } from "@/lib/animations";
+import { fadeUp, stagger } from "@/lib/animations";
+import { useLiveData } from "@/lib/use-live-data";
+import { cn, formatNumber } from "@/lib/utils";
 
 const ORANGE = "#FF5700";
-const COLORS = { positive: "#639922", neutral: "#9CA3AF", negative: "#E24B4A" };
 
 export default function RedditPage() {
-  const { data: live, isLive, loading } = useLiveData<any>("/api/reddit", null);
-  const [postFilter, setPostFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-
+  const { data, isLive, loading } = useLiveData<any>("/api/reddit", null);
+  const [query, setQuery] = useState("");
+  const [sentimentFilter, setSentimentFilter] = useState<"all" | "negative" | "neutral" | "positive">("all");
   if (loading) return <PageSkeleton title="Reddit Intelligence" color={ORANGE} />;
 
-  const stats = live?.stats || {};
-  const posts = live?.posts || [];
-  const subreddits = live?.subredditBreakdown || [];
-  const totalComments = live?.totalComments || 0;
-  const posCount = stats.positiveCount || 0;
-  const negCount = stats.negativeCount || 0;
-  const neuCount = stats.neutralCount || 0;
-  const embTotal = posCount + negCount + neuCount;
-
-  const donutData = embTotal > 0 ? [
-    { name: "Positive", value: posCount, color: COLORS.positive },
-    { name: "Neutral", value: neuCount, color: COLORS.neutral },
-    { name: "Negative", value: negCount, color: COLORS.negative },
-  ] : [];
-
-  const subChartData = subreddits.slice(0, 8).map((s: any) => ({ name: `r/${s.name}`, posts: s.count }));
-
-  const filteredPosts = posts.filter((p: any) => {
-    if (postFilter !== "all" && p.subreddit !== postFilter) return false;
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      return (p.title || "").toLowerCase().includes(q) || (p.snippet || "").toLowerCase().includes(q);
-    }
-    return true;
+  const stats = data?.stats || {};
+  const posts = data?.posts || [];
+  const subreddits = data?.subredditBreakdown || [];
+  const sentimentOptions = [
+    { id: "all", label: "All" },
+    { id: "negative", label: "Negative" },
+    { id: "neutral", label: "Neutral" },
+    { id: "positive", label: "Positive" },
+  ] as const;
+  const filtered = posts.filter((post: any) => {
+    const matchesQuery = query ? [post.title, post.snippet, post.subreddit].join(" ").toLowerCase().includes(query.toLowerCase()) : true;
+    const sentiment = String(post.sentiment || "neutral").toLowerCase();
+    const matchesSentiment = sentimentFilter === "all" || sentiment === sentimentFilter;
+    return matchesQuery && matchesSentiment;
   });
+  const sentimentTotal = (stats.positiveCount || 0) + (stats.negativeCount || 0) + (stats.neutralCount || 0);
+  const negRate = sentimentTotal ? Math.round(((stats.negativeCount || 0) / sentimentTotal) * 100) : 0;
 
   return (
-    <motion.div className="max-w-6xl mx-auto px-4 py-6 space-y-6" variants={stagger} initial="hidden" animate="show">
-      <motion.div variants={fadeUp}>
-        <div className="flex items-center gap-3">
-          <MessageCircle className="w-5 h-5" style={{ color: ORANGE }} />
-          <h1 className="text-2xl font-bold tracking-tight">Reddit Intelligence</h1>
+    <motion.div className="mx-auto max-w-6xl space-y-6 px-4 py-6" variants={stagger as any} initial="hidden" animate="show">
+      <motion.div variants={fadeUp as any}>
+        <div className="flex items-center gap-3"><MessageCircle className="h-5 w-5" style={{ color: ORANGE }} /><h1 className="text-2xl font-bold tracking-tight">PW Reddit Intelligence</h1></div>
+        <p className="mt-0.5 text-sm text-muted-foreground">Physics Wallah conversations from Reddit.</p>
+      </motion.div>
+
+      <motion.section variants={fadeUp as any} className="rounded-2xl border border-orange-200 bg-card p-5 dark:border-orange-800/40">
+        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: ORANGE }}>Current Narrative</p>
+        <h2 className="mt-2 text-xl font-bold">Reddit is the trust-and-comparison room.</h2>
+        <p className="mt-2 max-w-4xl text-sm leading-relaxed text-muted-foreground">
+          Students use Reddit to ask whether PW, Arjuna, Lakshya, Yakeen, Prayas, and Vidyapeeth are still worth trusting, compare them with Allen/Unacademy, and narrate support or academic frustration in detail.
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
+          <div className="rounded-xl border border-border p-3"><p className="text-2xl font-bold">{formatNumber(stats.totalMentions || 0)}</p><p className="text-[10px] text-muted-foreground">posts shown</p></div>
+          <div className="rounded-xl border border-border p-3"><p className="text-2xl font-bold">{formatNumber(data?.totalComments || 0)}</p><p className="text-[10px] text-muted-foreground">comments</p></div>
+          <div className="rounded-xl border border-red-200 p-3"><p className="text-2xl font-bold text-red-600">{negRate}%</p><p className="text-[10px] text-muted-foreground">negative classified</p></div>
+          <div className="rounded-xl border border-border p-3"><p className="text-sm font-bold">{stats.topSubreddit || "—"}</p><p className="text-[10px] text-muted-foreground">main community</p></div>
+          <div className="rounded-xl border border-border p-3"><p className="text-2xl font-bold">{subreddits.length}</p><p className="text-[10px] text-muted-foreground">subreddits</p></div>
         </div>
-        <p className="text-sm text-muted-foreground mt-0.5">What the anonymous internet really thinks about PW</p>
-      </motion.div>
+      </motion.section>
 
-      <motion.div variants={fadeUp}>
-        <MetricRow>
-          <MetricCard label="Posts" value={stats.totalMentions || 0} color={ORANGE} />
-          <MetricCard label="Comments" value={totalComments} />
-          <MetricCard label="Analyzed" value={embTotal} sparkline={[30, 45, 38, 52, 48, 55, embTotal > 0 ? 60 : 0]} />
-          <MetricCard label="Positive" value={posCount} color="#639922" trend={posCount > negCount ? 8 : -5} />
-          <MetricCard label="Negative" value={negCount} color="#E24B4A" trend={negCount > posCount ? 12 : -3} />
-          <motion.div whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }} transition={{ duration: 0.2 }}
-            className="rounded-xl border border-border bg-card p-3 cursor-default">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Top Sub</p>
-            <p className="text-sm font-bold mt-0.5">{stats.topSubreddit || "—"}</p>
-          </motion.div>
-        </MetricRow>
-      </motion.div>
+      {isLive && data?.rag?.enabled ? <motion.div variants={fadeUp as any}><RAGInsight title="Reddit Narrative Brief" analysis={data.rag.analysis} confidence={data.rag.confidence} mentionsUsed={data.rag.mentionsUsed} avgSimilarity={data.rag.avgSimilarity} sentimentBreakdown={data.rag.sentimentBreakdown} /></motion.div> : null}
 
-      {isLive && live?.rag?.enabled && (
-        <motion.div variants={fadeUp}>
-          <RAGInsight title="Reddit Analysis" analysis={live.rag.analysis} confidence={live.rag.confidence} mentionsUsed={live.rag.mentionsUsed} avgSimilarity={live.rag.avgSimilarity} sentimentBreakdown={live.rag.sentimentBreakdown} />
-        </motion.div>
-      )}
-
-      {isLive && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {donutData.length > 0 && (
-            <AnimatedChart delay={0} className="rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Sentiment Distribution</h3>
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width={160} height={160}>
-                  <PieChart><Pie data={donutData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" animationDuration={1500} animationBegin={0}>
-                    {donutData.map((d, i) => <Cell key={i} fill={d.color} strokeWidth={0} />)}
-                  </Pie></PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-2 text-sm">
-                  {donutData.map(d => (
-                    <div key={d.name} className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="text-muted-foreground">{d.name}</span>
-                      <span className="font-semibold ml-auto">{d.value}</span>
-                    </div>
-                  ))}
+      <motion.section variants={fadeUp as any} className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card p-5 lg:col-span-2">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div><p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Evidence Feed</p><h2 className="mt-1 text-lg font-bold">PW-specific Reddit discussions</h2></div>
+            <div className="flex flex-col gap-2 sm:items-end">
+              <label className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs"><Search className="h-3.5 w-3.5 text-muted-foreground" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search Reddit..." className="w-40 bg-transparent outline-none" /></label>
+              <div className="flex rounded-lg border border-border bg-muted/40 p-1">
+                {sentimentOptions.map((option) => (
+                  <button key={option.id} type="button" onClick={() => setSentimentFilter(option.id)} className={cn("rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors", sentimentFilter === option.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {filtered.map((post: any, index: number) => (
+              <div key={index} className="rounded-xl border border-border p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex shrink-0 flex-col items-center pt-1"><ArrowUp className="h-3.5 w-3.5 text-muted-foreground" /><span className="text-sm font-bold" style={{ color: ORANGE }}>{post.upvotes}</span></div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap gap-2"><span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}>r/{post.subreddit}</span><span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", post.sentiment === "negative" ? "bg-red-100 text-red-600" : post.sentiment === "positive" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700")}>{post.sentiment}</span></div>
+                    <p className="text-sm font-bold">{post.title}</p>
+                    {post.snippet ? <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{post.snippet}</p> : null}
+                    <div className="mt-2 flex items-center gap-3 text-[10px] text-muted-foreground"><span>{post.comments} comments</span>{post.createdAt ? <span>{new Date(post.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" })}</span> : null}{post.url ? <a href={post.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5 text-purple hover:underline">Open Reddit <ExternalLink className="h-3 w-3" /></a> : null}</div>
+                  </div>
                 </div>
               </div>
-            </AnimatedChart>
-          )}
-          {subChartData.length > 0 && (
-            <AnimatedChart delay={0.2} className="rounded-2xl border border-border bg-card p-5">
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">Subreddit Activity</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={subChartData} layout="vertical" margin={{ left: 80 }}>
-                  <XAxis type="number" tick={{ fontSize: 10 }} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={75} />
-                  <Tooltip />
-                  <Bar dataKey="posts" radius={[0, 4, 4, 0]} barSize={14} animationDuration={1500}>
-                    {subChartData.map((_: any, i: number) => <Cell key={i} fill={i === 0 ? ORANGE : i < 3 ? "#D85A30" : "#9CA3AF"} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </AnimatedChart>
-          )}
-        </div>
-      )}
-
-      <motion.div variants={fadeUp}>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold">Posts ({filteredPosts.length})</h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input type="text" placeholder="Search posts..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                className="text-xs pl-7 pr-3 py-1.5 rounded-lg border border-border bg-card focus:outline-none focus:ring-1 focus:ring-purple-500 w-44" />
-            </div>
-            <select value={postFilter} onChange={(e) => setPostFilter(e.target.value)}
-              className="text-xs px-2.5 py-1.5 rounded-lg border border-border bg-card focus:outline-none cursor-pointer">
-              <option value="all">All Subreddits</option>
-              {subreddits.map((s: any) => <option key={s.name} value={s.name}>r/{s.name} ({s.count})</option>)}
-            </select>
+            ))}
+            {!filtered.length ? <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No Reddit discussions match this filter.</div> : null}
           </div>
         </div>
-        <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-          {filteredPosts.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">No posts match your filters</p>}
-          {filteredPosts.map((post: any, i: number) => (
-            <motion.div key={i} whileHover={{ y: -1, boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }} transition={{ duration: 0.15 }}
-              className="rounded-xl border border-border bg-card p-3.5 cursor-pointer">
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center shrink-0 pt-0.5">
-                  <ArrowUp className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-sm font-bold" style={{ color: ORANGE }}>{post.upvotes}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ backgroundColor: `${ORANGE}15`, color: ORANGE }}>r/{post.subreddit}</span>
-                    <span className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded", post.sentiment === "negative" ? "bg-red-100 text-red-600" : post.sentiment === "positive" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500")}>{post.sentiment}</span>
-                  </div>
-                  <p className="text-sm font-medium line-clamp-1">{post.title}</p>
-                  {post.snippet && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{post.snippet}</p>}
-                  <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
-                    <span>{post.comments} comments</span>
-                    {post.url && <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline flex items-center gap-0.5 cursor-pointer">Open <ExternalLink className="w-2.5 h-2.5" /></a>}
-                  </div>
-                </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Communities</p>
+          <h2 className="mt-1 text-lg font-bold">Where the narrative lives</h2>
+          <div className="mt-4 space-y-3">
+            {subreddits.slice(0, 8).map((sub: any) => (
+              <div key={sub.name}>
+                <div className="mb-1 flex justify-between text-xs"><span className="font-semibold">r/{sub.name}</span><span className="text-muted-foreground">{sub.count}</span></div>
+                <div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full" style={{ width: `${Math.min(100, sub.count)}%`, backgroundColor: ORANGE }} /></div>
               </div>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
-      </motion.div>
+      </motion.section>
 
-      <motion.div variants={fadeUp}><IndiaMapComponent /></motion.div>
-
+      <motion.div variants={fadeUp as any}><IndiaMapComponent /></motion.div>
     </motion.div>
   );
 }
-

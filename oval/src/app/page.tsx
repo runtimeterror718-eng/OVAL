@@ -1,5 +1,5 @@
-import HeroLanding from "@/components/ui/hero-landing";
+import { redirect } from "next/navigation";
 
 export default function LandingPage() {
-  return <HeroLanding />;
+  redirect("/command-center");
 }

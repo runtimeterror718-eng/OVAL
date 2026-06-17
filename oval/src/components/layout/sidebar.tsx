@@ -4,36 +4,57 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Home,
-  Eye,
   MessageCircle,
   Camera,
   Search,
   Trophy,
-  Flame,
-  Shield,
   ClipboardCheck,
   Sun,
   Moon,
   ChevronDown,
+  ChevronRight,
   Play,
   Send,
   Users,
-  Network,
+  Smartphone,
+  LifeBuoy,
+  Siren,
+  Compass,
+  Bot,
+  FileText,
+  Settings,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/providers/theme-provider";
 
 const navItems = [
   { label: "Command Center", href: "/command-center", icon: Home },
+  { label: "Incidents", href: "/incidents", icon: Siren },
+  { label: "Explore", href: "/fire-tracker", icon: Compass },
   { label: "Reddit Intel", href: "/reddit", icon: MessageCircle },
   { label: "Instagram Intel", href: "/instagram", icon: Camera },
-  { label: "YouTube Intel", href: "/youtube", icon: Play },
+  {
+    label: "YouTube Intel",
+    href: "/youtube/not-owned",
+    icon: Play,
+    children: [
+      { label: "Owned", href: "/youtube/owned" },
+      { label: "Not Owned", href: "/youtube/not-owned" },
+    ],
+  },
   { label: "Telegram Intel", href: "/telegram", icon: Send },
   { label: "Google Intel", href: "/google", icon: Search },
-  { label: "Neural Map", href: "/neural-map", icon: Network },
+  { label: "LinkedIn Intel", href: "/linkedin", icon: BriefcaseBusiness },
+  { label: "Play Store Intel", href: "/playstore", icon: Smartphone },
+  { label: "Freshdesk Intel", href: "/freshdesk", icon: LifeBuoy },
+  // Neural Map hidden from nav (route/code preserved at /neural-map)
   { label: "Creators", href: "/creators", icon: Users },
   { label: "Competitors", href: "/competitors", icon: Trophy },
   { label: "Action Items", href: "/actionables", icon: ClipboardCheck },
+  { label: "AI Copilot", href: "/war-room", icon: Bot },
+  { label: "Reports", href: "/mirror", icon: FileText },
+  { label: "Admin", href: "/actionables", icon: Settings },
 ];
 
 function RadarIcon({ className }: { className?: string }) {
@@ -69,6 +90,7 @@ export function Sidebar() {
             OVAL
           </span>
         </div>
+        <p className="mt-1 text-[10px] font-medium text-muted-foreground">Student Voice & Reputation Intelligence</p>
       </div>
 
       {/* Brand Selector */}
@@ -83,26 +105,46 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav aria-label="Main navigation" className="flex-1 px-3 space-y-1 overflow-y-auto">
+      <nav aria-label="Main navigation" className="flex-1 px-3 space-y-1 overflow-y-auto overflow-x-visible">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
             (item.href !== "/" && pathname.startsWith(item.href));
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer",
-                isActive
-                  ? "bg-purple/10 text-purple border-l-2 border-purple"
-                  : "text-[var(--muted-foreground)] hover:text-foreground hover:bg-[var(--muted)]"
-              )}
-            >
-              <item.icon className="h-4 w-4 shrink-0" />
-              <span>{item.label}</span>
-            </Link>
+            <div key={`${item.label}-${item.href}`} className="group relative">
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer",
+                  isActive
+                    ? "bg-purple/10 text-purple border-l-2 border-purple"
+                    : "text-[var(--muted-foreground)] hover:text-foreground hover:bg-[var(--muted)]"
+                )}
+              >
+                <item.icon className="h-4 w-4 shrink-0" />
+                <span>{item.label}</span>
+                {item.children ? <ChevronRight className="ml-auto h-3.5 w-3.5" /> : null}
+              </Link>
+              {item.children ? (
+                <div className="invisible fixed left-[212px] z-[999] ml-2 min-w-36 rounded-xl border border-border bg-card p-1 opacity-0 shadow-2xl transition-all group-hover:visible group-hover:opacity-100" style={{ top: "272px" }}>
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={cn(
+                        "block rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                        pathname === child.href
+                          ? "bg-purple/10 text-purple"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      )}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           );
         })}
       </nav>

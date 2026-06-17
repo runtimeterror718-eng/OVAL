@@ -159,15 +159,43 @@ export default function CompetitorsPage() {
         <motion.div variants={fadeUp}>
           <h3 className="text-sm font-bold mb-3">Negative Content Requiring Attention ({negAmps.length})</h3>
           <div className="space-y-2 max-h-[400px] overflow-y-auto">
-            {negAmps.slice(0, 15).map((amp: any, i: number) => (
-              <div key={i} className="rounded-xl border border-border bg-card p-3 border-l-4 border-l-red-400">
-                <p className="text-sm text-foreground/80 italic line-clamp-2">&ldquo;{(amp.text || amp.quote || "").slice(0, 200)}&rdquo;</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">{amp.platform}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-600">{amp.sentiment || amp.keyword}</span>
+            {negAmps.slice(0, 15).map((amp: any, i: number) => {
+              const text = (amp.text || amp.quote || "").slice(0, 200);
+              const url = amp.source_url || amp.url || "";
+              const hasUrl = url && url !== "#" && url.startsWith("http");
+              const cardInner = (
+                <>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm text-foreground/80 italic line-clamp-2 flex-1">&ldquo;{text}&rdquo;</p>
+                    {hasUrl && (
+                      <ExternalLink className="w-3.5 h-3.5 text-red-400 group-hover:text-red-600 shrink-0 mt-0.5" />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted">{amp.platform}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-600">{amp.sentiment || amp.keyword}</span>
+                    {hasUrl && (
+                      <span className="text-[10px] text-muted-foreground/70 ml-auto">View source &rarr;</span>
+                    )}
+                  </div>
+                </>
+              );
+              return hasUrl ? (
+                <a
+                  key={i}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block rounded-xl border border-border bg-card p-3 border-l-4 border-l-red-400 hover:bg-card/80 hover:border-l-red-600 transition-colors"
+                >
+                  {cardInner}
+                </a>
+              ) : (
+                <div key={i} className="rounded-xl border border-border bg-card p-3 border-l-4 border-l-red-400">
+                  {cardInner}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </motion.div>
       )}

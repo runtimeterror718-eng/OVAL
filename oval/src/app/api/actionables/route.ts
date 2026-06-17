@@ -4,6 +4,7 @@ import {
   getBrandId, embedText, embedBatch, searchNegativeMentions,
   searchClusters, rerankMentions, generateWithContext,
   formatMentionContext, formatClusterContext, isRAGEnabled,
+  getSupabase,
   type MentionResult, type ClusterResult,
 } from "@/lib/rag";
 

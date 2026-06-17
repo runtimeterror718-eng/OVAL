@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   darkMode: "class",
@@ -16,12 +17,14 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        purple: "#534AB7",
-        teal: "#1D9E75",
+        // Brand colors as DEFAULT, spreading the built-in scales so
+        // utilities like fill-amber-400 / text-purple-600 keep working
+        purple: { ...colors.purple, DEFAULT: "#534AB7" },
+        teal: { ...colors.teal, DEFAULT: "#1D9E75" },
         coral: "#D85A30",
-        pink: "#D4537E",
+        pink: { ...colors.pink, DEFAULT: "#D4537E" },
         brandblue: "#378ADD",
-        amber: "#BA7517",
+        amber: { ...colors.amber, DEFAULT: "#BA7517" },
         danger: "#E24B4A",
         healthy: "#639922",
         // Tremor color system

@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Eye, MessageCircle, Camera, Shield, Play, Send } from "lucide-react";
+import { Home, MessageCircle, Camera, Siren, Smartphone, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const mobileNavItems = [
   { label: "Home", href: "/", icon: Home },
-  { label: "Mirror", href: "/mirror", icon: Eye },
+  { label: "Incidents", href: "/incidents", icon: Siren },
   { label: "Reddit", href: "/reddit", icon: MessageCircle },
   { label: "Instagram", href: "/instagram", icon: Camera },
-  { label: "YouTube", href: "/youtube", icon: Play },
-  { label: "Telegram", href: "/telegram", icon: Send },
+  { label: "Play Store", href: "/playstore", icon: Smartphone },
+  { label: "Freshdesk", href: "/freshdesk", icon: LifeBuoy },
 ];
 
 export function MobileNav() {
