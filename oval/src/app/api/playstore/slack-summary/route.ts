@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { promises as fs } from "fs";
+import path from "path";
+import crypto from "crypto";
 import { buildPlaystoreSlackMessage } from "@/lib/playstore-slack";
 
 export const dynamic = "force-dynamic";
+const DEDUPE_PATH = path.join(process.cwd(), "src", "data", "playstore-slack-state.json");
+let deliveryLock: Promise<any> | null = null;
 
 function isAuthorized(request: Request) {
   const expected = process.env.PLAYSTORE_SLACK_TRIGGER_TOKEN;
@@ -52,6 +57,27 @@ async function resolveSlackChannels(token: string) {
   return uniqueChannels;
 }
 
+async function readDedupeState() {
+  try {
+    const raw = await fs.readFile(DEDUPE_PATH, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+async function writeDedupeState(state: any) {
+  await fs.writeFile(DEDUPE_PATH, JSON.stringify(state, null, 2));
+}
+
+function messageFingerprint(message: ReturnType<typeof buildPlaystoreSlackMessage>) {
+  const body = JSON.stringify({
+    text: message.text,
+    blocks: message.blocks,
+  });
+  return crypto.createHash("sha256").update(body).digest("hex");
+}
+
 export async function POST(request: Request) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -84,41 +110,72 @@ export async function POST(request: Request) {
 
   const playstorePayload = await playstoreResponse.json();
   const message = buildPlaystoreSlackMessage(playstorePayload);
+  const fingerprint = messageFingerprint(message);
+  if (deliveryLock) {
+    const result = await deliveryLock;
+    return NextResponse.json(result);
+  }
 
-  const deliveries = [];
-  for (const channel of channels) {
-    const slackResponse = await fetch("https://slack.com/api/chat.postMessage", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      body: JSON.stringify({
-        channel,
-        text: message.text,
-        blocks: message.blocks,
-        unfurl_links: false,
-        unfurl_media: false,
-      }),
-    });
+  deliveryLock = (async () => {
+    const existingState = await readDedupeState();
+    if (existingState?.fingerprint === fingerprint) {
+      return {
+        success: true,
+        skipped: true,
+        reason: "No material Play Store briefing change",
+        deliveries: existingState.deliveries || [],
+        summary: message.meta,
+      };
+    }
 
-    const slackPayload = await slackResponse.json();
-    if (!slackResponse.ok || !slackPayload?.ok) {
-      return NextResponse.json(
-        {
+    const deliveries = [];
+    for (const channel of channels) {
+      const slackResponse = await fetch("https://slack.com/api/chat.postMessage", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify({
+          channel,
+          text: message.text,
+          blocks: message.blocks,
+          unfurl_links: false,
+          unfurl_media: false,
+        }),
+      });
+
+      const slackPayload = await slackResponse.json();
+      if (!slackResponse.ok || !slackPayload?.ok) {
+        throw {
           error: "Slack post failed",
           slackError: slackPayload?.error || slackResponse.statusText,
           failedChannel: channel,
-        },
-        { status: 502 }
-      );
+        };
+      }
+      deliveries.push({ channel, ts: slackPayload.ts });
     }
-    deliveries.push({ channel, ts: slackPayload.ts });
-  }
 
-  return NextResponse.json({
-    success: true,
-    deliveries,
-    summary: message.meta,
-  });
+    await writeDedupeState({
+      fingerprint,
+      deliveries,
+      summary: message.meta,
+      updatedAt: new Date().toISOString(),
+    });
+
+    return {
+      success: true,
+      deliveries,
+      summary: message.meta,
+    };
+  })();
+
+  try {
+    const result = await deliveryLock;
+    return NextResponse.json(result);
+  } catch (error: any) {
+    return NextResponse.json(error, { status: 502 });
+  } finally {
+    deliveryLock = null;
+  }
 }
