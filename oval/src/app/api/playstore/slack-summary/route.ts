@@ -10,9 +10,23 @@ function isAuthorized(request: Request) {
   return auth === `Bearer ${expected}`;
 }
 
-async function resolveSlackChannel(token: string) {
-  const userId = process.env.PLAYSTORE_SLACK_USER_ID;
-  if (userId) {
+function configuredSlackTargets() {
+  const userIds = (process.env.PLAYSTORE_SLACK_USER_IDS || process.env.PLAYSTORE_SLACK_USER_ID || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const channelIds = (process.env.PLAYSTORE_SLACK_CHANNEL_IDS || process.env.PLAYSTORE_SLACK_CHANNEL_ID || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  return { userIds, channelIds };
+}
+
+async function resolveSlackChannels(token: string) {
+  const { userIds, channelIds } = configuredSlackTargets();
+  const channels: string[] = [];
+
+  for (const userId of userIds) {
     const response = await fetch("https://slack.com/api/conversations.open", {
       method: "POST",
       headers: {
@@ -25,14 +39,17 @@ async function resolveSlackChannel(token: string) {
     if (!response.ok || !payload?.ok || !payload?.channel?.id) {
       throw new Error(payload?.error || "conversations.open failed");
     }
-    return payload.channel.id as string;
+    channels.push(payload.channel.id as string);
   }
 
-  const channelId = process.env.PLAYSTORE_SLACK_CHANNEL_ID;
-  if (!channelId) {
+  if (!userIds.length) {
+    channels.push(...channelIds);
+  }
+  const uniqueChannels = Array.from(new Set(channels));
+  if (!uniqueChannels.length) {
     throw new Error("Missing Slack target");
   }
-  return channelId;
+  return uniqueChannels;
 }
 
 export async function POST(request: Request) {
@@ -41,13 +58,14 @@ export async function POST(request: Request) {
   }
 
   const token = process.env.SLACK_BOT_TOKEN;
-  if (!token || (!process.env.PLAYSTORE_SLACK_CHANNEL_ID && !process.env.PLAYSTORE_SLACK_USER_ID)) {
+  const { userIds, channelIds } = configuredSlackTargets();
+  if (!token || (!userIds.length && !channelIds.length)) {
     return NextResponse.json({ error: "Missing Slack configuration" }, { status: 500 });
   }
 
-  let channel: string;
+  let channels: string[];
   try {
-    channel = await resolveSlackChannel(token);
+    channels = await resolveSlackChannels(token);
   } catch (error) {
     return NextResponse.json(
       {
@@ -67,36 +85,40 @@ export async function POST(request: Request) {
   const playstorePayload = await playstoreResponse.json();
   const message = buildPlaystoreSlackMessage(playstorePayload);
 
-  const slackResponse = await fetch("https://slack.com/api/chat.postMessage", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json; charset=utf-8",
-    },
-    body: JSON.stringify({
-      channel,
-      text: message.text,
-      blocks: message.blocks,
-      unfurl_links: false,
-      unfurl_media: false,
-    }),
-  });
-
-  const slackPayload = await slackResponse.json();
-  if (!slackResponse.ok || !slackPayload?.ok) {
-    return NextResponse.json(
-      {
-        error: "Slack post failed",
-        slackError: slackPayload?.error || slackResponse.statusText,
+  const deliveries = [];
+  for (const channel of channels) {
+    const slackResponse = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json; charset=utf-8",
       },
-      { status: 502 }
-    );
+      body: JSON.stringify({
+        channel,
+        text: message.text,
+        blocks: message.blocks,
+        unfurl_links: false,
+        unfurl_media: false,
+      }),
+    });
+
+    const slackPayload = await slackResponse.json();
+    if (!slackResponse.ok || !slackPayload?.ok) {
+      return NextResponse.json(
+        {
+          error: "Slack post failed",
+          slackError: slackPayload?.error || slackResponse.statusText,
+          failedChannel: channel,
+        },
+        { status: 502 }
+      );
+    }
+    deliveries.push({ channel, ts: slackPayload.ts });
   }
 
   return NextResponse.json({
     success: true,
-    channel,
-    ts: slackPayload.ts,
+    deliveries,
     summary: message.meta,
   });
 }
