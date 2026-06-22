@@ -1,91 +1,125 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { promisify } from "util";
-import { execFile } from "child_process";
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import insights from "@/data/playstore-insights.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 
 export const dynamic = "force-dynamic";
 
-const execFileAsync = promisify(execFile);
-const HOURLY_REFRESH_MS = 60 * 60 * 1000;
-let liveRefreshPromise: Promise<void> | null = null;
+const PLAYSTORE_REVIEW_TABLES = (process.env.PLAYSTORE_REVIEWS_TABLE || "playstore_reviews")
+  .split(",")
+  .map((table) => table.trim())
+  .filter(Boolean);
+const SUPABASE_PAGE_SIZE = 1000;
 
-async function readJsonFile(relativePath: string): Promise<any | null> {
-  try {
-    const raw = await fs.readFile(path.join(process.cwd(), "src", "data", relativePath), "utf-8");
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
 }
 
-function isStale(pulledAt?: string | null) {
-  if (!pulledAt) return true;
-  const lastPulled = new Date(pulledAt);
-  if (Number.isNaN(lastPulled.getTime())) return true;
-  return Date.now() - lastPulled.getTime() >= HOURLY_REFRESH_MS;
+function boolValue(value: unknown) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return ["true", "yes", "1"].includes(value.toLowerCase());
+  return Boolean(value);
 }
 
-async function refreshLiveReviewsIfNeeded() {
-  const store = await readJsonFile("playstore-live-reviews.json");
-  if (!isStale(store?.lastPulledAt)) return;
-  if (liveRefreshPromise) {
-    await liveRefreshPromise;
-    return;
+function firstValue(row: Record<string, any>, keys: string[]) {
+  for (const key of keys) {
+    if (row[key] !== undefined && row[key] !== null && row[key] !== "") return row[key];
+  }
+  return null;
+}
+
+function normalizeLiveReview(row: Record<string, any>, source: string) {
+  const postedAt = firstValue(row, ["posted_at", "published_at", "created_at", "date", "review_date", "updated_at"]);
+  const text = firstValue(row, ["text", "review_text", "content", "body", "comment"]);
+  if (!text) return null;
+  return {
+    reviewId: firstValue(row, ["review_id", "reviewId", "id"]),
+    author: firstValue(row, ["author", "author_name", "user_name", "reviewer_name"]),
+    rating: Number(firstValue(row, ["rating", "score", "stars"]) || 0) || null,
+    text: String(text),
+    version: firstValue(row, ["version", "app_version", "review_app_version", "appVersionName"]),
+    date: postedAt ? String(postedAt).slice(0, 10) : null,
+    postedAt,
+    replied: boolValue(firstValue(row, ["replied", "has_reply", "developer_replied", "replyText", "reply_text"])),
+    replyText: firstValue(row, ["replyText", "reply_text", "developer_reply"]),
+    language: firstValue(row, ["language", "reviewer_language", "lang"]),
+    device: firstValue(row, ["device", "device_name", "device_model"]),
+    thumbsUpCount: Number(firstValue(row, ["thumbsUpCount", "thumbs_up_count", "likes"]) || 0) || 0,
+    source,
+  };
+}
+
+async function readSupabaseLiveReviews() {
+  const supabase = getSupabaseClient();
+  if (!supabase) {
+    return {
+      liveReviews: [],
+      livePulledAt: null,
+      liveSource: "supabase:not-configured",
+    };
   }
 
-  const repoRoot = path.resolve(process.cwd(), "..");
-  const scriptPath = path.join(repoRoot, "scripts", "pull_playstore_reviews.py");
-  const keyPath = path.join(repoRoot, "secrets", "playstore-service-account.json");
-
-  try {
-    await fs.access(scriptPath);
-    await fs.access(keyPath);
-  } catch {
-    return;
-  }
-
-  liveRefreshPromise = (async () => {
-    try {
-      await execFileAsync("python3", [scriptPath], {
-        cwd: repoRoot,
-        timeout: 120000,
-      });
-    } catch {
-      // keep serving the last successful snapshot if refresh fails
-    } finally {
-      liveRefreshPromise = null;
+  for (const table of PLAYSTORE_REVIEW_TABLES) {
+    const rows: any[] = [];
+    for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
+      const to = from + SUPABASE_PAGE_SIZE - 1;
+      const { data, error } = await supabase
+        .from(table)
+        .select("review_id,author,rating,review_text,language,device,android_os_version,app_version,thumbs_up_count,posted_at,replied,reply_text,reply_posted_at,source")
+        .order("posted_at", { ascending: false })
+        .range(from, to);
+      if (error) {
+        rows.length = 0;
+        break;
+      }
+      rows.push(...(data || []));
+      if (!data || data.length < SUPABASE_PAGE_SIZE) break;
     }
-  })();
 
-  await liveRefreshPromise;
+    const liveReviews = rows
+      .map((row: any) => ({
+        reviewId: row.review_id,
+        author: row.author,
+        rating: row.rating,
+        text: row.review_text,
+        version: row.app_version,
+        date: row.posted_at ? String(row.posted_at).slice(0, 10) : null,
+        postedAt: row.posted_at,
+        replied: row.replied,
+        replyText: row.reply_text,
+        language: row.language,
+        device: row.device,
+        thumbsUpCount: row.thumbs_up_count || 0,
+        source: row.source || `supabase:${table}`,
+      }))
+      .filter((review: any) => review.text);
+
+    return {
+      liveReviews,
+      livePulledAt: liveReviews[0]?.postedAt || null,
+      liveSource: `supabase:${table}`,
+    };
+  }
+
+  return {
+    liveReviews: [],
+    livePulledAt: null,
+    liveSource: "supabase:table-unavailable",
+  };
 }
 
 export async function GET() {
-  await refreshLiveReviewsIfNeeded();
   const primary = (insights as any).apps?.[(insights as any).primaryPackage] || {};
-  const liveStore = await readJsonFile("playstore-live-reviews.json");
-  const pullLog = (await readJsonFile("playstore-pull-log.json")) || [];
-  const liveReviews = Object.values(liveStore?.reviews || {})
-    .map((review: any) => ({
-      reviewId: review.reviewId,
-      author: review.author,
-      rating: review.rating,
-      text: review.text,
-      version: review.version,
-      date: review.date ? String(review.date).slice(0, 10) : null,
-      postedAt: review.date,
-      replied: review.replied,
-      replyText: review.replyText,
-      language: review.language,
-      device: review.device,
-      thumbsUpCount: review.thumbsUpCount,
-      source: "live-api",
-    }))
-    .filter((review: any) => review.text)
-    .sort((a: any, b: any) => String(b.postedAt || "").localeCompare(String(a.postedAt || "")));
+  const livePayload = await readSupabaseLiveReviews();
+  const liveReviews = livePayload.liveReviews;
   const latestLiveDate = liveReviews[0]?.date || null;
   const baseRange = (insights as any).dateRange || {};
   const effectiveTo = latestLiveDate && latestLiveDate > String(baseRange.to || "") ? latestLiveDate : baseRange.to;
@@ -168,8 +202,8 @@ export async function GET() {
     ...insights,
     dateRange: { ...baseRange, to: effectiveTo },
     liveReviews,
-    livePulledAt: liveStore?.lastPulledAt || null,
+    livePulledAt: livePayload.livePulledAt,
+    liveSource: livePayload.liveSource,
     liveRefreshCadenceHours: 1,
-    pullLog,
   });
 }

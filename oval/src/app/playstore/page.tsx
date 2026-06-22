@@ -63,6 +63,28 @@ type LiveIssue = {
   latestDate?: string | null;
 };
 
+function normalizeEvidenceReviews(items: unknown): Review[] {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item): Review | null => {
+      if (typeof item === "string") return { text: item };
+      if (!item || typeof item !== "object") return null;
+      const review = item as Record<string, unknown>;
+      return {
+        rating: typeof review.rating === "number" ? review.rating : review.rating ? Number(review.rating) : null,
+        text: review.text == null ? null : String(review.text),
+        version: review.version == null ? null : String(review.version),
+        date: review.date == null ? null : String(review.date),
+        replied: typeof review.replied === "boolean" ? review.replied : null,
+        theme: review.theme == null ? null : String(review.theme),
+        owner: review.owner == null ? null : String(review.owner),
+        score: typeof review.score === "number" ? review.score : review.score ? Number(review.score) : null,
+        author: review.author == null ? null : String(review.author),
+      };
+    })
+    .filter((review): review is Review => Boolean(review?.text));
+}
+
 function displayDate(date?: string | null) {
   if (!date) return "Unknown";
   const parsed = new Date(date);
@@ -112,17 +134,17 @@ function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { l
 
   const rules = [
     {
-      label: "Admit card / form popup is blocking access",
-      summary: "Students say an admit-card, roll-number, or exam-form popup is blocking the app, forcing the wrong flow, or preventing lectures from opening.",
+      label: "Admit-card banner is blocking lectures",
+      summary: "Students say an admit-card, roll-number, or exam-form banner is forcing the wrong flow, throwing invalid errors, or preventing lectures from opening.",
       pattern: /admit\s*card|roll\s*no|invalid error|banner|popup|pop up|form/i,
     },
     {
-      label: "Students cannot access paid batch content",
+      label: "Paid batch access is failing",
       summary: "Recent low-star reviews say payments succeeded but paid batches, tests, or purchased access did not unlock correctly.",
       pattern: /purchased|purchase|paid|payment|pro batch|regular batch|not get access|did not get access|can't attempt test|test paper|batch access|access to regular batch/i,
     },
     {
-      label: "App performance is slowing study flow",
+      label: "App performance is disrupting study flow",
       summary: "Students report lag, delays, glitches, and app-open failures that are interrupting lectures and navigation.",
       pattern: /lag|delay|glitch|not opening|not open|network issue|slow|30 40 second|backend|not work properly|doesn't work|do not work/i,
     },
@@ -132,7 +154,7 @@ function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { l
       pattern: /refund|support|no response|not responsibl|complaint|books|ticket|resolution/i,
     },
     {
-      label: "Teacher and batch complaints are resurfacing",
+      label: "Teacher and batch complaints are back",
       summary: "Students are flagging schedule changes, faculty dissatisfaction, or batch-experience mismatch in recent reviews.",
       pattern: /teacher|faculty|schedule|3 class per day|class per day|offline class/i,
     },
@@ -394,7 +416,7 @@ function MiniKpi({
 }
 
 function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () => void }) {
-  const reviews = panel.reviews.filter((review) => review.text);
+  const reviews = normalizeEvidenceReviews(panel.reviews);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -461,7 +483,7 @@ function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () =
                   {review.replied ? "Replied" : "No reply"}
                 </span>
               </div>
-              <p className="mt-3 line-clamp-6 text-sm leading-relaxed text-slate-700">&ldquo;{review.text}&rdquo;</p>
+              <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">&ldquo;{review.text}&rdquo;</p>
               <p className="mt-3 text-[11px] text-slate-500">{review.author ? `${review.author} · ` : ""}v{review.version || "Unknown"} · {displayDate(review.date)} {review.owner ? `· ${review.owner}` : ""}</p>
             </article>
           )) : (
@@ -516,23 +538,23 @@ function classifyCommercialRisk(review: Review) {
       keywords: ["mis sell", "missell", "mis-sell", "misleading", "wrong information", "false", "fraud", "scam", "cheat", "cheated"],
     },
     {
-      label: "Batch / Course Issue",
+      label: "Batch & Course",
       owner: "Aditya Kumar",
       keywords: ["batch", "course", "class", "lecture", "teacher", "faculty", "syllabus", "content", "test series"],
     },
     {
-      label: "Payment / Refund",
+      label: "Payments & Refunds",
       owner: "Aayush / Keshav",
       keywords: ["payment", "refund", "deducted", "gateway", "transaction", "money", "paid", "subscription"],
     },
     {
-      label: "App / Playback",
+      label: "App Reliability",
       owner: "Product Reliability",
       keywords: ["video", "playback", "buffer", "crash", "login", "download", "app", "bug", "otp"],
     },
   ];
   return matchers.find((matcher) => matcher.keywords.some((keyword) => text.includes(keyword))) || {
-    label: "General Student Ask",
+    label: "General Support",
     owner: review.owner || "Support Ops",
     keywords: [],
   };
@@ -603,10 +625,10 @@ function newsSummary(item: NewsItem, hasPriorData = false): string {
     return `Students in the ${item.label} feel deprioritized — ${item.count} negative reviews in 14 days.${trend}`;
   }
   const map: Record<string, string> = {
-    "product:payment": `Payment and refund complaints — ${item.count} negative reviews in 14 days.${trend}`,
-    "product:login": `Login and access failures — ${item.count} negative reviews in 14 days.${trend}`,
-    "product:stability": `App crashes, lag and bugs — ${item.count} negative reviews in 14 days.${trend}`,
-    "product:video": `Video and playback problems (quality, downloads, 2x) — ${item.count} negative reviews in 14 days.${trend}`,
+    "product:payment": `Payment and refund complaints are active — ${item.count} negative reviews in 14 days.${trend}`,
+    "product:login": `Login and access failures are repeating — ${item.count} negative reviews in 14 days.${trend}`,
+    "product:stability": `App crashes, lag and bugs are surfacing — ${item.count} negative reviews in 14 days.${trend}`,
+    "product:video": `Video and playback issues are repeating — ${item.count} negative reviews in 14 days.${trend}`,
   };
   return map[item.key] || `${item.label}: ${item.count} negative reviews in 14 days.${trend}`;
 }
@@ -779,16 +801,18 @@ export default function PlayStorePage() {
       (reviewFilter === "negative" && Number(review.rating || 0) <= 2) ||
       (reviewFilter === "positive" && Number(review.rating || 0) >= 4) ||
       (reviewFilter === "unreplied" && review.replied === false) ||
-      (reviewFilter === "commercial" && ["Overselling", "Mis-selling", "Batch / Course Issue", "Payment / Refund"].includes(review.commercialRisk.label));
+      (reviewFilter === "commercial" && ["Overselling", "Mis-selling", "Batch & Course", "Payments & Refunds"].includes(review.commercialRisk.label));
     return matchesWindow && matchesQuery && matchesFilter;
   });
   const negativeWindowReviews = filteredLatestReviews.filter((review) => Number(review.rating || 0) <= 2);
   const negative7dReviews = enrichedLatestReviews.filter((review) => Number(review.rating || 0) <= 2 && isWithinLatest7d(review.date));
   const negativeCommercialReviews = negativeWindowReviews.filter((review) =>
-    ["Overselling", "Mis-selling", "Batch / Course Issue", "Payment / Refund", "App / Playback"].includes(review.commercialRisk.label)
+    ["Overselling", "Mis-selling", "Batch & Course", "Payments & Refunds", "App Reliability"].includes(review.commercialRisk.label)
   );
 
-  const openPanel = (title: string, subtitle: string, reviews: Review[], extras: Pick<EvidencePanel, "insights" | "bullets"> = {}) => setPanel({ title, subtitle, reviews, ...extras });
+  const openPanel = (title: string, subtitle: string, reviews: unknown, extras: Partial<Pick<EvidencePanel, "insights" | "bullets">> = {}) => {
+    setPanel({ title, subtitle, reviews: normalizeEvidenceReviews(reviews), ...extras });
+  };
   const reviewFromPriority = (item: any): Review => ({
     rating: item.rating,
     text: item.text,
@@ -911,12 +935,12 @@ export default function PlayStorePage() {
   }, []).sort((a, b) => b.count - a.count);
   const assignmentQueue = commercialCategories.slice(0, 6).map((category) => {
     const projectMap: Record<string, { project: string; issueType: string; priority: string }> = {
-      "Batch / Course Issue": { project: "ACADEMIC-OPS", issueType: "Batch Ops", priority: "P1" },
-      "Payment / Refund": { project: "PAYMENTS", issueType: "Refund / Payment", priority: "P1" },
-      "App / Playback": { project: "APP-REL", issueType: "Bug", priority: "P1" },
+      "Batch & Course": { project: "ACADEMIC-OPS", issueType: "Batch Ops", priority: "P1" },
+      "Payments & Refunds": { project: "PAYMENTS", issueType: "Refund / Payment", priority: "P1" },
+      "App Reliability": { project: "APP-REL", issueType: "Bug", priority: "P1" },
       "Overselling": { project: "SALES-GOV", issueType: "Compliance Review", priority: "P0" },
       "Mis-selling": { project: "SALES-QA", issueType: "Compliance Review", priority: "P0" },
-      "General Student Ask": { project: "SUPPORT-OPS", issueType: "Support Follow-up", priority: "P2" },
+      "General Support": { project: "SUPPORT-OPS", issueType: "Support Follow-up", priority: "P2" },
     };
     return {
       ...category,
@@ -1089,12 +1113,21 @@ export default function PlayStorePage() {
     return acc;
   }, {});
   const topConcern = Object.entries(concernCounts).sort((a, b) => b[1] - a[1])[0];
+  const topConcernShortLabelMap: Record<string, string> = {
+    "Batch & Course": "Batch issues",
+    "Payments & Refunds": "Refund issues",
+    "App Reliability": "App issues",
+    "Mis-selling": "Mis-selling",
+    "Overselling": "Overselling",
+    "General Support": "Support issues",
+  };
+  const topConcernLabel = topConcern ? (topConcernShortLabelMap[topConcern[0]] || topConcern[0]) : "";
   const heroVerdict = topConcern
-    ? `${topConcern[0]} is the top student concern - ${topConcern[1]} reports in 14 days`
+    ? `${topConcernLabel} lead negative reviews`
     : "No negative written reviews in the last 14 days";
   const heroNarrative = agentRiskLevel === "High"
-    ? `${negative7dReviews.length} negative written reviews landed in the last 7 days${anomalyTopic?.name ? `; "${anomalyTopic.name}" is the loudest issue topic` : ""}. Overall tone is still ${dominantEmotion?.name?.toLowerCase() || "mixed"}.`
-    : `${dominantEmotion?.name || "No emotion"} leads written feedback in ${selectedWindowLabel.toLowerCase()}${anomalyTopic?.name ? `; "${anomalyTopic.name}" is the loudest issue topic` : ""}.`;
+    ? `${topConcern ? `${topConcern[1]} reports were captured in the last 14 days` : `${negative7dReviews.length} negative reviews landed in the last 7 days`}${anomalyTopic?.name ? `, with ${anomalyTopic.name.toLowerCase()} as the loudest theme` : ""}.`
+    : `${dominantEmotion?.name || "Mixed sentiment"} is leading written feedback${anomalyTopic?.name ? `, with ${anomalyTopic.name.toLowerCase()} as the top theme` : ""}.`;
 
   // Executive briefing: auto-composed "what's happening" paragraph, fully data-driven
   const briefTotal = marqueeNegatives.length;
@@ -1106,9 +1139,9 @@ export default function PlayStorePage() {
   const briefTopFaculty = reviewNews.find((item) => item.type === "teacher");
   const briefTopBatches = reviewNews.filter((item) => item.type === "batch").slice(0, 2).map((item) => item.label.replace(" batch", ""));
   const briefNature: Record<string, string> = {
-    "Batch / Course Issue": "These aren't about the app breaking — they're about batch strategy and faculty",
-    "App / Playback": "These are product-reliability issues — video, playback, login and crashes",
-    "Payment / Refund": "These are commercial issues — payments, deductions and refund delays",
+    "Batch & Course": "These are batch experience complaints around classes, faculty, and course setup",
+    "App Reliability": "These are product issues around playback, login, crashes, and app speed",
+    "Payments & Refunds": "These are commercial complaints around payments, deductions, and refund delays",
     "Mis-selling": "These are trust issues — students allege misleading or false claims",
     "Overselling": "These are expectation issues — students cite over-promised ranks or selections",
   };
@@ -1120,23 +1153,27 @@ export default function PlayStorePage() {
   ].filter(Boolean).join(", and ");
   const latestIssueEvidence = latestStudentIssue?.reviews.find((review) => review.text && String(review.text).length <= 140)?.text || latestStudentIssue?.reviews[0]?.text || "";
   const briefingHeadline = latestStudentIssue
-    ? `${latestStudentIssue.label} is the latest student issue`
+    ? latestStudentIssue.label
     : topConcern
       ? `${briefTopLabel} is leading negative review volume`
       : "No active negative student issue in the selected window";
   const briefingSummary = latestStudentIssue
-    ? `${latestStudentIssue.count} low-rating reviews${latestStudentIssue.windowLabel === "today" ? " today" : ` in the ${latestStudentIssue.windowLabel}`} point to this issue.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
+    ? `${latestStudentIssue.count} low-rating reviews landed ${latestStudentIssue.windowLabel === "today" ? "today" : `in the ${latestStudentIssue.windowLabel}`}.${latestStudentIssue.versions.length ? ` Most reports are on v${latestStudentIssue.versions.join(", v")}.` : ""}`
     : topConcern
       ? `${briefTopCount} of ${briefTotal} negative reviews (${briefPct}%) sit in this bucket${briefAccelerating ? `, with ${brief7d} arriving in the last 7 days` : ""}.`
       : "Students are relatively quiet right now.";
   const briefingContext = latestStudentIssue && topConcern
-    ? `Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
+    ? `Most complaints mention banners, admit-card prompts, or roll-number errors appearing before lectures load. Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
     : topConcern
       ? `${briefNatureLine}${briefSpecifics ? `: ${briefSpecifics}` : ""}. Complaints are landing on the current release (${currentVersion.version || "latest"}).`
       : "";
   const briefingQuote = latestStudentIssue && latestIssueEvidence
     ? String(latestIssueEvidence).trim()
     : "";
+  const executiveBrief = [briefingSummary, briefingContext].filter(Boolean).join(" ");
+  const briefingEvidence = latestStudentIssue?.reviews?.length
+    ? latestStudentIssue.reviews
+    : marqueeNegatives.filter((review) => review.commercialRisk.label === briefTopLabel);
 
   const shareSnapshot = async () => {
     try {
@@ -1237,7 +1274,7 @@ export default function PlayStorePage() {
                 {briefingContext ? <p className="text-sm leading-relaxed text-slate-500">{briefingContext}</p> : null}
                 {briefingQuote ? (
                   <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
-                    <span className="font-semibold text-slate-500">Student signal:</span> &nbsp;&ldquo;{briefingQuote}&rdquo;
+                    <span className="font-semibold text-slate-500">Recent signal:</span> &nbsp;&ldquo;{briefingQuote}&rdquo;
                   </div>
                 ) : null}
               </div>
@@ -1248,16 +1285,10 @@ export default function PlayStorePage() {
                 <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">Current release {currentVersion.version || "--"}</span>
                 {latestStudentIssue?.latestDate ? <span className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-black text-amber-700">Latest review {displayDate(latestStudentIssue.latestDate)}</span> : null}
                 {briefTopFaculty ? <span className="rounded-lg bg-violet-50 px-3 py-1.5 text-xs font-black text-violet-700">Faculty: {briefTopFaculty.label}</span> : null}
-                {latestStudentIssue ? (
+                {briefingEvidence.length ? (
                   <button
-                    onClick={() => openPanel(latestStudentIssue.label, executiveBrief, latestStudentIssue.reviews)}
-                    className="ml-auto cursor-pointer rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-xs font-black text-violet-600 transition-colors duration-200 hover:bg-violet-50"
-                  >
-                    Read the evidence <ChevronRight className="inline h-3.5 w-3.5" />
-                  </button>
-                ) : topConcern ? (
-                  <button
-                    onClick={() => openPanel(briefTopLabel, executiveBrief, marqueeNegatives.filter((review) => review.commercialRisk.label === briefTopLabel))}
+                    type="button"
+                    onClick={() => openPanel(latestStudentIssue?.label || briefTopLabel || "Latest issue evidence", executiveBrief, briefingEvidence)}
                     className="ml-auto cursor-pointer rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-xs font-black text-violet-600 transition-colors duration-200 hover:bg-violet-50"
                   >
                     Read the evidence <ChevronRight className="inline h-3.5 w-3.5" />
@@ -1367,8 +1398,8 @@ export default function PlayStorePage() {
                   <span className="flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Breaking
                   </span>
-                  <h2 className="text-lg font-black text-slate-950">Review Newsroom</h2>
-                  <span className="text-xs text-slate-500">Storylines auto-detected from the last 14 days of negative reviews</span>
+                  <h2 className="text-lg font-black text-slate-950">Emerging Storylines</h2>
+                    <span className="text-xs text-slate-500">Detected from the last 14 days of negative reviews</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   {reviewNews.map((item) => {
@@ -1608,11 +1639,11 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
-                <SectionBand index="02" title="Risk Drivers" subtitle="What is generating negative reviews and commercial risk" />
+                <SectionBand index="02" title="Risk Drivers" subtitle="What is driving negative reviews right now" />
 
                 <motion.section variants={fadeUp as any} className="grid grid-cols-1 items-start gap-4 min-[1500px]:grid-cols-2">
                   <Card className="flex flex-col p-4">
-                    <SectionTitle title="Theme Radar" subtitle="Ranked topic clusters, readable by issue volume" />
+                    <SectionTitle title="Theme Radar" subtitle="The biggest complaint clusters in the current window" />
                     <div className="space-y-3">
                       {topTopics.slice(0, 7).map((topic: any, index: number) => {
                         const width = `${Math.max(8, Math.round((Number(topic.mentions || 0) / maxTopicMentions) * 100))}%`;
@@ -1639,7 +1670,7 @@ export default function PlayStorePage() {
                   </Card>
 
                   <Card className="flex min-h-[330px] flex-col p-4">
-                    <SectionTitle title="Anomaly Detector" subtitle="What changed?" />
+                    <SectionTitle title="Spike Detector" subtitle="What changed recently" />
                     <div className="grid gap-3 rounded-xl bg-red-50 p-3">
                       <p className="flex items-center gap-2 text-xs font-black text-red-600"><AlertTriangle className="h-3.5 w-3.5" /> Spike Detected: {anomalyTopic?.name || "Low-rating reviews"}</p>
                       <p className="text-xs leading-relaxed text-slate-700">
@@ -1676,8 +1707,8 @@ export default function PlayStorePage() {
                 <motion.section variants={fadeUp as any}>
                   <Card className="p-4">
                     <SectionTitle
-                      title="Commercial Risk Classification"
-                      subtitle="Negative review evidence only: overselling, mis-selling, course, payment, and tech risk routed from actual review language"
+                      title="Issue Breakdown"
+                      subtitle="Negative review evidence grouped into trust, batch, payment, and product buckets"
                       onAction={() => openPanel("All negative commercial-risk comments", `${negativeCommercialReviews.length} comments in ${selectedWindowLabel}`, negativeCommercialReviews)}
                     />
                     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-3">
@@ -1741,7 +1772,7 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
-                <SectionBand index="03" title="Release Intelligence" subtitle="App versions live in the last month and what each one is generating" />
+                <SectionBand index="03" title="Release Intelligence" subtitle="Which app versions are generating praise or pain" />
 
                 <motion.section variants={fadeUp as any}>
                   <Card className="p-4">
@@ -1799,11 +1830,11 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
-                <SectionBand index="04" title="Ownership & Action" subtitle="Who needs to act, with Jira-ready routing" />
+                <SectionBand index="04" title="Ownership & Action" subtitle="Who needs to act next" />
 
                 <motion.section variants={fadeUp as any}>
                   <Card className="p-4">
-                    <SectionTitle title="PM / Jira Assignment Queue" subtitle="Jira-ready routing from the filtered review evidence. Owner and project are inferred from issue category." />
+                    <SectionTitle title="Action Queue" subtitle="Owner-ready routing from the filtered review evidence" />
                     <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
                       {assignmentQueue.map((item) => (
                         <article key={`${item.label}-${item.project}`} className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -2053,51 +2084,6 @@ export default function PlayStorePage() {
                 </Card>
               </motion.section>
           </div>
-            {(data.pullLog || []).length ? (
-              <motion.section variants={fadeUp as any}>
-                <Card className="p-4">
-                  <SectionTitle
-                    title="Live Sync Log"
-                    subtitle="Every pull from the Google Play Developer API. Run scripts/pull_playstore_reviews.py --loop 300 to keep it rolling."
-                    action={null}
-                  />
-                  <div className="overflow-x-auto rounded-xl border border-slate-100">
-                    <table className="w-full min-w-[680px] text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-500">
-                        <tr>
-                          <th className="px-4 py-3 font-bold">Pulled at</th>
-                          <th className="px-4 py-3 font-bold">Status</th>
-                          <th className="px-4 py-3 font-bold">Fetched</th>
-                          <th className="px-4 py-3 font-bold">New</th>
-                          <th className="px-4 py-3 font-bold">Updated</th>
-                          <th className="px-4 py-3 font-bold">Total stored</th>
-                          <th className="px-4 py-3 font-bold">Message</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(data.pullLog || []).slice(0, 12).map((entry: any) => (
-                          <tr key={entry.pulledAt} className="border-t border-slate-100">
-                            <td className="px-4 py-3 font-bold text-slate-700">
-                              {new Date(entry.pulledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className={cn("rounded-full px-2 py-1 text-[10px] font-black", entry.status === "ok" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700")}>
-                                {entry.status === "ok" ? "Success" : "Failed"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3">{entry.fetched}</td>
-                            <td className={cn("px-4 py-3 font-black", entry.new > 0 ? "text-violet-700" : "text-slate-400")}>{entry.new > 0 ? `+${entry.new}` : entry.new}</td>
-                            <td className="px-4 py-3 text-slate-500">{entry.updated}</td>
-                            <td className="px-4 py-3 font-bold">{formatNumber(entry.totalStored || 0)}</td>
-                            <td className="max-w-[260px] truncate px-4 py-3 text-slate-500">{entry.message || "--"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
-              </motion.section>
-            ) : null}
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-3 text-xs text-slate-500">
               <span>All times in IST</span>
               <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Data through {displayDate(data.dateRange?.to)}</span>
