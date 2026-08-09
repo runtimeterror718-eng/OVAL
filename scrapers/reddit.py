@@ -1,14 +1,15 @@
 """
-Reddit scraper — no-auth JSON API for negative PR detection.
+Reddit scraper — OAuth-first scraper for negative PR detection.
 
 Owner: Team A
 
 Pipeline:
-  1. Search targeted subreddits for PW mentions via Reddit's public JSON API
+  1. Search targeted subreddits for PW mentions via Reddit OAuth when configured
   2. Scrape posts + ALL comments (comments = where real criticism lives)
   3. Store to reddit_posts + reddit_comments + mentions
 
-No API key needed — uses Reddit's public .json endpoints.
+Falls back to Reddit's public JSON endpoints only when OAuth credentials are not
+configured.
 
 Usage:
     python -m scrapers.reddit --brand "PhysicsWallah" --max-posts 50 --max-comments 100
@@ -20,25 +21,32 @@ import asyncio
 import logging
 import time
 import random
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import requests as http_requests
 
-from scrapers.base import BaseScraper
+from scrapers.base import BaseScraper, fetch_with_backoff
 from search.engine import register_searcher
-from search.filters import SearchParams
+from search.filters import SearchParams, in_window, reddit_time_filter
 from storage import queries as db
 
 logger = logging.getLogger(__name__)
 
-HEADERS = {"User-Agent": "brand-monitoring-tool/1.0 (contact: dev@example.com)"}
+# Browser UA — Reddit now 403s the old "bot"-style UA on its public JSON/RSS.
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+    )
+}
 
 # ---------------------------------------------------------------------------
 # Subreddits and queries for PW negative PR
 # ---------------------------------------------------------------------------
 
 PW_SUBREDDITS = [
+    "PhysicsWallah",
     "JEENEETards",
     "IndianAcademia",
     "btechtards",
@@ -52,15 +60,218 @@ PW_SEARCH_QUERIES = [
     "physicswallah",
     "physics wallah",
     "alakh pandey",
+    "pw arjuna",
+    "physics wallah arjuna",
+    "arjuna batch pw",
+    "pw lakshya",
+    "physics wallah lakshya",
+    "lakshya batch pw",
+    "pw yakeen",
+    "pw prayas",
+    "pw vidyapeeth",
     "PW scam OR fraud OR controversy",
     "PW quality OR teachers leaving OR refund",
     "PW layoffs OR data leak OR IPO",
 ]
 
+PW_BRAND_TERMS = [
+    "physicswallah",
+    "physics wallah",
+    "physics-wallah",
+    "alakh pandey",
+    "alakh sir",
+    "pw app",
+    "pw live",
+    "pwonlyias",
+    "pw skills",
+]
+
+PW_COURSE_TERMS = [
+    "arjuna",
+    "lakshya",
+    "yakeen",
+    "prayas",
+    "vidyapeeth",
+    "pathshala",
+    "khazana",
+    "pw infinity",
+]
+
+PW_CONTEXT_TERMS = [
+    "pw",
+    "physics",
+    "wallah",
+    "jee",
+    "neet",
+    "batch",
+    "teacher",
+    "module",
+    "lecture",
+    "dpp",
+    "test series",
+]
+
+
+def is_pw_specific_text(*parts: Any) -> bool:
+    """Return true only for Reddit text that is clearly about Physics Wallah."""
+    text = " ".join(str(part or "") for part in parts).lower()
+    if not text.strip():
+        return False
+    if any(term in text for term in PW_BRAND_TERMS):
+        return True
+    if " pw " in f" {text} ":
+        return True
+    has_course = any(term in text for term in PW_COURSE_TERMS)
+    has_context = any(term in text for term in PW_CONTEXT_TERMS)
+    return has_course and has_context
+
 
 # ---------------------------------------------------------------------------
-# Reddit JSON API helpers (no auth needed)
+# Reddit API helpers
 # ---------------------------------------------------------------------------
+
+def _get_reddit_client():
+    """Return a PRAW client when Reddit OAuth credentials are configured."""
+    try:
+        from config.settings import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT
+
+        if not REDDIT_CLIENT_ID or not REDDIT_CLIENT_SECRET:
+            return None
+
+        import praw
+
+        return praw.Reddit(
+            client_id=REDDIT_CLIENT_ID,
+            client_secret=REDDIT_CLIENT_SECRET,
+            user_agent=REDDIT_USER_AGENT or HEADERS["User-Agent"],
+            check_for_async=False,
+        )
+    except Exception as e:
+        logger.warning("Reddit OAuth client unavailable, falling back to JSON API: %s", e)
+        return None
+
+
+def _praw_submission_to_dict(submission: Any) -> dict[str, Any]:
+    """Convert a PRAW submission to our standard format."""
+    published = datetime.utcfromtimestamp(getattr(submission, "created_utc", 0) or 0)
+    subreddit = str(getattr(submission, "subreddit", "") or "")
+    permalink = getattr(submission, "permalink", "") or ""
+    source_url = getattr(submission, "url", "") or ""
+    if permalink:
+        source_url = f"https://reddit.com{permalink}"
+
+    return {
+        "post_id": getattr(submission, "id", "") or "",
+        "content_text": f"{getattr(submission, 'title', '') or ''}\n{getattr(submission, 'selftext', '') or ''}",
+        "content_type": "text",
+        "author_handle": str(getattr(submission, "author", "") or "[deleted]"),
+        "author_name": str(getattr(submission, "author", "") or "[deleted]"),
+        "engagement_score": getattr(submission, "score", 0) or 0,
+        "likes": getattr(submission, "score", 0) or 0,
+        "shares": 0,
+        "comments_count": getattr(submission, "num_comments", 0) or 0,
+        "source_url": source_url,
+        "published_at": published.isoformat(),
+        "language": "en",
+        "raw_data": {
+            "subreddit": subreddit,
+            "id": getattr(submission, "id", "") or "",
+            "upvote_ratio": getattr(submission, "upvote_ratio", 0) or 0,
+            "permalink": permalink,
+            "is_self": getattr(submission, "is_self", True),
+            "num_awards": getattr(submission, "total_awards_received", 0) or 0,
+            "flair": getattr(submission, "link_flair_text", None),
+        },
+    }
+
+
+def _reddit_oauth_search(
+    reddit: Any,
+    subreddit: str,
+    query: str,
+    sort: str = "relevance",
+    time_filter: str = "year",
+    limit: int = 25,
+) -> list[dict[str, Any]]:
+    """Search Reddit via OAuth/PRAW and normalize submissions."""
+    try:
+        submissions = reddit.subreddit(subreddit).search(
+            query,
+            sort=sort,
+            time_filter=time_filter,
+            limit=limit,
+        )
+        return [_praw_submission_to_dict(s) for s in submissions]
+    except Exception as e:
+        logger.warning("Reddit OAuth search error for r/%s '%s': %s", subreddit, query, e)
+        return []
+
+
+def _reddit_oauth_new_since(
+    reddit: Any,
+    subreddit: str,
+    after_date: datetime,
+    before_date: datetime | None = None,
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
+    """Walk r/subreddit/new newest-first and return the requested date window.
+
+    Reddit's search endpoint only offers coarse time buckets and ranked results.
+    The chronological listing is the most reliable way to backfill a subreddit;
+    Reddit caps listings at roughly 1,000 submissions, so high-volume subreddits
+    can still require an archive provider for a complete 60-day history.
+    """
+    after_utc = after_date.replace(tzinfo=timezone.utc) if after_date.tzinfo is None else after_date.astimezone(timezone.utc)
+    before_utc = None
+    if before_date is not None:
+        before_utc = before_date.replace(tzinfo=timezone.utc) if before_date.tzinfo is None else before_date.astimezone(timezone.utc)
+
+    posts: list[dict[str, Any]] = []
+    try:
+        for submission in reddit.subreddit(subreddit).new(limit=limit):
+            created = datetime.fromtimestamp(
+                getattr(submission, "created_utc", 0) or 0,
+                tz=timezone.utc,
+            )
+            if created < after_utc:
+                break
+            if before_utc is not None and created > before_utc:
+                continue
+            posts.append(_praw_submission_to_dict(submission))
+    except Exception as e:
+        logger.warning("Reddit OAuth /new backfill error for r/%s: %s", subreddit, e)
+    return posts
+
+
+def _reddit_get_comments_oauth(reddit: Any, source_url: str, limit: int = 100) -> list[dict[str, Any]]:
+    """Get comments for a post via OAuth/PRAW."""
+    try:
+        submission = reddit.submission(url=source_url)
+        submission.comment_sort = "top"
+        submission.comments.replace_more(limit=0)
+
+        comments = []
+        for c in submission.comments.list():
+            body = getattr(c, "body", "") or ""
+            if not body or body == "[deleted]":
+                continue
+            created = datetime.utcfromtimestamp(getattr(c, "created_utc", 0) or 0)
+            comments.append({
+                "post_id": getattr(submission, "id", "") or "",
+                "comment_body": body,
+                "comment_author": str(getattr(c, "author", "") or "[deleted]"),
+                "comment_score": getattr(c, "score", 0) or 0,
+                "comment_parent_id": getattr(c, "parent_id", "") or "",
+                "comment_depth": getattr(c, "depth", 0) or 0,
+                "created_at": created.isoformat(),
+            })
+            if len(comments) >= limit:
+                break
+
+        return comments
+    except Exception as e:
+        logger.warning("Reddit OAuth comment scrape error: %s", e)
+        return []
 
 def _reddit_search(
     subreddit: str,
@@ -94,6 +305,89 @@ def _reddit_search(
     except Exception as e:
         logger.warning("Reddit search error for r/%s: %s", subreddit, e)
         return []
+
+
+def _rss_entry_to_dict(entry: Any, subreddit: str = "") -> dict[str, Any]:
+    """Convert a Reddit search.rss entry to our standard normalized format."""
+    import html
+    import re
+    from email.utils import parsedate_to_datetime
+
+    link = entry.get("link", "") or ""
+    # Extract the post id from /comments/<id>/ and the subreddit from /r/<sub>/.
+    m_id = re.search(r"/comments/([a-z0-9]+)/", link)
+    m_sub = re.search(r"/r/([^/]+)/", link)
+    post_id = m_id.group(1) if m_id else (entry.get("id", "") or "").split("/")[-1]
+    sub = subreddit or (m_sub.group(1) if m_sub else "")
+
+    # RSS 'updated' is the reliable timestamp; 'published' can be wrong on search feeds.
+    ts = entry.get("updated") or entry.get("published")
+    published_iso = None
+    if ts:
+        try:
+            published_iso = datetime.fromisoformat(ts.replace("Z", "+00:00")).isoformat()
+        except ValueError:
+            try:
+                published_iso = parsedate_to_datetime(ts).isoformat()
+            except (TypeError, ValueError):
+                published_iso = None
+
+    # The RSS <content> is HTML; strip tags + unescape entities for a rough body.
+    raw_body = entry.get("summary", "") or ""
+    body = re.sub(r"<[^>]+>", " ", raw_body)
+    body = html.unescape(re.sub(r"\s+", " ", body)).strip()
+    title = html.unescape(entry.get("title", "") or "")
+
+    author = entry.get("author", "") or ""
+    author = author.lstrip("/").removeprefix("u/")
+
+    return {
+        "post_id": post_id,
+        "content_text": f"{title}\n{body}",
+        "content_type": "text",
+        "author_handle": author,
+        "author_name": author,
+        "engagement_score": 0,
+        "likes": 0,
+        "shares": 0,
+        "comments_count": 0,
+        "source_url": link,
+        "published_at": published_iso,
+        "language": "en",
+        "raw_data": {
+            "subreddit": sub,
+            "id": post_id,
+            "permalink": link.replace("https://www.reddit.com", ""),
+            "is_self": True,
+            "source": "rss",
+        },
+    }
+
+
+def _reddit_rss_search(query: str, subreddit: str = "", sort: str = "new", limit: int = 25) -> list[dict]:
+    """Fallback search via Reddit's public RSS feed (works without OAuth).
+
+    Reddit blocks the unauthenticated search.json with 403, but search.rss
+    remains accessible. Uses exponential backoff for transient blocks.
+    """
+    import feedparser
+
+    if subreddit and subreddit != "all":
+        url = f"https://www.reddit.com/r/{subreddit}/search.rss"
+        params = {"q": query, "restrict_sr": "on", "sort": sort, "limit": str(limit)}
+    else:
+        url = "https://www.reddit.com/search.rss"
+        params = {"q": query, "sort": sort, "limit": str(limit)}
+
+    resp = fetch_with_backoff(url, params=params, headers=HEADERS, label="reddit-rss")
+    if resp is None or resp.status_code != 200:
+        logger.warning(
+            "Reddit RSS search %s for r/%s '%s'",
+            resp.status_code if resp else "no-response", subreddit or "all", query,
+        )
+        return []
+    feed = feedparser.parse(resp.text)
+    return [_rss_entry_to_dict(e, subreddit) for e in feed.entries]
 
 
 def _reddit_get_comments(permalink: str, limit: int = 100) -> list[dict]:
@@ -292,35 +586,100 @@ class RedditScraper(BaseScraper):
         """Search Reddit for PW mentions across targeted subreddits."""
         results = []
         seen_ids = set()
+        reddit = _get_reddit_client()
 
         queries = params.keywords or PW_SEARCH_QUERIES
         subreddits = getattr(params, '_reddit_subreddits', None) or PW_SUBREDDITS
         max_per = max(params.max_results_per_platform // max(len(queries) * len(subreddits), 1), 10)
 
+        # Reddit search supports only coarse time buckets; pick the smallest
+        # one that covers the requested lookback, then apply an exact cut below.
+        tf = reddit_time_filter(params.after_date)
+
+        def _add(p: dict, sub: str = "") -> None:
+            normalized = p if p.get("post_id") else _submission_to_dict(p, sub)
+            pid = normalized.get("post_id", "")
+            if not pid or pid in seen_ids:
+                return
+            if not in_window(normalized.get("published_at"), params.after_date, params.before_date):
+                return
+            raw = normalized.get("raw_data", {})
+            if not is_pw_specific_text(
+                normalized.get("content_text", ""),
+                raw.get("subreddit", ""),
+                raw.get("flair", ""),
+            ):
+                return
+            seen_ids.add(pid)
+            results.append(normalized)
+
+        # RSS sort has no "relevance"; map to a supported value.
+        rss_sort = "new" if params.after_date else "relevance"
+        public_fallback_failures = 0
+
+        def _query_sub(sub: str, query: str, sort: str) -> list[dict]:
+            """Try OAuth → JSON API → RSS fallback, in order, until one yields posts."""
+            nonlocal public_fallback_failures
+            if reddit:
+                posts = _reddit_oauth_search(reddit, sub, query, sort=sort, time_filter=tf, limit=max_per)
+                if posts:
+                    return posts
+            elif public_fallback_failures >= 3:
+                return []
+            posts = _reddit_search(sub, query, sort=sort, time_filter=tf, limit=max_per)
+            if posts:
+                public_fallback_failures = 0
+                return posts
+            # Both OAuth and JSON unavailable/blocked → RSS (with backoff).
+            posts = _reddit_rss_search(query, subreddit=sub, sort=rss_sort, limit=max_per)
+            if posts:
+                public_fallback_failures = 0
+                return posts
+            if not reddit:
+                public_fallback_failures += 1
+                if public_fallback_failures == 3:
+                    logger.warning(
+                        "Reddit public endpoints are blocked/rate-limited; skipping remaining public fallback searches. "
+                        "Configure REDDIT_CLIENT_ID and REDDIT_CLIENT_SECRET for reliable backfills."
+                    )
+            return []
+
         def _search():
+            # For an exact backfill, first walk each target subreddit's
+            # chronological listing. Query search below supplements this for
+            # busy subreddits whose 1,000-item listing does not reach the cutoff.
+            if reddit and params.after_date:
+                for sub in subreddits:
+                    for p in _reddit_oauth_new_since(
+                        reddit,
+                        sub,
+                        params.after_date,
+                        params.before_date,
+                    ):
+                        _add(p, sub)
+                    logger.info("Backfilled r/%s/new: %d matching posts so far", sub, len(results))
+
             for sub in subreddits:
                 for query in queries:
+                    if not reddit and public_fallback_failures >= 3:
+                        break
                     time.sleep(random.uniform(1, 2))
-                    posts = _reddit_search(sub, query, sort="relevance", limit=max_per)
-                    for p in posts:
-                        pid = p.get("data", {}).get("id", "")
-                        if pid and pid not in seen_ids:
-                            seen_ids.add(pid)
-                            results.append(_submission_to_dict(p, sub))
+                    for p in _query_sub(sub, query, "relevance"):
+                        _add(p, sub)
                 logger.info("Searched r/%s: %d queries, %d total posts so far", sub, len(queries), len(results))
+                if not reddit and public_fallback_failures >= 3:
+                    break
 
             # Also search r/all for top PW content
             for query in queries[:3]:
+                if not reddit and public_fallback_failures >= 3:
+                    break
                 time.sleep(random.uniform(1, 2))
-                posts = _reddit_search("all", query, sort="top", time_filter="year", limit=max_per)
-                for p in posts:
-                    pid = p.get("data", {}).get("id", "")
-                    if pid and pid not in seen_ids:
-                        seen_ids.add(pid)
-                        results.append(_submission_to_dict(p))
+                for p in _query_sub("all", query, "top"):
+                    _add(p)
 
         await asyncio.get_event_loop().run_in_executor(None, _search)
-        logger.info("Reddit search complete: %d unique posts", len(results))
+        logger.info("Reddit search complete: %d unique posts (window: %s)", len(results), tf)
         return results
 
     async def scrape_and_store_post(
@@ -382,16 +741,20 @@ class RedditScraper(BaseScraper):
         return stored_post
 
     async def scrape_comments(self, source_url: str, limit: int = 200) -> list[dict[str, Any]]:
-        """Scrape comments from a Reddit post via public JSON API."""
+        """Scrape comments from a Reddit post via OAuth, with public JSON fallback."""
         raw_permalink = source_url.replace("https://reddit.com", "")
         comments = []
+        reddit = _get_reddit_client()
 
         def _scrape():
             nonlocal comments
             time.sleep(random.uniform(0.5, 1.5))
-            raw_comments = _reddit_get_comments(raw_permalink, limit=limit)
+            raw_comments = _reddit_get_comments_oauth(reddit, source_url, limit=limit) if reddit else []
+            if not raw_comments:
+                raw_comments = _reddit_get_comments(raw_permalink, limit=limit)
             for c in raw_comments:
-                c["post_id"] = raw_permalink.split("/comments/")[1].split("/")[0] if "/comments/" in raw_permalink else ""
+                if not c.get("post_id"):
+                    c["post_id"] = raw_permalink.split("/comments/")[1].split("/")[0] if "/comments/" in raw_permalink else ""
             comments = raw_comments
 
         await asyncio.get_event_loop().run_in_executor(None, _scrape)
@@ -407,9 +770,13 @@ class RedditScraper(BaseScraper):
 
     async def run_pipeline(
         self, brand_id: str, keywords: list[str], hashtags: list[str],
+        max_posts: int = 50,
         max_comments: int = 100,
         enable_llm_triage: bool = True,
         enable_comment_classification: bool = True,
+        after_date: datetime | None = None,
+        before_date: datetime | None = None,
+        subreddits: list[str] | None = None,
     ) -> dict:
         """
         Full Reddit pipeline with LLM intelligence:
@@ -425,7 +792,12 @@ class RedditScraper(BaseScraper):
             hashtags=hashtags,
             platforms=["reddit"],
             brand_id=brand_id,
+            max_results_per_platform=max_posts,
+            after_date=after_date,
+            before_date=before_date,
         )
+        if subreddits:
+            params._reddit_subreddits = subreddits
 
         search_results = await self.search(params)
         logger.info("Reddit pipeline: %d posts found", len(search_results))
@@ -554,19 +926,31 @@ def main():
                         help="Max total posts")
     parser.add_argument("--max-comments", type=int, default=50,
                         help="Max comments per post")
+    parser.add_argument("--days", type=int, default=0,
+                        help="Backfill window in days (0 = no date filter)")
+    parser.add_argument("--subreddits", default="",
+                        help="Only scrape these subreddits (comma-separated, without r/)")
     args = parser.parse_args()
 
     keywords = [k.strip() for k in args.keywords.split(",") if k.strip()]
     if not keywords:
         keywords = PW_SEARCH_QUERIES
+    subreddits = [s.strip().removeprefix("r/") for s in args.subreddits.split(",") if s.strip()]
+
+    from datetime import timezone, timedelta
+    after_date = before_date = None
+    if args.days > 0:
+        before_date = datetime.now(timezone.utc)
+        after_date = before_date - timedelta(days=args.days)
 
     print(f"{'='*60}")
     print(f"  Reddit Negative PR Detection")
     print(f"{'='*60}")
-    print(f"  Subreddits:   {', '.join(PW_SUBREDDITS)}")
+    print(f"  Subreddits:   {', '.join(subreddits or PW_SUBREDDITS)}")
     print(f"  Queries:      {len(keywords)}")
     print(f"  Max posts:    {args.max_posts}")
     print(f"  Max comments: {args.max_comments}/post")
+    print(f"  Window:       {f'last {args.days}d' if args.days > 0 else 'all time'}")
     print(f"{'='*60}")
     print()
 
@@ -587,7 +971,11 @@ def main():
             brand_id=brand_id,
             keywords=keywords,
             hashtags=[],
+            max_posts=args.max_posts,
             max_comments=args.max_comments,
+            after_date=after_date,
+            before_date=before_date,
+            subreddits=subreddits or None,
         ))
     finally:
         loop.close()

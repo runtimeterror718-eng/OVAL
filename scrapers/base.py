@@ -23,6 +23,57 @@ from search.filters import SearchParams
 
 logger = logging.getLogger(__name__)
 
+# HTTP status codes worth retrying with backoff (transient / soft-blocks).
+RETRYABLE_STATUS = {403, 407, 429, 500, 502, 503, 504}
+
+
+def fetch_with_backoff(
+    url: str,
+    *,
+    params: dict | None = None,
+    headers: dict | None = None,
+    timeout: int = SCRAPER_REQUEST_TIMEOUT,
+    max_retries: int = SCRAPER_MAX_RETRIES,
+    backoff_base: float = SCRAPER_BACKOFF_BASE,
+    session: Any | None = None,
+    label: str = "http",
+):
+    """Synchronous GET with exponential backoff + jitter.
+
+    Retries on network errors and on RETRYABLE_STATUS responses. Returns the
+    final ``requests``/``curl_cffi`` Response (caller inspects status_code), or
+    None if every attempt failed with an exception. A non-retryable error
+    response (e.g. 404) is returned immediately without retrying.
+    """
+    import requests as _requests
+
+    get = session.get if session is not None else _requests.get
+    last_exc: Exception | None = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = get(url, params=params, headers=headers, timeout=timeout)
+            if resp.status_code in RETRYABLE_STATUS and attempt < max_retries:
+                wait = backoff_base ** attempt + random.uniform(0, 1)
+                logger.warning(
+                    "[%s] HTTP %d on attempt %d/%d, retrying in %.1fs (%s)",
+                    label, resp.status_code, attempt, max_retries, wait, url,
+                )
+                time.sleep(wait)
+                continue
+            return resp
+        except Exception as exc:  # network error, timeout, TLS, proxy failure
+            last_exc = exc
+            if attempt == max_retries:
+                logger.error("[%s] Failed after %d attempts: %s", label, max_retries, exc)
+                return None
+            wait = backoff_base ** attempt + random.uniform(0, 1)
+            logger.warning(
+                "[%s] Attempt %d/%d errored (%s), retrying in %.1fs",
+                label, attempt, max_retries, exc, wait,
+            )
+            time.sleep(wait)
+    return None
+
 
 class RateLimiter:
     """Token-bucket rate limiter per platform."""

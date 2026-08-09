@@ -2,23 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MessageCircle, Camera, Siren, Smartphone, LifeBuoy } from "lucide-react";
+import { BarChart3, BriefcaseBusiness, CircleDot, Link2, MessageCircle, Play, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const mobileNavItems = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Incidents", href: "/incidents", icon: Siren },
-  { label: "Reddit", href: "/reddit", icon: MessageCircle },
-  { label: "Instagram", href: "/instagram", icon: Camera },
+  { label: "Signals", href: "/command-center", icon: BarChart3 },
   { label: "Play Store", href: "/playstore", icon: Smartphone },
-  { label: "Freshdesk", href: "/freshdesk", icon: LifeBuoy },
+  { label: "Reddit", href: "/reddit", icon: MessageCircle },
+  { label: "LinkedIn", href: "/linkedin", icon: BriefcaseBusiness },
+  { label: "YouTube", href: "/youtube", icon: Play },
+  { label: "Integrations", href: "/integrations", icon: Link2 },
+  { label: "Issues", href: "/issues", icon: CircleDot },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--card)] border-t border-[var(--border)]">
+    <nav className="oval-mobile-nav md:hidden">
       <div className="flex items-center justify-around h-14">
         {mobileNavItems.map((item) => {
           const isActive =
@@ -30,10 +31,10 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-0.5 px-2 py-1 min-w-[48px]",
+                "oval-mobile-nav-item",
                 isActive
-                  ? "text-purple"
-                  : "text-[var(--muted-foreground)]"
+                  ? "oval-mobile-nav-item-active"
+                  : ""
               )}
             >
               <item.icon className="h-5 w-5" />

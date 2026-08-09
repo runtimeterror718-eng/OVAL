@@ -19,7 +19,7 @@ const PAGES = [
   { label: "Telegram Intelligence", href: "/telegram", icon: Send, keywords: "telegram channels messages fake" },
   { label: "Google Intelligence", href: "/google", icon: Globe, keywords: "google autocomplete serp trends news" },
   { label: "Play Store Intelligence", href: "/playstore", icon: Smartphone, keywords: "play store app reviews ratings versions support" },
-  { label: "Freshdesk Intelligence", href: "/freshdesk", icon: LifeBuoy, keywords: "freshdesk tickets support queue taxonomy routing sla" },
+  { label: "Freshdesk Intelligence", href: "/audience-intelligence/freshdesk", icon: LifeBuoy, keywords: "freshdesk tickets support queue taxonomy routing sla csat" },
   { label: "Creator Intelligence", href: "/creators", icon: Users, keywords: "creators threats friends influencers" },
   { label: "Competitive Intelligence", href: "/competitors", icon: Trophy, keywords: "competitors allen unacademy byju share voice" },
   { label: "Action Items", href: "/actionables", icon: ClipboardCheck, keywords: "actionables tasks actions department" },

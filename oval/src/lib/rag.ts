@@ -10,7 +10,9 @@
  * All functions are server-side only (API routes).
  */
 
+import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { isQdrantConfigured, searchQdrantClusters, searchQdrantEvidence } from "@/lib/qdrant-rag";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -260,6 +262,7 @@ export interface RAGResult {
     avgSimilarity: number;
     platforms: Record<string, number>;
     sentimentBreakdown: Record<string, number>;
+    retrievalProvider: "qdrant" | "supabase-pgvector";
   };
 }
 
@@ -290,23 +293,42 @@ export async function ragQuery(
   const embedding = await embedText(query);
   if (!embedding) return null;
 
-  // Vector search
+  // Qdrant is the canonical retrieval layer. Supabase pgvector is retained as
+  // an outage/bootstrap fallback until the first Qdrant sync is complete.
+  const [qdrantMentions, qdrantClusters] = await Promise.all([
+    searchQdrantEvidence(embedding, {
+      platform: opts.platform,
+      sentiment: opts.sentiment,
+      limit: opts.mentionLimit ?? 20,
+      threshold: 0.25,
+    }),
+    searchQdrantClusters(embedding, {
+      platform: opts.platform,
+      limit: opts.clusterLimit ?? 5,
+      threshold: 0.2,
+    }),
+  ]);
+  const retrievalProvider: "qdrant" | "supabase-pgvector" = qdrantMentions !== null ? "qdrant" : "supabase-pgvector";
   const [rawMentions, clusters] = await Promise.all([
-    opts.platform || opts.sentiment
-      ? searchMentionsByFilter(embedding, {
-          platform: opts.platform,
-          sentiment: opts.sentiment,
-          limit: opts.mentionLimit ?? 20,
-          brandId: opts.brandId ?? undefined,
-        })
-      : searchMentions(embedding, {
-          limit: opts.mentionLimit ?? 20,
+    qdrantMentions !== null
+      ? Promise.resolve(qdrantMentions)
+      : opts.platform || opts.sentiment
+        ? searchMentionsByFilter(embedding, {
+            platform: opts.platform,
+            sentiment: opts.sentiment,
+            limit: opts.mentionLimit ?? 20,
+            brandId: opts.brandId ?? undefined,
+          })
+        : searchMentions(embedding, {
+            limit: opts.mentionLimit ?? 20,
+            brandId: opts.brandId ?? undefined,
+          }),
+    qdrantClusters !== null
+      ? Promise.resolve(qdrantClusters)
+      : searchClusters(embedding, {
+          limit: opts.clusterLimit ?? 5,
           brandId: opts.brandId ?? undefined,
         }),
-    searchClusters(embedding, {
-      limit: opts.clusterLimit ?? 5,
-      brandId: opts.brandId ?? undefined,
-    }),
   ]);
 
   // Rerank
@@ -349,6 +371,7 @@ export async function ragQuery(
       avgSimilarity: Math.round(avgSimilarity * 1000) / 1000,
       platforms,
       sentimentBreakdown: sentiments,
+      retrievalProvider,
     },
   };
 
@@ -358,4 +381,4 @@ export async function ragQuery(
   return result;
 }
 
-export const isRAGEnabled = () => !!openaiKey;
+export const isRAGEnabled = () => Boolean(openaiKey && (isQdrantConfigured() || url));

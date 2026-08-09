@@ -35,7 +35,7 @@ export async function GET() {
       generatedAt: (insights as any).generatedAt,
       limitations: [
         "Built from uploaded Freshdesk CSV export, not live Freshdesk API.",
-        "The export has no created-at/resolved-at/SLA fields, so this is a queue composition snapshot, not latency trend analysis.",
+        "This CSV includes timestamps, but one export is still a queue composition snapshot rather than a trend or SLA recovery analysis.",
         "Support sentiment is inferred from issue type and urgency language; no CSAT/reopen fields are present.",
       ],
     }),

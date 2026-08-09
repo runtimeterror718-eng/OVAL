@@ -1,630 +1,154 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { AlertTriangle, ArrowRight, BriefcaseBusiness, Camera, Globe, Heart, LifeBuoy, MessageCircle, Play, Smartphone, TrendingUp } from "lucide-react";
-import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { PageSkeleton } from "@/components/ui/page-skeleton";
-import { fadeUp, stagger } from "@/lib/animations";
+import Image from "next/image";
+import { Bot, ChevronLeft, ChevronRight, ExternalLink, FileText, ImageIcon, Mic, Plus, Send, X } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLiveData } from "@/lib/use-live-data";
 import { formatNumber } from "@/lib/utils";
 
-const platformMeta: Record<string, { label: string; href: string; icon: any; color: string }> = {
-  reddit: { label: "Reddit", href: "/reddit", icon: MessageCircle, color: "#FF5700" },
-  instagram: { label: "Instagram", href: "/instagram", icon: Camera, color: "#E1306C" },
-  youtube: { label: "YouTube", href: "/youtube", icon: Play, color: "#FF0000" },
-  google: { label: "Google", href: "/google", icon: Globe, color: "#4285F4" },
-  linkedin: { label: "LinkedIn", href: "/linkedin", icon: BriefcaseBusiness, color: "#0A66C2" },
-  playstore: { label: "Play Store", href: "/playstore", icon: Smartphone, color: "#34A853" },
-  freshdesk: { label: "Freshdesk", href: "/freshdesk", icon: LifeBuoy, color: "#534AB7" },
+type ChannelSegment = { label: string; value: number; tone: "positive" | "neutral" | "negative" };
+const sourceIcons: Record<string, string> = {
+  "Play Store": "/platform-icons/play-store.png",
+  LinkedIn: "/platform-icons/linkedin.png",
+  YouTube: "/platform-icons/youtube.webp",
+  Freshdesk: "/platform-icons/freshdesk.webp",
+  Reddit: "/platform-icons/reddit.webp",
 };
 
-function pct(part: number, total: number) {
-  return total ? Math.round((part / total) * 100) : 0;
+function ChannelCard({ label, href, iconSrc, value, unit, summary, segments }: { label: string; href: string; iconSrc: string; value: number; unit: string; summary: string; segments: ChannelSegment[] }) {
+  const segmentTotal = segments.reduce((sum, segment) => sum + segment.value, 0);
+  return <Link className="cp-metric cp-channel-card" href={href}><header><span><Image src={iconSrc} alt="" width={22} height={22} className="cp-channel-logo" />{label}</span><ExternalLink aria-hidden="true" /></header><strong>{formatNumber(value)}</strong><p className="cp-channel-unit">{unit}</p><p className="cp-channel-summary" title={summary}>{summary}</p><div className="cp-distribution" role="img" aria-label={segments.map((segment) => `${segment.label}: ${segment.value}`).join(", ")}>{segments.map((segment) => <span key={segment.label} className={`cp-segment-${segment.tone}`} style={{ width: `${share(segment.value, segmentTotal)}%` }} />)}</div><div className="cp-segment-legend">{segments.map((segment) => <span key={segment.label}><i className={`cp-dot-${segment.tone}`} />{segment.label}<b>{formatNumber(segment.value)}</b></span>)}</div></Link>;
 }
 
-function latestDelta(trend: any[], field: string) {
-  const latest = trend?.[trend.length - 1];
-  const prior = trend?.[trend.length - 2];
-  const current = Number(latest?.[field] || 0);
-  const previous = Number(prior?.[field] || 0);
-  const delta = current - previous;
-  return { current, previous, delta, pct: previous ? Math.round((delta / previous) * 100) : null, label: latest?.label || latest?.month || "latest" };
-}
-
-function evidenceText(value: any) {
-  if (!value) return "";
-  if (typeof value === "string") return value;
-  return value.text || value.description || value.subject || value.title || "";
-}
-
-function PlatformCard({ id, metric, sentiment, issue, proof }: { id: keyof typeof platformMeta; metric: string; sentiment: string; issue: string; proof: string }) {
-  const meta = platformMeta[id];
-  const Icon = meta.icon;
-  return (
-    <Link href={meta.href} className="rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-purple/40 hover:shadow-md">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: `${meta.color}18` }}>
-            <Icon className="h-4 w-4" style={{ color: meta.color }} />
-          </span>
-          <div>
-            <p className="text-sm font-bold">{meta.label}</p>
-            <p className="text-[10px] text-muted-foreground">{metric}</p>
-          </div>
-        </div>
-        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-      </div>
-      <div className="mt-4 rounded-xl border border-border bg-background/40 p-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Current read</p>
-        <p className="mt-1 text-sm font-semibold">{issue}</p>
-        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{proof}</p>
-      </div>
-      <p className="mt-3 text-xs font-medium" style={{ color: meta.color }}>{sentiment}</p>
-    </Link>
-  );
-}
-
-type CarouselItem = {
-  key: string;
-  platform: string;
-  title: string;
-  meta: string;
-  href?: string;
-  image?: string | null;
-  tone: string;
-  color: string;
-};
-
-function CarouselSection({ title, eyebrow, items, emptyCopy }: { title: string; eyebrow: string; items: CarouselItem[]; emptyCopy: string }) {
-  const loop = [...items, ...items];
-
-  if (!items.length) {
-    return (
-      <div className="rounded-2xl border border-dashed border-border bg-card p-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{eyebrow}</p>
-        <h2 className="mt-1 text-lg font-bold">{title}</h2>
-        <p className="mt-2 text-xs text-muted-foreground">{emptyCopy}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{eyebrow}</p>
-          <h2 className="text-lg font-bold">{title}</h2>
-        </div>
-        <p className="text-[10px] text-muted-foreground">PW-only · hover pauses</p>
-      </div>
-      <div className="flex w-max gap-3 media-carousel-track">
-        {loop.map((item, index) => (
-          <a key={`${item.key}-${index}`} href={item.href || "#"} target="_blank" rel="noopener noreferrer" className="w-64 shrink-0 overflow-hidden rounded-xl border border-border bg-background">
-            <div className="relative h-32 bg-muted">
-              {item.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.image} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-gradient-to-br from-purple/20 to-pink/20 px-5 text-center text-xs font-semibold text-muted-foreground">
-                  {item.platform} creative preview
-                </div>
-              )}
-              <span className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ backgroundColor: item.color }}>{item.platform}</span>
-              <span className="absolute bottom-2 left-2 rounded-full bg-black/65 px-2 py-0.5 text-[10px] font-medium text-white">{item.tone}</span>
-            </div>
-            <div className="p-3">
-              <p className="line-clamp-2 text-sm font-semibold">{item.title}</p>
-              <p className="mt-1 text-[10px] text-muted-foreground">{item.meta}</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MovementCard({ platform, metric, delta, context, href }: { platform: string; metric: string; delta: ReturnType<typeof latestDelta>; context: string; href: string }) {
-  const isUp = delta.delta > 0;
-  return (
-    <Link href={href} className="rounded-2xl border border-border bg-card p-4 hover:border-purple/50">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{platform}</p>
-          <h3 className="mt-1 text-sm font-bold">{metric}</h3>
-        </div>
-        <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${isUp ? "bg-orange-100 text-orange-700" : delta.delta < 0 ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
-          {delta.delta > 0 ? "+" : ""}{formatNumber(delta.delta)}
-        </span>
-      </div>
-      <p className="mt-3 text-2xl font-bold">{formatNumber(delta.current)}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{delta.label} · {delta.pct === null ? "new baseline" : `${delta.pct > 0 ? "+" : ""}${delta.pct}% MoM`} · {context}</p>
-    </Link>
-  );
-}
-
-function displayMonth(month?: string | null) {
-  if (!month) return "Latest";
-  const parsed = new Date(`${month}-01T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return month;
-  return parsed.toLocaleDateString("en-IN", { month: "short" });
-}
-
-function PulseTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ payload?: any }>; label?: string }) {
-  if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload || {};
-  return (
-    <div className="min-w-[200px] rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-900 shadow-xl shadow-black/15 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50">
-      <p className="mb-2 font-medium tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="font-mono text-sm font-semibold">{Number(row.rating || 0).toFixed(2)}★ average rating</p>
-      <div className="mt-2 border-t border-slate-200 pt-2 text-slate-600 dark:border-slate-700 dark:text-slate-300">
-        <p>{formatNumber(row.reviews || 0)} Play Store reviews</p>
-        <p>{row.lowRatingRate}% low-rating pressure · {row.replyRate}% reply rate</p>
-      </div>
-    </div>
-  );
+function share(part: number, total: number) { return total > 0 ? (part / total) * 100 : 0; }
+function briefSignal(value: unknown, fallback: string) {
+  const text = String(value || fallback).replace(/^negative\s*/i, "").replace(/\s+/g, " ").trim();
+  return text.length > 170 ? `${text.slice(0, 167).trimEnd()}…` : text;
 }
 
 export default function CommandCenter() {
+  const [insightIndex, setInsightIndex] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantQuery, setAssistantQuery] = useState("");
+  const [assistantQuestion, setAssistantQuestion] = useState("What needs attention across OVAL right now?");
   const reddit = useLiveData<any>("/api/reddit", null);
-  const instagram = useLiveData<any>("/api/instagram", null);
-  const youtube = useLiveData<any>("/api/youtube", null);
-  const google = useLiveData<any>("/api/google", null);
   const linkedin = useLiveData<any>("/api/linkedin", null);
-  const playstore = useLiveData<any>("/api/playstore", null, { refreshMs: 60 * 60 * 1000, noStore: true });
+  const youtube = useLiveData<any>("/api/youtube", null);
+  const playstore = useLiveData<any>("/api/playstore", null, { refreshMs: 60 * 60 * 1000 });
   const freshdesk = useLiveData<any>("/api/freshdesk", null);
-  const reputationRadar = useLiveData<any>("/api/reputation-radar?hours=72", null);
-
-  const loading = [reddit, instagram, youtube, google, linkedin, playstore, freshdesk, reputationRadar].some((state) => state.loading);
-  if (loading) return <PageSkeleton title="Command Center" color="#534AB7" />;
-
-  const rStats = reddit.data?.stats || {};
-  const iStats = instagram.data?.stats || {};
-  const yStats = youtube.data?.stats || {};
-  const gStats = google.data?.stats || {};
-  const lStats = linkedin.data?.stats || {};
-  const radarStats = reputationRadar.data?.stats || {};
-  const radarNegative = reputationRadar.data?.negativePosts || [];
-  const radarPositive = reputationRadar.data?.positivePosts || [];
-  const mentionStream = reputationRadar.data?.mentionStream || reputationRadar.data?.items || [];
-  const radarClusters = reputationRadar.data?.clusters || [];
-  const radarOwners = reputationRadar.data?.ownerQueues || [];
-  const pPrimary = playstore.data?.apps?.[playstore.data?.primaryPackage] || {};
-  const fStats = freshdesk.data?.stats || {};
-  const fCategories = freshdesk.data?.categories || [];
-  const contracts = [
-    { id: "freshdesk", label: "Freshdesk", href: "/freshdesk", contract: freshdesk.data?.contract },
-    { id: "playstore", label: "Play Store", href: "/playstore", contract: playstore.data?.contract },
-    { id: "reddit", label: "Reddit", href: "/reddit", contract: reddit.data?.contract },
-    { id: "instagram", label: "Instagram", href: "/instagram", contract: instagram.data?.contract },
-    { id: "youtube", label: "YouTube", href: "/youtube", contract: youtube.data?.contract },
-    { id: "google", label: "Google", href: "/google", contract: google.data?.contract },
-    { id: "linkedin", label: "LinkedIn", href: "/linkedin", contract: linkedin.data?.contract },
+  const loading = [reddit, linkedin, youtube, playstore, freshdesk].some((source) => source.loading);
+  const app = playstore.data?.apps?.[playstore.data?.primaryPackage] || {};
+  const topIssue = app.themes?.[0]?.name || reddit.data?.clusters?.[0]?.name || "No dominant issue";
+  const linkedinSignals = Number(linkedin.data?.stats?.totalPosts || 0);
+  const appCritical = Number(app.lowRatingCount || 0);
+  const linkedinCritical = Number(linkedin.data?.stats?.negative || 0);
+  const redditCritical = Number(reddit.data?.stats?.negativeCount || 0);
+  const freshdeskSignals = Number(freshdesk.data?.stats?.totalTickets || 0);
+  const freshdeskAttention = Number(freshdesk.data?.stats?.activeTickets || 0);
+  const playRatingCount = (rating: number) => Number(app.ratingDistribution?.find((item: any) => Number(item.rating) === rating)?.count || 0);
+  const playPositive = playRatingCount(4) + playRatingCount(5);
+  const playNeutral = playRatingCount(3);
+  const youtubeSentiment = youtube.data?.stats?.sentiment || {};
+  const youtubeSignals = Number(youtubeSentiment.total || youtube.data?.stats?.totalComments || 0);
+  const youtubePositive = Number(youtubeSentiment.positive || 0);
+  const youtubeNeutral = Number(youtubeSentiment.neutral || 0);
+  const youtubeNegative = Number(youtubeSentiment.negative || 0);
+  const freshdeskClosed = (freshdesk.data?.statusBreakdown || []).filter((item: any) => ["closed", "resolved"].includes(String(item.status).toLowerCase())).reduce((sum: number, item: any) => sum + Number(item.count || 0), 0);
+  const freshdeskOther = Math.max(0, freshdeskSignals - freshdeskClosed - freshdeskAttention);
+  const freshness = linkedin.data?.generatedAt || playstore.data?.generatedAt || freshdesk.data?.generatedAt;
+  const linkedinLead = linkedin.data?.summary?.topNegatives?.[0] || (linkedin.data?.posts || []).find((post: any) => String(post.sentiment).toLowerCase() === "negative");
+  const redditLead = (reddit.data?.posts || []).find((post: any) => String(post.sentiment).toLowerCase() === "negative") || reddit.data?.posts?.[0];
+  const playstoreLead = (app.criticalReviews || app.liveReviews || [])[0];
+  const youtubeLead = youtube.data?.attentionCards?.[0] || youtube.data?.prRiskVideos?.[0];
+  const freshdeskLead = freshdesk.data?.urgentExamples?.[0] || freshdesk.data?.activeExamples?.[0];
+  const liveSignals = [
+    ...(linkedin.data?.posts || []).slice(0, 2).map((post: any) => ({ source: "LinkedIn", title: post.title || post.author || "Public LinkedIn signal", text: post.text || post.summary, url: post.url, time: post.publishedAt, state: post.sentiment || "neutral" })),
+    ...(reddit.data?.posts || []).slice(0, 2).map((post: any) => ({ source: "Reddit", title: post.title || "Reddit discussion", text: post.text || post.body, url: post.url, time: post.createdAt || post.date, state: post.sentiment || "neutral" })),
+    ...(app.criticalReviews || app.liveReviews || []).slice(0, 2).map((review: any) => ({ source: "Play Store", title: `${review.rating || "—"}★ app review`, text: review.text, url: review.url, time: review.date, state: Number(review.rating || 5) <= 2 ? "critical" : "neutral" })),
+    ...(freshdesk.data?.categories || []).slice(0, 2).map((item: any) => ({ source: "Freshdesk", title: item.label || item.name || "Support cluster", text: item.summary || item.examples?.[0]?.description || item.examples?.[0]?.text || item.examples?.[0]?.subject, time: freshness, state: "attention" })),
+  ].filter((item) => item.text).slice(0, 6);
+  const insights = [
+    { title: "LinkedIn", iconSrc: sourceIcons.LinkedIn, text: briefSignal(linkedinLead?.summary || linkedinLead?.title, `${formatNumber(linkedinCritical)} LinkedIn posts currently need attention.`), href: linkedinLead?.url || "/linkedin", external: Boolean(linkedinLead?.url) },
+    { title: "Reddit", iconSrc: sourceIcons.Reddit, text: briefSignal(redditLead?.title || redditLead?.snippet, `${formatNumber(redditCritical)} Reddit discussions are currently classified as negative.`), href: redditLead?.url || "/reddit", external: Boolean(redditLead?.url) },
+    { title: "Play Store", iconSrc: sourceIcons["Play Store"], text: briefSignal(playstoreLead?.text, `${formatNumber(appCritical)} low-rating Play Store reviews need attention.`), href: playstoreLead?.url || "/playstore", external: Boolean(playstoreLead?.url) },
+    { title: "YouTube", iconSrc: sourceIcons.YouTube, text: briefSignal(youtubeLead?.detail || youtubeLead?.title, `${formatNumber(youtubeNegative)} YouTube comments are currently classified as negative.`), href: youtubeLead?.url || "/youtube", external: Boolean(youtubeLead?.url) },
+    { title: "Freshdesk", iconSrc: sourceIcons.Freshdesk, text: briefSignal(freshdeskLead?.description || freshdeskLead?.subject, `${formatNumber(freshdeskAttention)} support tickets remain active.`), href: "/freshdesk", external: false },
   ];
-  const incidentCandidates = contracts
-    .flatMap((item) => (item.contract?.incidentCandidates || []).map((candidate: any) => ({ ...candidate, platformLabel: item.label, href: item.href })))
-    .sort((a: any, b: any) => (b.crisisScore || 0) - (a.crisisScore || 0))
-    .slice(0, 6);
-  const iSent = iStats.sentiment || {};
-  const ySent = yStats.sentiment || {};
-  const lSent = lStats.sentiment || {};
-  const totalSignals = (rStats.totalMentions || 0) + (iStats.totalPosts || 0) + (yStats.totalVideos || 0) + (gStats.totalAutocomplete || 0) + (lStats.totalPosts || 0) + (pPrimary.sampleSize || 0) + (fStats.totalTickets || 0);
-  const urgentFreshdesk = (freshdesk.data?.urgentExamples || []).slice(0, 3);
-  const playThemes = pPrimary.themes || [];
-  const topPlayTheme = playThemes[0];
-  const topFreshdesk = fCategories[0];
-  const negativeAutocompleteRate = pct(gStats.negativeAutocomplete || 0, gStats.totalAutocomplete || 0);
-  const youtubeWindow = youtube.data?.latest24hWindow || {};
-  const youtubeShorts = (youtube.data?.latest24hShorts || []).map((video: any) => ({
-    key: `yt-short-${video.videoId}`,
-    platform: "Short",
-    title: video.title,
-    meta: `${formatNumber(video.views || 0)} views · ${formatNumber(video.comments || 0)} comments`,
-    href: video.url,
-    image: video.videoId ? `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg` : null,
-    tone: video.triageLabel || video.channelName || "PW short",
-    color: "#FF0000",
-  }));
-  const youtubeLongVideos = (youtube.data?.latest24hVideos || []).map((video: any) => ({
-    key: `yt-video-${video.videoId}`,
-    platform: "Video",
-    title: video.title,
-    meta: `${formatNumber(video.views || 0)} views · ${formatNumber(video.comments || 0)} comments`,
-    href: video.url,
-    image: video.videoId ? `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg` : null,
-    tone: video.channelName || "PW video",
-    color: "#FF0000",
-  }));
-  const instagramReels = (instagram.data?.pwReels || []).map((post: any, index: number) => ({
-    key: `ig-reel-${post.postId || index}`,
-    platform: "Reel",
-    title: post.caption || `@${post.account} reel`,
-    meta: `${formatNumber(post.likes || 0)} likes · ${formatNumber(post.reelPlays || 0)} plays`,
-    href: post.url,
-    image: post.thumbnailUrl,
-    tone: `@${post.account || "physicswallah"}`,
-    color: "#E1306C",
-  }));
-  const movementCards = [
-    { platform: "Play Store", metric: "Low-rating rate", delta: latestDelta(pPrimary.monthlyTrend || [], "lowRatingRate"), context: `${pPrimary.averageRating || "—"}★ overall`, href: "/playstore" },
-    { platform: "Reddit", metric: "Posts and comment heat", delta: latestDelta(reddit.data?.monthlyTrend || [], "comments"), context: "student debate depth", href: "/reddit" },
-    { platform: "Instagram", metric: "Comment volume", delta: latestDelta(instagram.data?.monthlyTrend || [], "comments"), context: "under post/reel layer", href: "/instagram" },
-    { platform: "YouTube", metric: "Video comment volume", delta: latestDelta(youtube.data?.monthlyTrend || [], "comments"), context: "watch-and-react layer", href: "/youtube" },
-    { platform: "Google", metric: "Negative suggestion count", delta: latestDelta(google.data?.monthlyTrend || [], "negativeSuggestions"), context: "front-door reputation", href: "/google" },
-    { platform: "LinkedIn", metric: "Professional reaction volume", delta: latestDelta(linkedin.data?.monthlyTrend || [], "count"), context: "employer-brand layer", href: "/linkedin" },
-  ];
-  const playRatingTrend = (pPrimary.monthlyTrend || []).filter((month: any) => month.month && month.month !== "Unknown").slice(-6);
-  const playRatingValues = playRatingTrend.map((month: any) => Number(month.averageRating || 0)).filter(Boolean);
-  const minPlayRating = Math.max(0, Math.min(...playRatingValues, 5) - 0.03);
-  const maxPlayRating = Math.min(5, Math.max(...playRatingValues, 0) + 0.03);
-  const playPulseChartData = playRatingTrend.map((month: any) => ({
-    ...month,
-    label: displayMonth(month.month),
-    rating: Number(month.averageRating || 0),
-    ratingArea: Number(month.averageRating || 0),
-  }));
-  const latestPlayMonth = playRatingTrend[playRatingTrend.length - 1] || {};
-  const previousPlayMonth = playRatingTrend[playRatingTrend.length - 2] || {};
-  const clusters = [
-    ...((freshdesk.data?.clusters || freshdesk.data?.categories || []).slice(0, 2).map((item: any) => ({ platform: "Freshdesk", name: item.name, mentions: item.mentions || item.count, evidence: item.evidence || item.examples || [] }))),
-    ...((playThemes || []).slice(0, 2).map((item: any) => ({ platform: "Play Store", name: item.name, mentions: item.mentions, evidence: item.examples || [] }))),
-    ...((reddit.data?.clusters || []).slice(0, 2).map((item: any) => ({ platform: "Reddit", ...item }))),
-    ...((instagram.data?.clusters || []).slice(0, 2).map((item: any) => ({ platform: "Instagram", ...item }))),
-    ...((youtube.data?.clusters || []).slice(0, 2).map((item: any) => ({ platform: "YouTube", ...item }))),
-    ...((google.data?.clusters || []).slice(0, 2).map((item: any) => ({ platform: "Google", ...item }))),
-    ...((linkedin.data?.clusters || []).slice(0, 2).map((item: any) => ({ platform: "LinkedIn", ...item }))),
-  ].sort((a: any, b: any) => (b.mentions || 0) - (a.mentions || 0)).slice(0, 6);
+  const activeInsight = insights[insightIndex];
+  const changeInsight = (direction: number) => setInsightIndex((current) => (current + direction + insights.length) % insights.length);
+  const stackedInsights = [1, 2].map((offset) => insights[(insightIndex + offset) % insights.length]);
+  const askAssistant = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextQuestion = assistantQuery.trim();
+    if (!nextQuestion) return;
+    setAssistantQuestion(nextQuestion);
+    setAssistantQuery("");
+  };
+  useEffect(() => {
+    if (carouselPaused) return;
+    const timer = window.setInterval(() => setInsightIndex((current) => (current + 1) % insights.length), 2000);
+    return () => window.clearInterval(timer);
+  }, [carouselPaused, insights.length]);
 
-  return (
-    <motion.div className="space-y-6" variants={stagger as any} initial="hidden" animate="show">
-      <motion.section variants={fadeUp as any} className="rounded-2xl border border-purple/25 bg-card p-5">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-purple">Leadership Daily View</p>
-            <h1 className="mt-1 text-2xl font-bold">What students are saying across every surface</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              The useful story today is operational: support asks are dominated by store/logistics, Play Store comments are about teaching, access and delivery, Google has enrollment-risk suggestions, and social video surfaces show what is spreading.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl border border-border p-3">
-              <p className="text-xl font-bold">{formatNumber(totalSignals)}</p>
-              <p className="text-[10px] text-muted-foreground">signals</p>
-            </div>
-            <div className="rounded-xl border border-orange-200 p-3">
-              <p className="text-xl font-bold text-orange-600">{formatNumber(fStats.activeTickets || 0)}</p>
-              <p className="text-[10px] text-muted-foreground">live tickets</p>
-            </div>
-            <div className="rounded-xl border border-red-200 p-3">
-              <p className="text-xl font-bold text-red-600">{negativeAutocompleteRate}%</p>
-              <p className="text-[10px] text-muted-foreground">negative Google</p>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="rounded-2xl border border-border bg-card p-5">
-        <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-purple">72-Hour Reputation Radar</p>
-            <h2 className="mt-1 text-lg font-bold">Negative posts and good things around PW right now</h2>
-            <p className="mt-1 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-              Entity-aware scan across LinkedIn, Reddit, YouTube, Instagram, Google and Play Store. Parent posts stay on top; comments are evidence under the parent item.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl border border-border px-3 py-2">
-              <p className="text-lg font-bold">{formatNumber(radarStats.total || 0)}</p>
-              <p className="text-[10px] text-muted-foreground">relevant items</p>
-            </div>
-            <div className="rounded-xl border border-red-200 px-3 py-2">
-              <p className="text-lg font-bold text-red-600">{formatNumber(radarStats.negative || 0)}</p>
-              <p className="text-[10px] text-muted-foreground">negative/mixed</p>
-            </div>
-            <div className="rounded-xl border border-green-200 px-3 py-2">
-              <p className="text-lg font-bold text-green-600">{formatNumber(radarStats.positive || 0)}</p>
-              <p className="text-[10px] text-muted-foreground">good things</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <div className="rounded-2xl border border-red-200 bg-red-50/40 p-4 dark:bg-red-950/10">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-red-600">Negative in last 72h</p>
-            <div className="mt-3 space-y-2">
-              {radarNegative.slice(0, 4).map((item: any) => (
-                <a key={item.id} href={item.url || "#"} target="_blank" rel="noopener noreferrer" className="block rounded-xl border border-red-100 bg-background p-3 hover:border-red-300">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="line-clamp-2 text-sm font-bold">{item.title}</p>
-                    <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">{item.impact?.finalPriorityScore || item.priorityScore}</span>
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.text || item.evidenceComments?.[0]?.text || "No text captured."}</p>
-                  <p className="mt-2 text-[10px] text-muted-foreground">{item.platform} · {item.issueCategory} · {item.businessOwner}</p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
-                    escalation {item.impact?.escalationScore ?? "—"} · influence {item.impact?.influenceScore ?? "—"} · engagement {item.impact?.engagementScore ?? "—"}
-                  </p>
-                </a>
-              ))}
-              {!radarNegative.length ? <p className="rounded-xl border border-dashed border-red-200 p-3 text-xs text-muted-foreground">No negative PW-relevant parent posts in the last 72 hours.</p> : null}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-green-200 bg-green-50/40 p-4 dark:bg-green-950/10">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-green-600">Good things in last 72h</p>
-            <div className="mt-3 space-y-2">
-              {radarPositive.slice(0, 4).map((item: any) => (
-                <a key={item.id} href={item.url || "#"} target="_blank" rel="noopener noreferrer" className="block rounded-xl border border-green-100 bg-background p-3 hover:border-green-300">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="line-clamp-2 text-sm font-bold">{item.title}</p>
-                    <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">{item.impact?.finalPriorityScore || item.priorityScore}</span>
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{item.text || item.evidenceComments?.[0]?.text || "No text captured."}</p>
-                  <p className="mt-2 text-[10px] text-muted-foreground">{item.platform} · {item.issueCategory}</p>
-                  <p className="mt-1 text-[10px] text-muted-foreground">
-                    influence {item.impact?.influenceScore ?? "—"} · engagement {item.impact?.engagementScore ?? "—"} · {item.authorProfile?.influenceSource || "unknown"}
-                  </p>
-                </a>
-              ))}
-              {!radarPositive.length ? <p className="rounded-xl border border-dashed border-green-200 p-3 text-xs text-muted-foreground">No positive PW-relevant parent posts in the last 72 hours.</p> : null}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Fastest issue clusters</p>
-            <div className="mt-3 space-y-2">
-              {radarClusters.slice(0, 4).map((cluster: any) => (
-                <div key={`${cluster.sentiment}-${cluster.name}`} className="rounded-xl border border-border bg-background p-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-bold">{cluster.name}</p>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold">{formatNumber(cluster.count)}</span>
-                  </div>
-                  <p className="mt-1 text-[10px] text-muted-foreground">{cluster.businessOwner} · {cluster.platforms?.join(", ")}</p>
-                </div>
-              ))}
-              {radarOwners.slice(0, 3).map((queue: any) => (
-                <div key={queue.owner} className="flex items-center justify-between rounded-xl border border-border px-3 py-2 text-xs">
-                  <span>{queue.owner}</span>
-                  <span className="font-bold">{formatNumber(queue.count)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="rounded-2xl border border-border bg-card p-5">
-        <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-purple">Latest Mentions</p>
-            <h2 className="mt-1 text-lg font-bold">Every PW-relevant mention the radar picked up</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              This is the raw mention stream after entity matching. Risk items stay in the escalation queue above.
-            </p>
-          </div>
-          <div className="rounded-xl border border-border px-3 py-2 text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Matched</p>
-            <p className="text-sm font-bold">{formatNumber(mentionStream.length)} latest</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {mentionStream.slice(0, 8).map((item: any) => {
-            const meta = platformMeta[item.platform] || { label: item.platform, href: "#", color: "#6B7280" };
-            return (
-              <a key={`mention-${item.id}`} href={item.url || meta.href || "#"} target={item.url ? "_blank" : undefined} rel={item.url ? "noopener noreferrer" : undefined} className="rounded-xl border border-border bg-background p-3 hover:border-purple/40">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ backgroundColor: meta.color }}>{meta.label}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${item.riskLane === "main_risk" ? "bg-red-100 text-red-700" : item.riskLane === "positive_signal" ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
-                    {item.riskLane === "main_risk" ? "risk" : item.riskLane === "positive_signal" ? "positive" : "mention"}
-                  </span>
-                </div>
-                <p className="line-clamp-2 text-sm font-bold">{item.title}</p>
-                <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{item.text || item.evidenceComments?.[0]?.text || "Mention captured without text body."}</p>
-                <p className="mt-2 text-[10px] text-muted-foreground">{item.reputationIntent} · score {item.impact?.finalPriorityScore ?? item.priorityScore ?? "—"}</p>
-              </a>
-            );
-          })}
-          {!mentionStream.length ? (
-            <p className="rounded-xl border border-dashed border-border p-4 text-xs text-muted-foreground md:col-span-2 xl:col-span-4">No PW-relevant mentions found for this window.</p>
-          ) : null}
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="rounded-2xl border border-border bg-card p-5">
-        <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-purple">Leadership Pulse</p>
-            <h2 className="mt-1 text-lg font-bold">Play Store rating momentum</h2>
-            <p className="mt-1 text-xs text-muted-foreground">A quick read on whether app-store trust is improving or slipping month by month.</p>
-          </div>
-          <div className="rounded-xl border border-border px-3 py-2 text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Latest</p>
-            <p className="text-sm font-bold">{displayMonth(latestPlayMonth.month)} · {latestPlayMonth.averageRating || "—"}★</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.45fr_0.9fr]">
-          <div className="overflow-hidden rounded-2xl border border-border bg-background/40 p-4">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="size-3.5 rounded-full border-4 bg-background" style={{ borderColor: "#14B8A6" }} />
-                <span>Average rating</span>
-              </div>
-              <p className="text-[10px] text-muted-foreground">Hover points for volume and low-rating pressure.</p>
-            </div>
-            <div className="h-[310px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={playPulseChartData} margin={{ top: 8, right: 18, left: 2, bottom: 8 }}>
-                  <defs>
-                    <linearGradient id="commandCenterRatingGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#14B8A6" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#14B8A6" stopOpacity={0.04} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="4 4" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickMargin={12} />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    domain={[minPlayRating, maxPlayRating]}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                    tickFormatter={(value) => `${Number(value).toFixed(2)}★`}
-                    width={48}
-                  />
-                  {latestPlayMonth.month ? <ReferenceLine x={displayMonth(latestPlayMonth.month)} stroke="#14B8A6" strokeWidth={1} /> : null}
-                  <Tooltip content={<PulseTooltip />} cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }} />
-                  <Area type="linear" dataKey="ratingArea" stroke="transparent" fill="url(#commandCenterRatingGradient)" dot={false} activeDot={false} />
-                  <Line
-                    type="linear"
-                    dataKey="rating"
-                    name="Rating"
-                    stroke="#14B8A6"
-                    strokeWidth={2.5}
-                    dot={{ fill: "hsl(var(--background))", strokeWidth: 2.5, r: 6, stroke: "#14B8A6" }}
-                    activeDot={{ r: 7, fill: "hsl(var(--background))", stroke: "#14B8A6", strokeWidth: 3 }}
-                  />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div className="rounded-2xl border border-border p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">What it says</p>
-              <p className="mt-2 text-sm leading-relaxed">
-                App-store trust is at {latestPlayMonth.averageRating || "—"}★ in {displayMonth(latestPlayMonth.month)}.
-                {previousPlayMonth.averageRating ? ` Movement vs ${displayMonth(previousPlayMonth.month)} is ${(Number(latestPlayMonth.averageRating || 0) - Number(previousPlayMonth.averageRating || 0)).toFixed(2)}★.` : ""}
-              </p>
-            </div>
-            <Link href="/playstore" className="block rounded-2xl border border-[#34A853]/30 p-4 hover:border-[#34A853]/70">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#34A853]">Open detail</p>
-              <p className="mt-2 text-sm font-bold">See versions, issue clusters and comment evidence</p>
-              <p className="mt-1 text-xs text-muted-foreground">{formatNumber(pPrimary.textReviewCount || 0)} written reviews are available for root-cause reading.</p>
-            </Link>
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <PlatformCard id="freshdesk" metric={`${formatNumber(fStats.totalTickets || 0)} tickets`} sentiment={`${fStats.controlledRate || 0}% controlled, ${formatNumber(fStats.activeTickets || 0)} live`} issue={topFreshdesk ? `${topFreshdesk.name} is the biggest ask` : "Support issues available"} proof={topFreshdesk ? `${formatNumber(topFreshdesk.count)} tickets. Students are asking for order status, delivery clarity, access help, and payment/refund resolution.` : "Freshdesk export loaded."} />
-        <PlatformCard id="playstore" metric={`${formatNumber(pPrimary.sampleSize || 0)} reviews`} sentiment={`${pPrimary.averageRating || "—"}★ average, ${pPrimary.lowRatingRate || 0}% low ratings`} issue={topPlayTheme ? `${topPlayTheme.name} leads written reviews` : "Written review themes available"} proof={topPlayTheme ? `${formatNumber(topPlayTheme.mentions)} written-review mentions. Read comments, not crash telemetry, to understand what students feel.` : "Play Store comments loaded."} />
-        <PlatformCard id="reddit" metric={`${formatNumber(rStats.totalMentions || 0)} posts shown`} sentiment={`${rStats.positiveCount || 0} positive / ${rStats.negativeCount || 0} negative classified`} issue="Anonymous long-form trust debate" proof={`${rStats.topSubreddit || "Reddit"} is where students compare PW against alternatives and narrate frustration in detail.`} />
-        <PlatformCard id="instagram" metric={`${formatNumber(iStats.totalPosts || 0)} posts`} sentiment={`${iSent.positive || 0} positive / ${iSent.negative || 0} negative`} issue="Campaign and community reaction" proof={`${formatNumber(iStats.totalReelPlays || 0)} reel plays. Comments show real asks behind polished posts.`} />
-        <PlatformCard id="youtube" metric={`${formatNumber(yStats.totalVideos || 0)} videos`} sentiment={`${ySent.positive || 0} positive / ${ySent.negative || 0} negative`} issue={`${yStats.prRiskCount || 0} videos flagged for PR risk`} proof="Thumbnails and comments show which narratives students and creators are actually watching." />
-        <PlatformCard id="google" metric={`${formatNumber(gStats.totalAutocomplete || 0)} suggestions`} sentiment={`${gStats.negativeAutocomplete || 0} negative, ${gStats.warningAutocomplete || 0} warning`} issue="Enrollment front-door risk" proof="Google autocomplete and SERP decide what parents see before they trust the brand." />
-        <PlatformCard id="linkedin" metric={`${formatNumber(lStats.totalPosts || 0)} PW discussion posts`} sentiment={`${lSent.positive || 0} positive / ${lSent.negative || 0} negative`} issue="Professional reputation and employer-brand read" proof={`${formatNumber(lStats.evidenceComments || 0)} visible comments are attached under parent posts, so reactions support the post instead of becoming noisy top-level items.`} />
-      </motion.section>
-
-      <motion.section variants={fadeUp as any}>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Incident Candidates</p>
-          <h2 className="mt-1 text-lg font-bold">Issues the algorithm would watch or open</h2>
-          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {incidentCandidates.map((incident: any) => (
-              <Link key={`${incident.platformLabel}-${incident.id}`} href={incident.href} className="block rounded-xl border border-border p-4 hover:border-purple/50">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{incident.platformLabel} · {incident.status}</p>
-                    <h3 className="mt-1 text-sm font-bold">{incident.title}</h3>
-                  </div>
-                  <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${incident.crisisScore >= 70 ? "bg-red-100 text-red-700" : incident.crisisScore >= 50 ? "bg-orange-100 text-orange-700" : "bg-muted text-muted-foreground"}`}>
-                    {incident.crisisScore}
-                  </span>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">{incident.owner} · {incident.crisisLevel} · {incident.negativeShare}% negative evidence</p>
-                <p className="mt-2 line-clamp-2 text-[10px] text-muted-foreground">{(incident.drivers || []).join(" · ")}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any}>
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-          <CarouselSection title="YouTube Shorts In Last 24h" eyebrow="PW Shorts Auto-Scroll" items={youtubeShorts} emptyCopy={`No PW-owned Shorts found in the latest 24h window${youtubeWindow.to ? ` ending ${new Date(youtubeWindow.to).toLocaleString("en-IN")}` : ""}.`} />
-          <CarouselSection title="YouTube Videos In Last 24h" eyebrow="PW Video Auto-Scroll" items={youtubeLongVideos} emptyCopy={`No PW-owned long videos found in the latest 24h window${youtubeWindow.to ? ` ending ${new Date(youtubeWindow.to).toLocaleString("en-IN")}` : ""}.`} />
-          <CarouselSection title="Instagram Reels Moving Now" eyebrow="PW Reels Carousel" items={instagramReels} emptyCopy="No official PW Instagram reels are ready for this view right now." />
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="space-y-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-purple" />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Month On Month</p>
-            <h2 className="text-lg font-bold">What changed since the previous month</h2>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-6">
-          {movementCards.map((card) => <MovementCard key={`${card.platform}-${card.metric}`} {...card} />)}
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="rounded-2xl border border-border bg-card p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Cross-Platform Clusters</p>
-        <h2 className="mt-1 text-lg font-bold">The student asks behind the charts</h2>
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {clusters.map((cluster: any, index: number) => (
-            <div key={`${cluster.platform}-${cluster.name}-${index}`} className="rounded-xl border border-border p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{cluster.platform}</p>
-                  <h3 className="mt-1 text-sm font-bold">{cluster.name}</h3>
-                </div>
-                <span className="rounded-full bg-muted px-2 py-1 text-[10px] font-bold">{formatNumber(cluster.mentions || 0)}</span>
-              </div>
-              {evidenceText(cluster.evidence?.[0]) ? (
-                <p className="mt-3 line-clamp-3 text-xs italic leading-relaxed text-muted-foreground">&ldquo;{evidenceText(cluster.evidence[0])}&rdquo;</p>
-              ) : (
-                <p className="mt-3 text-xs text-muted-foreground">Cluster available; evidence opens inside the platform detail view.</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </motion.section>
-
-      <motion.section variants={fadeUp as any} className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-5 xl:col-span-2">
-          <div className="mb-4 flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-            <h2 className="text-lg font-bold">What needs action now</h2>
-          </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            <Link href="/freshdesk" className="rounded-xl border border-border p-4 hover:border-purple/50">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Support ask</p>
-              <p className="mt-2 text-sm font-bold">Where is my order / access / refund?</p>
-              <p className="mt-1 text-xs text-muted-foreground">{topFreshdesk ? `${formatNumber(topFreshdesk.count)} tickets in ${topFreshdesk.name}.` : "Freshdesk categories loaded."}</p>
-            </Link>
-            <Link href="/playstore" className="rounded-xl border border-border p-4 hover:border-purple/50">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">App-store feeling</p>
-              <p className="mt-2 text-sm font-bold">Students praise teaching but complain about delivery/access.</p>
-              <p className="mt-1 text-xs text-muted-foreground">{formatNumber(pPrimary.textReviewCount || 0)} written reviews available.</p>
-            </Link>
-            <Link href="/google" className="rounded-xl border border-border p-4 hover:border-purple/50">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Reputation risk</p>
-              <p className="mt-2 text-sm font-bold">Negative suggestions still appear in search.</p>
-              <p className="mt-1 text-xs text-muted-foreground">{negativeAutocompleteRate}% of autocomplete suggestions are negative.</p>
-            </Link>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="mb-4 flex items-center gap-2">
-            <Heart className="h-4 w-4 text-green-600" />
-            <h2 className="text-lg font-bold">Voice snippets</h2>
-          </div>
-          <div className="space-y-2">
-            {urgentFreshdesk.map((ticket: any) => (
-              <div key={ticket.ticketId} className="rounded-xl border border-border p-3">
-                <p className="text-[10px] font-semibold text-muted-foreground">Freshdesk · {ticket.group}</p>
-                <p className="mt-1 line-clamp-2 text-xs">{ticket.subject}</p>
-              </div>
-            ))}
-            {(youtube.data?.topComments || []).slice(0, 2).map((comment: any, index: number) => (
-              <div key={index} className="rounded-xl border border-border p-3">
-                <p className="text-[10px] font-semibold text-muted-foreground">YouTube comment</p>
-                <p className="mt-1 line-clamp-2 text-xs">&ldquo;{comment.text}&rdquo;</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-    </motion.div>
-  );
+  return <div className="cp-overview">
+    <section className="cp-hero">
+      <div className="cp-heading"><p>Data based on active OVAL sources</p><h2>Overview Panel</h2></div>
+      <div className="cp-insights" aria-label="High-attention evidence carousel" onMouseEnter={() => setCarouselPaused(true)} onMouseLeave={() => setCarouselPaused(false)} onFocusCapture={() => setCarouselPaused(true)} onBlurCapture={() => setCarouselPaused(false)}>
+        {stackedInsights.slice().reverse().map((insight, reverseIndex) => {
+          const depth = stackedInsights.length - reverseIndex;
+          return <article key={`back-${insight.title}`} className={`cp-insight-back cp-insight-back-${depth}`} aria-hidden="true"><p><Image src={insight.iconSrc} alt="" width={28} height={28} className="cp-carousel-source-icon" /></p><h3>&ldquo;{insight.text}&rdquo;</h3></article>;
+        })}
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.article
+            key={insightIndex}
+            className="cp-insight-card"
+            initial={{ x: 70, opacity: 0, scale: 0.96 }}
+            animate={{ x: 0, opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ x: -240, y: 20, opacity: 0, rotate: -7, scale: 0.94 }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.18}
+            onDragEnd={(_, info) => { if (info.offset.x < -70 || info.velocity.x < -450) changeInsight(1); }}
+          >
+            <p><Image src={activeInsight.iconSrc} alt="" width={30} height={30} className="cp-carousel-source-icon" /><span className="sr-only">{activeInsight.title}</span><ExternalLink /></p>
+            <h3>&ldquo;{activeInsight.text}&rdquo;</h3>
+            <a className="cp-insight-evidence-link" href={activeInsight.href} target={activeInsight.external ? "_blank" : undefined} rel={activeInsight.external ? "noopener noreferrer" : undefined}>Open evidence <ExternalLink /></a>
+            <div className="cp-carousel-controls"><button onClick={() => changeInsight(-1)} aria-label="Previous insight"><ChevronLeft /></button><span>{insightIndex + 1} / {insights.length}</span><button onClick={() => changeInsight(1)} aria-label="Remove current card and show next insight"><ChevronRight /></button></div>
+            <small>Drag left or use the arrow to dismiss this card</small>
+          </motion.article>
+        </AnimatePresence>
+      </div>
+    </section>
+    {loading ? <p className="cp-loading">Updating live readings as sources respond…</p> : null}
+    <section className="cp-grid">
+      <div className="cp-left-grid">
+        <ChannelCard label="Play Store" href="/playstore" iconSrc="/platform-icons/play-store.png" value={Number(app.sampleSize || 0)} unit="reviews captured" summary={`${Number(app.averageRating || 0).toFixed(2)}★ average; ${formatNumber(appCritical)} low-rating reviews need attention.`} segments={[{ label: "4–5★", value: playPositive, tone: "positive" }, { label: "3★", value: playNeutral, tone: "neutral" }, { label: "1–2★", value: appCritical, tone: "negative" }]} />
+        <ChannelCard label="LinkedIn" href="/linkedin" iconSrc="/platform-icons/linkedin.png" value={linkedinSignals} unit="posts captured" summary={`Conversation is positive-leaning; ${formatNumber(linkedinCritical)} posts are negative.`} segments={[{ label: "Positive", value: Number(linkedin.data?.stats?.positive || 0), tone: "positive" }, { label: "Neutral", value: Number(linkedin.data?.stats?.neutral || 0), tone: "neutral" }, { label: "Negative", value: linkedinCritical, tone: "negative" }]} />
+        <ChannelCard label="YouTube" href="/youtube" iconSrc="/platform-icons/youtube.webp" value={youtubeSignals} unit="comments classified" summary={`${youtubeSentiment.overall || "Mixed"} sentiment; ${formatNumber(youtubeNegative)} comments are negative.`} segments={[{ label: "Positive", value: youtubePositive, tone: "positive" }, { label: "Neutral", value: youtubeNeutral, tone: "neutral" }, { label: "Negative", value: youtubeNegative, tone: "negative" }]} />
+        <ChannelCard label="Freshdesk" href="/freshdesk" iconSrc="/platform-icons/freshdesk.webp" value={freshdeskSignals} unit="tickets captured" summary={`${formatNumber(freshdeskAttention)} tickets are active and require operational follow-through.`} segments={[{ label: "Closed", value: freshdeskClosed, tone: "positive" }, { label: "Other", value: freshdeskOther, tone: "neutral" }, { label: "Active", value: freshdeskAttention, tone: "negative" }]} />
+      </div>
+    </section>
+    <section className="cp-live-stream">
+      <div className="cp-live-heading"><div><p>Live intelligence</p><h3>Latest source evidence</h3><small>Recent posts, reviews, discussions, and support patterns requiring validation.</small></div><span>{liveSignals.length} verified signals</span></div>
+      <div className="cp-live-list">{liveSignals.length ? liveSignals.map((signal, index) => {
+        const tone = ["negative", "critical", "attention"].includes(String(signal.state).toLowerCase()) ? "critical" : String(signal.state).toLowerCase() === "positive" ? "positive" : "neutral";
+        return <article className="cp-evidence-card" key={`${signal.source}-${index}`}><header><span className="cp-evidence-source"><Image src={sourceIcons[signal.source] || sourceIcons.Freshdesk} alt="" width={24} height={24} />{signal.source}</span><span className={`cp-evidence-badge cp-evidence-${tone}`}>{tone === "critical" ? "Needs attention" : tone}</span></header><div className="cp-evidence-body"><h4>{signal.title}</h4><p>{String(signal.text).replace(/\s+/g, " ").slice(0, 210)}</p></div><footer><small>{signal.time ? new Date(signal.time).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Latest refresh"}</small>{signal.url ? <a href={signal.url} target="_blank" rel="noopener noreferrer">View evidence <ExternalLink /></a> : <span>Internal evidence</span>}</footer></article>;
+      }) : <p className="cp-empty">No source evidence is available yet. The next successful collector refresh will populate this stream.</p>}</div>
+    </section>
+    <p className="cp-freshness">Updated {freshness ? new Date(freshness).toLocaleString("en-IN") : "when the latest source refresh completes"}</p>
+    {assistantOpen ? <aside className="cp-ai-float-panel" aria-label="OVAL AI Assistant">
+      <header><span><Bot aria-hidden="true" />AI Assistant</span><button type="button" onClick={() => setAssistantOpen(false)} aria-label="Close AI assistant"><X aria-hidden="true" /></button></header>
+      <div className="cp-ai-conversation">
+        <section><span className="cp-ai-user-avatar">PW</span><div><b>Physics Wallah</b><p>{assistantQuestion}</p></div></section>
+        <section><span className="cp-ai-oval-avatar">O</span><div><b>OVAL</b><p>The leading cross-channel pattern is <strong>{topIssue}</strong>. Current attention volume includes {formatNumber(appCritical)} low-rating reviews, {formatNumber(linkedinCritical)} negative LinkedIn posts, and {formatNumber(freshdeskAttention)} active support tickets.</p><div className="cp-ai-mini-reading"><span style={{ width: `${share(appCritical, appCritical + linkedinCritical + freshdeskAttention)}%` }} /><i style={{ width: `${share(linkedinCritical, appCritical + linkedinCritical + freshdeskAttention)}%` }} /><b /></div><small>AI-generated read · validate against evidence</small></div></section>
+      </div>
+      <div className="cp-ai-tools"><label><FileText />Files<input type="file" /></label><label><ImageIcon />Images<input type="file" accept="image/*" /></label><button type="button" onClick={() => setAssistantQuery("Summarise the latest voice-of-customer themes")}><Mic />Audio Chat</button></div>
+      <form className="cp-ai-composer" onSubmit={askAssistant}><input value={assistantQuery} onChange={(event) => setAssistantQuery(event.target.value)} placeholder="Enter your AI Assistant request" aria-label="AI Assistant request" /><label aria-label="Attach supporting file"><Plus /><input type="file" /></label><button type="submit" aria-label="Send request"><Send /></button></form>
+    </aside> : null}
+    <button type="button" className="cp-ai-fab" aria-expanded={assistantOpen} aria-label={assistantOpen ? "Close OVAL AI Assistant" : "Open OVAL AI Assistant"} onClick={() => setAssistantOpen((current) => !current)}><Bot aria-hidden="true" /></button>
+  </div>;
 }

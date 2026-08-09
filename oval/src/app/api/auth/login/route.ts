@@ -1,42 +1,27 @@
-import { createHash } from "crypto";
 import { NextResponse } from "next/server";
+import { crmSessionClient } from "@/lib/crm-server";
 
 export const dynamic = "force-dynamic";
-
 const PW_EMAIL = /^[a-z0-9._%+-]+@pw\.live$/i;
 
 export async function POST(request: Request) {
-  let body: { email?: string; password?: string };
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    const body = await request.json();
+    const email = String(body.email || "").trim().toLowerCase();
+    if (!PW_EMAIL.test(email)) return NextResponse.json({ error: "Access is limited to @pw.live email IDs" }, { status: 400 });
+    const supabase = crmSessionClient();
+    if (body.otp) {
+      const result = await supabase.auth.verifyOtp({ email, token: String(body.otp).trim(), type: "email" });
+      if (result.error) return NextResponse.json({ error: result.error.message }, { status: 401 });
+      return NextResponse.json({ ok: true, user: { email: result.data.user?.email } });
+    }
+    const result = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true, emailRedirectTo: `${new URL(request.url).origin}/auth/callback?next=/issues` },
+    });
+    if (result.error) return NextResponse.json({ error: result.error.message }, { status: 400 });
+    return NextResponse.json({ ok: true, otpSent: true });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Could not authenticate" }, { status: 500 });
   }
-
-  const email = String(body.email || "").trim().toLowerCase();
-  const password = String(body.password || "");
-
-  if (!PW_EMAIL.test(email)) {
-    return NextResponse.json({ error: "Access is limited to @pw.live email IDs" }, { status: 401 });
-  }
-  if (!process.env.ACCESS_PASSWORD || password !== process.env.ACCESS_PASSWORD) {
-    return NextResponse.json({ error: "Incorrect access password" }, { status: 401 });
-  }
-
-  console.log(`[auth] login ok: ${email} at ${new Date().toISOString()}`);
-
-  const token = createHash("sha256").update(`oval-access:${process.env.ACCESS_PASSWORD}`).digest("hex");
-  const response = NextResponse.json({ ok: true });
-  response.cookies.set("oval_access", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-  response.cookies.set("oval_user", email, {
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-  return response;
 }

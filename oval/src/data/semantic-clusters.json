@@ -1,0 +1,2455 @@
+{
+  "version": "1.0",
+  "brand_id": "166d8523-79a0-4b1c-b56f-8b40b6cc2f1f",
+  "generated_at": "2026-08-04T11:27:48.076523+00:00",
+  "platforms": {
+    "playstore": {
+      "platform": "playstore",
+      "label": "Play Store",
+      "source_count": 368,
+      "clustered_source_count": 53,
+      "cluster_scope": "negative evidence",
+      "sentiment": {
+        "positive": 297,
+        "neutral": 18,
+        "negative": 53
+      },
+      "cluster_count": 6,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "61fe93b7-8926-5a64-baf0-d473d42b1cf1",
+          "label": "App stability and loading",
+          "summary": "Students encounter crashes, glitches, lag or content that disappears while using the app. Repeated semantic signals include study, test, open.",
+          "why_it_matters": "Reliability problems interrupt study sessions and can depress app-store conversion.",
+          "count": 19,
+          "share": 35.8,
+          "cohesion": 0.639,
+          "prototype_similarity": 0.451,
+          "confidence": "high",
+          "subthemes": [
+            "study",
+            "test",
+            "open",
+            "screen"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 19
+          },
+          "source_ids": [
+            "ac54ccac-dd73-4157-83fc-698da88885d6",
+            "eda4534c-93ac-4295-9747-2c7185e26239",
+            "5d7921b2-b230-4a93-b58a-6fe72c33c108",
+            "fdd3c3eb-d602-47a9-aa59-e1a78329027c",
+            "f686087c-a84c-4581-acfd-c63aa7c1331d",
+            "17d288b5-ec70-48b0-9176-fa13abe67a84",
+            "e8eeb16c-14fa-4c36-b9c9-2c59aeb1ef42",
+            "2ba59a09-c30d-46b4-af9f-4c2cd24a31e4",
+            "709aa469-ef06-43b9-a6c4-9ab59ef9ce36",
+            "c36a430d-d91f-41a9-ad90-260de1e3417d",
+            "77ee0712-2e74-4791-bf6f-3ee945bd96d7",
+            "da5b1e2f-b4b6-46ca-bdf5-df7d296f6361",
+            "33676a5c-594f-430b-b69e-bea550eacc13",
+            "42d6041c-b49e-42d7-8002-e9b701ea01e0",
+            "07008552-1abf-4995-9ce6-5f5306fab96c",
+            "88ac7ff9-67f9-4426-af49-95b2ee5e0d02",
+            "66442165-34ce-4a4c-a166-1ad23b12a3e5",
+            "9cd6862a-f329-40ce-965a-258551e2b2ee",
+            "fd1bddad-8324-4efb-8634-c3411c951cdd"
+          ],
+          "representative_evidence": [
+            {
+              "id": "da5b1e2f-b4b6-46ca-bdf5-df7d296f6361",
+              "text": "Facing a very strange issue every time I open the app it keeps crashing at the login screen.",
+              "sentiment": "negative",
+              "author": "Viplov Kumar",
+              "url": null,
+              "published_at": "2026-07-19T10:21:55+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "709aa469-ef06-43b9-a6c4-9ab59ef9ce36",
+              "text": "My app's been glitching all day. Can it be fixed soon, please?",
+              "sentiment": "negative",
+              "author": "Phoebe Buffay",
+              "url": null,
+              "published_at": "2026-07-19T14:13:31+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "42d6041c-b49e-42d7-8002-e9b701ea01e0",
+              "text": "I am using this app currently on my ipad but many features of the app are not available for example the catchup ,test pass , digital book",
+              "sentiment": "negative",
+              "author": "Samiksha Sharma",
+              "url": null,
+              "published_at": "2026-07-19T07:29:21+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "66442165-34ce-4a4c-a166-1ad23b12a3e5",
+              "text": "This app is totally fraud i have paid all the fees for umang 2.0 batch and now my live classes are not coming . i request you to do not install this app.",
+              "sentiment": "negative",
+              "author": "Bharat Pawar",
+              "url": null,
+              "published_at": "2026-07-19T04:01:04+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "ac54ccac-dd73-4157-83fc-698da88885d6",
+              "text": "after the recent update there is an bug in the software idk what but if I open my app then it automatically takes me to the home page nd I don't know what to do I try everything clearing cache nd everything uninstall nd install but it's not fixing nd chatgpt says there is a chance that in recent update there will be an bug so I want you to fix this as soon as possible Im not be able to attend classes I've paid money to attend class not to fix some bug",
+              "sentiment": "negative",
+              "author": "Gaurav Yadav",
+              "url": null,
+              "published_at": "2026-07-20T14:40:38+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "77ee0712-2e74-4791-bf6f-3ee945bd96d7",
+              "text": "unfortunately this new version of the app is not accessible in the mac book system.. can this problem be rectified soon ??",
+              "sentiment": "negative",
+              "author": "Aaryan Mukherjee",
+              "url": null,
+              "published_at": "2026-07-19T11:00:03+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "46b271a1-fdbb-5407-9a95-a50d951db4ab",
+          "label": "Teaching and course experience",
+          "summary": "Students discuss faculty quality, course structure, syllabus coverage and whether the teaching experience meets expectations. Repeated semantic signals include class, teachers, teaching.",
+          "why_it_matters": "This cluster protects PW's central academic proposition and should remain separate from app defects.",
+          "count": 14,
+          "share": 26.4,
+          "cohesion": 0.618,
+          "prototype_similarity": 0.385,
+          "confidence": "medium",
+          "subthemes": [
+            "class",
+            "teachers",
+            "teaching",
+            "book"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 14
+          },
+          "source_ids": [
+            "be9217b2-ce31-46e5-976e-5d7ba971316c",
+            "6525cc2a-1a02-482c-8c27-3ab786ab62eb",
+            "49a30547-e923-4d49-89dc-a09edb832f1a",
+            "11b49553-dcc9-4c02-86ff-1facf6a0c1df",
+            "04e56db1-dc15-41ef-9a95-e882f11991f2",
+            "3eb0b0af-1a61-4b5c-8db9-574fd35a5482",
+            "2ee22e11-a05d-4289-af46-02251cf12d48",
+            "fabe7f78-bd00-440c-a8fd-48304046f5e5",
+            "b02b78ab-5d84-4126-9dc7-b147cc12cd35",
+            "b7c0eb10-bcfc-4ab3-9c6a-8b3fc0473553",
+            "c094bedc-ca7a-461e-b66c-96d4cfb9331b",
+            "86b57f81-0a03-4263-8db4-d6473107b0db",
+            "38348d98-b0a4-4e41-89da-63939eee2119",
+            "dd66d880-9b5c-4427-94b7-b08197231a29"
+          ],
+          "representative_evidence": [
+            {
+              "id": "86b57f81-0a03-4263-8db4-d6473107b0db",
+              "text": "sirf do. teen teacher hi thik se padhte hain aur baki teacher bhi badal diye jaate hain .. kuch teachers to pdf read karke chale jate hain ..jab maine book bhi mangvaya tha to 5000 ke book ke nam par fraud kiya Gaya .. khazana ke nam pe alag se paise add kar dete hain offline staff ka behaviour bahut kharab tha... management bhi achi nahi hai brainwash acha karte hain ye log students ka ... don't believe",
+              "sentiment": "negative",
+              "author": "Sanjana Kumari",
+              "url": null,
+              "published_at": "2026-07-18T17:22:22+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "49a30547-e923-4d49-89dc-a09edb832f1a",
+              "text": "no doubt pw app bahot acha hai teachers are mine blowing but mere sath khuch din eak issue hua tha aap kabhi bhi iss app se module na le kyuki ye log offer bolke online payment lenge aur phir paisa wapas nhi denge kabhi bolenge ye check karo kabhi woh wahiyat hai ye kya batau june se leke abhi tak mera Paisa wapas nhi kiya inhone bolte hai ye check karwao woh karwao lekin aata khuch nhi please kabhi yaha se module na le",
+              "sentiment": "negative",
+              "author": "shweta Shweta devi",
+              "url": null,
+              "published_at": "2026-07-20T08:43:11+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "38348d98-b0a4-4e41-89da-63939eee2119",
+              "text": "student help and support system total bakbas hi batch lene se pahle call pe call ,or batch lene ke baad ek issue ko report kar karke dimag kharab ho jaye majal hi ki pw usko solve kare ya student se baat kare total sirdard option hi help and support option in pw",
+              "sentiment": "negative",
+              "author": "shivakant tiwari",
+              "url": null,
+              "published_at": "2026-07-18T14:19:16+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "11b49553-dcc9-4c02-86ff-1facf6a0c1df",
+              "text": "they make people fool I purchase course for teaching exam in Mp but they are not teahing maths properly no detailed class only intro end left u can never pass exam in that class",
+              "sentiment": "negative",
+              "author": "latika Mahant",
+              "url": null,
+              "published_at": "2026-07-20T07:03:01+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "fabe7f78-bd00-440c-a8fd-48304046f5e5",
+              "text": "very nice class",
+              "sentiment": "negative",
+              "author": "LONELY ANSH",
+              "url": null,
+              "published_at": "2026-07-19T08:46:43+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "be9217b2-ce31-46e5-976e-5d7ba971316c",
+              "text": "Mai pw store sw AEK book ka set mangya tha aur us me se AEK book fati Hui nikli hai aur muje padne me dikkat ho Rahi hai aur muje ye accept nahi karna hai",
+              "sentiment": "negative",
+              "author": "Shaikh Abrar",
+              "url": null,
+              "published_at": "2026-07-20T16:59:31+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "f24d967c-02bb-537f-8a4c-9cb5fa5875ce",
+          "label": "Paid batch access and entitlement",
+          "summary": "Students paid for learning access but cannot reach the promised batch, class or validity period. Repeated semantic signals include money, class, batch.",
+          "why_it_matters": "Paid-access failure turns a product defect into a direct trust and refund risk.",
+          "count": 5,
+          "share": 9.4,
+          "cohesion": 0.622,
+          "prototype_similarity": 0.383,
+          "confidence": "medium",
+          "subthemes": [
+            "money",
+            "class",
+            "batch",
+            "slow"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 5
+          },
+          "source_ids": [
+            "18d0f4eb-3049-4153-b343-b61eb96bd7ce",
+            "3bd1465a-230f-4869-a1b5-8484e74c27f1",
+            "b6174b92-eca8-4ab5-8c5d-26f9d12f7a80",
+            "6a1f40f1-16a9-42b0-bf7e-6fab37cca536",
+            "9e26105a-de06-401c-9b46-137c1e788cd5"
+          ],
+          "representative_evidence": [
+            {
+              "id": "9e26105a-de06-401c-9b46-137c1e788cd5",
+              "text": "app mentioned that my certified ethical hacking course starting on 18 july 2026 and i paid 4999 rupees but totay is 19 july 2026 but batch shows no data or empty. They do not deserve even 1 star rating",
+              "sentiment": "negative",
+              "author": "Ansh Gupta",
+              "url": null,
+              "published_at": "2026-07-19T06:26:10+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "18d0f4eb-3049-4153-b343-b61eb96bd7ce",
+              "text": "My experience with Physics Wallah App class was extremely disappointing. I had taken within 20 days id is a blocked join class 1year but after 20 days parmanent blocked Calling children 'criminal' has a profound impact on their future and mental health. According to the justice, Indian law does not consider children as criminals, but rather sees them as \"children\" in need of reform.",
+              "sentiment": "negative",
+              "author": "Prathm Garg",
+              "url": null,
+              "published_at": "2026-07-20T07:37:55+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "3bd1465a-230f-4869-a1b5-8484e74c27f1",
+              "text": "I'm disappointed with the support experience.I am still eligible for the CSAT batch and have already shared screenshots proving my access and eligibility. However, it has been over 7 days since I first emailed, and despite sending reminders, I have not received any response. My batch is still locked, even though I am entitled to access it. I request that my access be restored immediately or that I be given a clear explanation for denying access to a batch I am legitimately eligible for.",
+              "sentiment": "negative",
+              "author": "Aisha Aishwarya",
+              "url": null,
+              "published_at": "2026-07-20T03:44:12+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "b6174b92-eca8-4ab5-8c5d-26f9d12f7a80",
+              "text": "My books are not shipped. And the batch is so slow. Teaching is okay but the pace is slow. I wasted my money.",
+              "sentiment": "negative",
+              "author": "Smriti Rekha Das",
+              "url": null,
+              "published_at": "2026-07-19T10:02:30+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "6a1f40f1-16a9-42b0-bf7e-6fab37cca536",
+              "text": "worth of money pw class mai 🤧🤧",
+              "sentiment": "negative",
+              "author": "Shivang Gupta",
+              "url": null,
+              "published_at": "2026-07-19T09:24:09+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 3
+        },
+        {
+          "id": "e8dc363a-b0d0-5128-926d-08f17c2c3423",
+          "label": "Support response and resolution",
+          "summary": "Students repeatedly seek help but report unanswered emails, calls or tickets and no visible resolution path. Repeated semantic signals include poor, support, team.",
+          "why_it_matters": "Slow recovery amplifies otherwise-fixable product and payment problems.",
+          "count": 4,
+          "share": 7.5,
+          "cohesion": 0.623,
+          "prototype_similarity": 0.305,
+          "confidence": "low",
+          "subthemes": [
+            "poor",
+            "support",
+            "team",
+            "help"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 4
+          },
+          "source_ids": [
+            "f642578e-d013-4494-960d-393714c2d438",
+            "642d53c1-7699-4345-918a-33fb59970fe4",
+            "5ca0ea7b-358e-4be8-ad9c-bffbd9806a3f",
+            "7b7487e0-df31-46bb-b489-383478291adf"
+          ],
+          "representative_evidence": [
+            {
+              "id": "642d53c1-7699-4345-918a-33fb59970fe4",
+              "text": "support team very poor 😢 😭😭",
+              "sentiment": "negative",
+              "author": "Ankit thakur",
+              "url": null,
+              "published_at": "2026-07-20T11:02:42+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "7b7487e0-df31-46bb-b489-383478291adf",
+              "text": "help support is very poor",
+              "sentiment": "negative",
+              "author": "ChandraShekhar Toshavada",
+              "url": null,
+              "published_at": "2026-07-18T15:44:44+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "5ca0ea7b-358e-4be8-ad9c-bffbd9806a3f",
+              "text": "I regret registering. Soon after signing up, I started getting frequent marketing calls. Please reduce promotional calling and respect users' preferences.",
+              "sentiment": "negative",
+              "author": "Ashparsh Pandey",
+              "url": null,
+              "published_at": "2026-07-20T09:10:24+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "f642578e-d013-4494-960d-393714c2d438",
+              "text": "please give access two people on same mobile number",
+              "sentiment": "negative",
+              "author": "chandra shekhar Toshavada",
+              "url": null,
+              "published_at": "2026-07-20T11:30:49+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "6d1ec634-8c7d-5ee3-8ded-c70b8fa0a88f",
+          "label": "General dissatisfaction",
+          "summary": "Low-rating comments express dissatisfaction but provide too little detail to diagnose a specific product failure. Repeated semantic signals include experience, itma, sahi.",
+          "why_it_matters": "These signals should be monitored but kept out of actionable engineering counts until clarified.",
+          "count": 3,
+          "share": 5.7,
+          "cohesion": 0.686,
+          "prototype_similarity": 0.303,
+          "confidence": "low",
+          "subthemes": [
+            "experience",
+            "itma",
+            "sahi",
+            "10 complaint"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 3
+          },
+          "source_ids": [
+            "560afcd9-c879-44ac-9c27-e0c274ed1a37",
+            "7b5aba0b-d749-4306-8507-a722e860f432",
+            "0ee7aae1-1e4c-46d0-ab10-1a56838573a6"
+          ],
+          "representative_evidence": [
+            {
+              "id": "0ee7aae1-1e4c-46d0-ab10-1a56838573a6",
+              "text": "itma jayada bekar app h 10 complaint karne ke bad bhi kuch sahi nahi kiya",
+              "sentiment": "negative",
+              "author": "PRADEEP Sahu",
+              "url": null,
+              "published_at": "2026-07-19T10:10:47+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "560afcd9-c879-44ac-9c27-e0c274ed1a37",
+              "text": "very bad experience",
+              "sentiment": "negative",
+              "author": "Mohd Aareez Khan",
+              "url": null,
+              "published_at": "2026-07-20T10:02:23+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "7b5aba0b-d749-4306-8507-a722e860f432",
+              "text": "Don't get me wrong, but you seriously need to change this AI moderation system. I literally got banned from posting in the community because it said I used \"prohibited words,\" even though I didn't use any slurs or anything inappropriate at all. My post was literally about studies. I got banned for absolutely no reason, and honestly, it's so freaking irritating. Please fix it ASAP because it's becoming impossible to post or even ask simple questions without getting flagged.",
+              "sentiment": "negative",
+              "author": "Kaia",
+              "url": null,
+              "published_at": "2026-07-19T21:31:11+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 5
+        },
+        {
+          "id": "90a29920-854b-56a5-8a45-169426e191c7",
+          "label": "Refunds, payments and deductions",
+          "summary": "Students describe completed payments, disputed deductions or refunds that remain unresolved after cancellation. Repeated semantic signals include exchange, arjuna, veri ghatiya.",
+          "why_it_matters": "Money-related failures create the highest escalation and reputational risk.",
+          "count": 3,
+          "share": 5.7,
+          "cohesion": 0.698,
+          "prototype_similarity": 0.323,
+          "confidence": "low",
+          "subthemes": [
+            "exchange",
+            "arjuna",
+            "veri ghatiya",
+            "model question"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 3
+          },
+          "source_ids": [
+            "f1124200-7275-4cbb-a90c-fb9831760f66",
+            "a133a498-2229-49a5-ac82-76adada155dc",
+            "13c469ef-5b76-4631-bf60-966067667a1f"
+          ],
+          "representative_evidence": [
+            {
+              "id": "13c469ef-5b76-4631-bf60-966067667a1f",
+              "text": "mere ko mere paise refund chahie veri ghatiya model mein question nahin Hai",
+              "sentiment": "negative",
+              "author": "Dharmendra Barnwal",
+              "url": null,
+              "published_at": "2026-07-18T18:25:47+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "f1124200-7275-4cbb-a90c-fb9831760f66",
+              "text": "Mene galti se arjuna jee batch le liya...Jab m exchange k liye kahta hun to support team gussa m kahte h nhi hoga exchange..Aur m arjuna neet ko afford nhi kr skta..",
+              "sentiment": "negative",
+              "author": "Krishna Kumar",
+              "url": null,
+              "published_at": "2026-07-19T14:49:49+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "a133a498-2229-49a5-ac82-76adada155dc",
+              "text": "i purchased some books accidentally so there are not refunded me even i reported my issue so be careful while purchasing",
+              "sentiment": "negative",
+              "author": "Mohammed Shafee",
+              "url": null,
+              "published_at": "2026-07-19T12:21:34+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 6
+        }
+      ]
+    },
+    "linkedin": {
+      "platform": "linkedin",
+      "label": "LinkedIn",
+      "source_count": 261,
+      "clustered_source_count": 30,
+      "cluster_scope": "negative evidence",
+      "sentiment": {
+        "positive": 128,
+        "neutral": 103,
+        "negative": 30
+      },
+      "cluster_count": 5,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "bba97bd6-18df-5cae-b286-ed424ea41447",
+          "label": "Workplace culture and employee dignity",
+          "summary": "Employees or former employees allege disrespect, intimidation, retaliation or ignored internal complaints. Repeated semantic signals include employee, senior, kumar.",
+          "why_it_matters": "Workplace claims can affect hiring, retention and leadership credibility.",
+          "count": 9,
+          "share": 30.0,
+          "cohesion": 0.835,
+          "prototype_similarity": 0.301,
+          "confidence": "medium",
+          "subthemes": [
+            "employee",
+            "senior",
+            "kumar",
+            "experience"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 9
+          },
+          "source_ids": [
+            "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
+            "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
+            "d527f262-8cce-4f33-97c3-b43ed352d22b",
+            "2ffdf98d-3f73-4af2-bfbe-f42994b0d57a",
+            "4cd8a2e8-9faa-4109-a916-280872b78971",
+            "45cbf935-211e-482b-aff1-04ca8c206b7c",
+            "0f38f46c-96b6-4d5b-8161-466e945197cd",
+            "4c9deb12-efd5-4d57-9547-0e6ad5084af6",
+            "40ed565b-9e65-4903-a3cb-c8cf4bef7a19"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2ffdf98d-3f73-4af2-bfbe-f42994b0d57a",
+              "text": "Alakh Pandeysir PW (PhysicsWallah) PW Skills PW Support My Experience with Work Culture at PW Skills rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Alakh Pandeysir PW (PhysicsWallah). My first meeting with my new Senior Manager, Mrs. Sherya, was one of the most negative professional meetings I have experienced. Instead of discussing my return, expectations, onboarding, or understanding the circumstances, the conversat",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_workculture-edtech-pwskills-activity-7483394813719924737-sYX6",
+              "published_at": "2026-07-16T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "d527f262-8cce-4f33-97c3-b43ed352d22b",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual le",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual leadership don't mean shit there—you just have to be a top-tier ass-l",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
+              "text": "My Experience as an Employee PW Support PW (PhysicsWallah) Prateek Maheshwari Alakh Pandey rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- My Experience as an Employee PW Support]( Prateek Maheshwari. Shockingly, on just the second day of the PIP, my employment was terminated. The attached screenshot is evidence that I had already complained internally about disrespectful behavior and an unhealthy work environment. I c",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pwskills-edtech-activity-7483542681336426497-cPqW",
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "0f38f46c-96b6-4d5b-8161-466e945197cd",
+              "text": "Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. Sagar Sharma · · 2026-07-01 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. In my experience with Physics Wallah (PW), I found the sales process deeply disappointing. Instead of transparent guidance, I encountered promises that were difficult to verify. When I raised questions and chose not to proceed, the interaction became unprofessional, ",
+              "sentiment": "negative",
+              "author": "Sagar Sharma",
+              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_physicswallah-pwskills-edtech-activity-7478081308682911744-yPK8",
+              "published_at": "2026-07-01T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "45cbf935-211e-482b-aff1-04ca8c206b7c",
+              "text": "Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. Sagar Sharma · · 2026-07-01 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. In my experience with Physics Wallah (PW), I found the sales process deeply disappointing. Instead of transparent guidance, I encountered promises that were difficult to verify. When I raised questions and chose not to proceed, the interaction became unprofessional, ",
+              "sentiment": "negative",
+              "author": "Sagar Sharma",
+              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_physicswallah-pwskills-edtech-activity-7478081308682911744-yPK8",
+              "published_at": "2026-07-01T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "0fa1525f-61a0-5757-aeec-fecb68b80506",
+          "label": "Sales conduct and misleading promises",
+          "summary": "Prospects allege aggressive or misleading counselling and difficulty validating outcomes before purchase. Repeated semantic signals include kumar, big, learning.",
+          "why_it_matters": "Sales-governance failures can create both compliance risk and high-visibility warnings to other buyers.",
+          "count": 8,
+          "share": 26.7,
+          "cohesion": 0.719,
+          "prototype_similarity": 0.274,
+          "confidence": "medium",
+          "subthemes": [
+            "kumar",
+            "big",
+            "learning",
+            "000"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 8
+          },
+          "source_ids": [
+            "7f6b6e1b-4777-40b5-8f67-9ce4c581fedd",
+            "074e46a0-c148-4776-92c2-ef839e636279",
+            "70421dd3-96b0-4bf1-b45f-7e3f4c331c89",
+            "f7442678-af76-4f7f-9c08-234670d64547",
+            "740566b3-e2ed-4827-a0ac-653a813b21e7",
+            "dfea55f4-af71-4eac-869e-13926ec6cfa1",
+            "5ce8d581-f13e-4603-8279-eddd2b1d9607",
+            "078d4949-a280-4855-9bfa-03d6994e1868"
+          ],
+          "representative_evidence": [
+            {
+              "id": "5ce8d581-f13e-4603-8279-eddd2b1d9607",
+              "text": "Dear PW Support Team, PW (PhysicsWallah) Alakh Pandey sir Sinha Arvind · · 2026-06-30 Sinha Arvind : Sales Specialist at Self-employed with 24 years 5 months of experience. Previous roles include Co-Founder at Dirghayu Bharat, Sales And Marketing Specialist at Dirghayu Bharat, and Operation Manager at Reliance Retail. Based in Rajarhat, West Bengal, India [IN]. --- Dear PW Support Team, [PW (PhysicsWallah)]( [Alakh Pandey]( sir This is regarding the cancellation of my daughter's JEE Prayas Dropper Batch enrollment and the continuous EMI demands being raised despite our cancellation request. My daughter attended only approximately one week of classes. As soon as we decided to discontinue the ",
+              "sentiment": "negative",
+              "author": "Sinha Arvind",
+              "url": "https://www.linkedin.com/posts/sinha-arvind-5b6663269_dear-pw-support-team-pw-physicswallah-activity-7477800112782733313-MWe6",
+              "published_at": "2026-06-30T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "f7442678-af76-4f7f-9c08-234670d64547",
+              "text": "Dear PW Support Team, PW (PhysicsWallah) Alakh Pandey sir Sinha Arvind · · 2026-06-30 Sinha Arvind : Sales Specialist at Self-employed with 24 years 5 months of experience. Previous roles include Co-Founder at Dirghayu Bharat, Sales And Marketing Specialist at Dirghayu Bharat, and Operation Manager at Reliance Retail. Based in Rajarhat, West Bengal, India [IN]. --- Dear PW Support Team, [PW (PhysicsWallah)]( [Alakh Pandey]( sir This is regarding the cancellation of my daughter's JEE Prayas Dropper Batch enrollment and the continuous EMI demands being raised despite our cancellation request. My daughter attended only approximately one week of classes. As soon as we decided to discontinue the ",
+              "sentiment": "negative",
+              "author": "Sinha Arvind",
+              "url": "https://www.linkedin.com/posts/sinha-arvind-5b6663269_dear-pw-support-team-pw-physicswallah-activity-7477800112782733313-MWe6",
+              "published_at": "2026-06-30T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "078d4949-a280-4855-9bfa-03d6994e1868",
+              "text": "⚠️ A Word of Caution for Students Considering Physics Wallah (PW) Courses Sagar Sharma · · 2026-06-24 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- ⚠️ A Word of Caution for Students Considering Physics Wallah (PW) Courses Before investing your hard-earned money in any paid course, please do thorough research and ask tough questions. My personal experience with the sales process was disappointing. I found the sales approach unprofessional, and I was unable to obtain sufficient verifiable evidence regarding placement outcomes despite seeking c",
+              "sentiment": "negative",
+              "author": "Sagar Sharma",
+              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_dataanalytics-careeradvice-onlinelearning-activity-7475637164957937665-GeqI",
+              "published_at": "2026-06-24T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "70421dd3-96b0-4bf1-b45f-7e3f4c331c89",
+              "text": "I never thought I would have to write a post like this. Prashant kumar · · 2026-07-07 Prashant kumar : Based in Samastipur, Bihar, India [IN]. --- I never thought I would have to write a post like this. I am sharing my experience publicly in the hope that it reaches the leadership team at Physics Wallah and helps prevent similar situations for other students. Here's what happened: 📅 My batch was valid until 30 June 2026. 📞 Before making any payment, I called a PW counselor and specifically asked: \"If I pay ₹3,000 today, will my batch validity be extended?\" I was clearly informed that my batch validity would be extended by approximately 6 months, until 31 December 2026. Trusting this assuranc",
+              "sentiment": "negative",
+              "author": "Prashant kumar",
+              "url": "https://www.linkedin.com/posts/prashant-kumar-74377a21b_physicswallah-edtech-studentexperience-activity-7480208430478213121-19fw",
+              "published_at": "2026-07-07T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "740566b3-e2ed-4827-a0ac-653a813b21e7",
+              "text": "This is not expected from PW (PhysicsWallah). How can you accept money for the product and don't take responsibility of product delivery? The product was delivered somewhere without OTP. There is no … Rajesh Kumar · · 2026-06-30 Rajesh Kumar : Rajesh Kumar has held roles including Design Verification Engineer at Amazon Lab126, Senior Lead Engineer at Qualcomm, and Senior Engineer at Qualcomm. Based in Bengaluru, Karnataka, India [IN]. --- This is not expected from PW (PhysicsWallah) ![This is not expected from PW (PhysicsWallah). How can you accept money for the product and don't take responsibility of product delivery? The product was delivered somewhere without OTP. There is no … Rajesh Ku",
+              "sentiment": "negative",
+              "author": "Rajesh Kumar",
+              "url": "https://www.linkedin.com/posts/rajeshkumar107_physicswallah-support-alakhpandey-activity-7477719052480638976-nixl",
+              "published_at": "2026-06-30T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "074e46a0-c148-4776-92c2-ef839e636279",
+              "text": "A friend of mine bought an annual learning during the summer sale for ₹4,999, slashed from ₹12,000. Prabakaran Mathivanan · · 2026-07-06 Prabakaran Mathivanan : Associate Project Manager at Trigent Software Inc with 16 years 3 months of experience. Previous roles include Business Analyst cum Module Lead at Trigent Software Inc, Founder at Shopunleashed, and Technical Test Lead at Edgeverve. Based in Greater Bengaluru Area [IN]. --- GotoMarket Buyerjourney ProductManagament A friend of mine bought an annual learning subscription during the summer sale for ₹4,999, slashed from ₹12,000. Here's the full journey which explains where it broke. Thinking: He wasn't looking to learn anything specific",
+              "sentiment": "negative",
+              "author": "Prabakaran Mathivanan",
+              "url": "https://www.linkedin.com/posts/prabakaran-mathivanan-58637411b_gotomarket-buyerjourney-productmanagament-activity-7479732325497573376-55eQ",
+              "published_at": null,
+              "issue_type": "support"
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "fd67c3c2-1614-565a-9760-c19963f23d6b",
+          "label": "Hiring and candidate experience",
+          "summary": "Posts discuss recruitment treatment, interview experience, offers and aggressive joining incentives. Repeated semantic signals include brand, refund, salary.",
+          "why_it_matters": "Candidate experience shapes employer brand even when it is not an employee-relations incident.",
+          "count": 8,
+          "share": 26.7,
+          "cohesion": 0.742,
+          "prototype_similarity": 0.33,
+          "confidence": "medium",
+          "subthemes": [
+            "brand",
+            "refund",
+            "salary",
+            "nism"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 8
+          },
+          "source_ids": [
+            "3c1f5b86-232e-4a3f-8ba7-12cd35fcf1e0",
+            "cb9baccb-0bca-47be-99aa-101926d830b7",
+            "232f2d60-304e-4d02-9551-9f4ec0051769",
+            "3d2a0b02-c926-4e67-bb83-15534a751342",
+            "7d304a98-02c9-4328-99ec-9855db02bb93",
+            "54600973-246d-4b71-a978-336a12eb40d3",
+            "00470def-3a94-4258-86f7-3d1989e472e4",
+            "9506f510-fb70-45e7-8aee-3b5794f55f40"
+          ],
+          "representative_evidence": [
+            {
+              "id": "54600973-246d-4b71-a978-336a12eb40d3",
+              "text": "Post by yogesh kumar akula · · 2026-07-02 yogesh kumar akula : Graduate Engineer Trainee at Coforge with 1 year 3 months of experience. Previous roles include Growth And Partnership Intern at RideScan, Associate Software Engineer Intern at Accenture in India, and Contributer at Hacktoberfest. Based in Hyderabad, Telangana, India [IN]. --- I rarely call out brands publicly. But this needs to be said. 🧵 I recently enrolled in the NISM Series XII – Securities Markets Foundation course on PW (PhysicsWallah)]( — you've built something incredible for Indian students. Don't let broken support systems erode that trust. I hope this reaches someone who can help. 🙏 Alakh Pandey]( Physics Wallah (PW) Ph",
+              "sentiment": "negative",
+              "author": "yogesh kumar akula",
+              "url": "https://www.linkedin.com/posts/akulayogeshkumar_physicswallah-nism-consumerrights-activity-7478301281976217600-r3JW",
+              "published_at": "2026-07-02T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "3d2a0b02-c926-4e67-bb83-15534a751342",
+              "text": "Post by yogesh kumar akula · · 2026-07-02 yogesh kumar akula : Graduate Engineer Trainee at Coforge with 1 year 3 months of experience. Previous roles include Growth And Partnership Intern at RideScan, Associate Software Engineer Intern at Accenture in India, and Contributer at Hacktoberfest. Based in Hyderabad, Telangana, India [IN]. --- I rarely call out brands publicly. But this needs to be said. 🧵 I recently enrolled in the NISM Series XII – Securities Markets Foundation course on PW (PhysicsWallah)]( — you've built something incredible for Indian students. Don't let broken support systems erode that trust. I hope this reaches someone who can help. 🙏 Alakh Pandey]( Physics Wallah (PW) Ph",
+              "sentiment": "negative",
+              "author": "yogesh kumar akula",
+              "url": "https://www.linkedin.com/posts/akulayogeshkumar_physicswallah-nism-consumerrights-activity-7478301281976217600-r3JW",
+              "published_at": "2026-07-02T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "00470def-3a94-4258-86f7-3d1989e472e4",
+              "text": "Post by Praveen Sharma · · 2026-06-28 Praveen Sharma : Test Development Engineer at SII Group India with 10 years of experience. Previous roles include Senior Test Engineer at Incedo Inc., QA Manager at LBB (Little Black Book), and QA Manager at PTC Punjabi Network. Based in Delhi, India [IN]. --- Physics Wallah (PW) has earned the trust of millions of students and parents across India by making quality education accessible. That is exactly why I hope this concern reaches the right people within the organization. My nephew(Gauransh Sharma class 10th) enrolled in a PW online batch. Before enrollment, we were informed that if he chose not to continue, the refund would be processed as per the s",
+              "sentiment": "negative",
+              "author": "Praveen Sharma",
+              "url": "https://www.linkedin.com/posts/praveen-sharma-sdet_physicswallah-pw-customerexperience-activity-7477022663098421248-8AR1",
+              "published_at": "2026-06-28T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "cb9baccb-0bca-47be-99aa-101926d830b7",
+              "text": "Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. Priyanka Paw · · 2026-07-18 Priyanka Paw : Assistant Sales Manager at TripzyGo with 7 years 8 months of experience. Previous roles include Sales Team Lead at Thrillophilia.com, Travel Sales Consultant at Luxe Comfort Travels, and Intenship at Thomas Cook India Limited. Based in Indore, Madhya Pradesh, India [IN]. --- Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. For almost 2 years, I worked at TripzyGo But this post is bigger than my own salary. During my tenure, I was repeatedly instructed to terminate employees by labelling them “non-performers,” including people who had joined",
+              "sentiment": "negative",
+              "author": "Priyanka Paw",
+              "url": "https://www.linkedin.com/posts/priyanka-paw-28b1a9140_employeerights-salarydelay-labourlaw-activity-7484245279114698752-IOtc",
+              "published_at": "2026-07-18T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "3c1f5b86-232e-4a3f-8ba7-12cd35fcf1e0",
+              "text": "Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. Priyanka Paw · · 2026-07-18 Priyanka Paw : Assistant Sales Manager at TripzyGo with 7 years 8 months of experience. Previous roles include Sales Team Lead at Thrillophilia.com, Travel Sales Consultant at Luxe Comfort Travels, and Intenship at Thomas Cook India Limited. Based in Indore, Madhya Pradesh, India [IN]. --- Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. For almost 2 years, I worked at TripzyGo But this post is bigger than my own salary. During my tenure, I was repeatedly instructed to terminate employees by labelling them “non-performers,” including people who had joined",
+              "sentiment": "negative",
+              "author": "Priyanka Paw",
+              "url": "https://www.linkedin.com/posts/priyanka-paw-28b1a9140_employeerights-salarydelay-labourlaw-activity-7484245279114698752-IOtc",
+              "published_at": "2026-07-18T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "232f2d60-304e-4d02-9551-9f4ec0051769",
+              "text": "An Open Letter to the Leadership Team at Physics Wallah I have always respected Physics Wallah's mission of making quality education affordable and accessible. That is exactly why this experience has been so disappointing. This post is not intended to damage anyone's reputation. It is a sincere request for a fair review of my case. • In 2025, I purchased a complete PW course for ₹4,200 and received 1 year of access. • As my batch approached its expiry date (30 June 2026), I explored the extension options available inside the app. • After that, I began receiving follow-up calls from PW counselors regarding my expiring batch. • Based on those conversations, I understood that by paying ₹3,000, ",
+              "sentiment": "negative",
+              "author": "Prashant kumar",
+              "url": "https://www.linkedin.com/posts/prashant-kumar-74377a21b_physicswallah-edtech-studentexperience-activity-7480198199492931584-ffFr",
+              "published_at": "2026-07-07T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 3
+        },
+        {
+          "id": "7d74bb7f-3ede-5c6c-b986-9cc700f0a7f5",
+          "label": "Termination, PIP and forced resignation",
+          "summary": "Posts connect termination, PIPs or resignation pressure with policy disputes or speaking up internally. Repeated semantic signals include termination, ashish choudhary, jio.",
+          "why_it_matters": "Each claim requires an evidence-led People and Legal review rather than a generic public response.",
+          "count": 2,
+          "share": 6.7,
+          "cohesion": 0.878,
+          "prototype_similarity": 0.34,
+          "confidence": "low",
+          "subthemes": [
+            "termination",
+            "ashish choudhary",
+            "jio",
+            "warehouse"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 2
+          },
+          "source_ids": [
+            "a8be269c-0fad-4f25-9ee3-1d977cc9ae5f",
+            "b6a4b4d2-0b52-4cc3-a49f-570cd581282e"
+          ],
+          "representative_evidence": [
+            {
+              "id": "a8be269c-0fad-4f25-9ee3-1d977cc9ae5f",
+              "text": "Even the HR was in such a hurry that the termination email didn't even mention the correct legal name of the company.PW (PhysicsWallah)Alakh PandeyPrateek Maheshwari Tanya S. rajeev kumar · · 2026-07-17 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Even the HR was in such a hurry that the termination email didn't even mention the correct legal name of the company.PW (PhysicsWallah)Alakh PandeyPrateek Maheshwari Tanya S. The termination email re",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workplaceculture-activity-7483782635945738240-kBYx",
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "b6a4b4d2-0b52-4cc3-a49f-570cd581282e",
+              "text": "Alakh Pandey Physics Wallah (PW) Ashish K Choudhary · · 2026-07-15 Ashish K Choudhary : Regional Manager -Supply Chain- East (Including North East) at Jio with 27 years 3 months of experience. Previous roles include Regional HUB Warehouse & Logistics Operation Manager - East, at Jio, Warehouse Logistics Manager at Jio, and Manager - State Warehouse & Logistics, Hyderabad, Andhra Pradesh at Jio. Based in Kolkata metropolitan area, West Bengal, India [IN]. --- Alakh Pandey Gopal Sharma Prateek Maheshwari [Ashish K Choudhary]( · 2026-07-16 · 1 Once again false commitment given by PW worst Experience [Ashish K Choudhary]( · 2026-07-16 Unable to access the app [PW Support](",
+              "sentiment": "negative",
+              "author": "Ashish K Choudhary",
+              "url": "https://www.linkedin.com/posts/ashishkchoudhary-scm_physicswallah-studentfirst-parentvoice-activity-7483153251220144130-Bdbm",
+              "published_at": "2026-07-15T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "b9ffa0aa-45e4-57ae-b451-bc59a9079622",
+          "label": "IPO, valuation and investor narrative",
+          "summary": "Professional discussion evaluates PW's valuation, profitability, growth choices and comparisons with other edtech companies. Repeated semantic signals include focussing th, money, public.",
+          "why_it_matters": "This mixed investor narrative should not be treated as entirely negative.",
+          "count": 2,
+          "share": 6.7,
+          "cohesion": 1.0,
+          "prototype_similarity": 0.29,
+          "confidence": "low",
+          "subthemes": [
+            "focussing th",
+            "money",
+            "public",
+            "investor"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 2
+          },
+          "source_ids": [
+            "d75df588-cfdc-4f7f-8ebe-bf69a8166c17",
+            "f9be3cd0-ee18-47f1-b187-302f885e34a3"
+          ],
+          "representative_evidence": [
+            {
+              "id": "f9be3cd0-ee18-47f1-b187-302f885e34a3",
+              "text": "Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Davinder Singh · · 2026-07-06 Davinder Singh : Founder at Divuu Decode with 1 year 5 months of experience. Previous roles include Fundraiser at Muskurahat Foundation, Product Marketing Intern at Pawzz Foundation, and Financial Research Analyst at Gravitas Masters. Based in Pune City, Maharashtra, India [IN]. --- Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Same sector. Same five years. But completely opposite endings. Here's the consulting read on India's edtech reset 👇 The pandemic handed this sector free demand. When classrooms reopened, that demand vanished and th",
+              "sentiment": "negative",
+              "author": "Davinder Singh",
+              "url": "https://www.linkedin.com/posts/davinder-singh-9b0a80361_edtech-startupindia-physicswallah-activity-7479820675688607745-BkIZ",
+              "published_at": "2026-07-06T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "d75df588-cfdc-4f7f-8ebe-bf69a8166c17",
+              "text": "Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Davinder Singh · · 2026-07-06 Davinder Singh : Founder at Divuu Decode with 1 year 5 months of experience. Previous roles include Fundraiser at Muskurahat Foundation, Product Marketing Intern at Pawzz Foundation, and Financial Research Analyst at Gravitas Masters. Based in Pune City, Maharashtra, India [IN]. --- Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Same sector. Same five years. But completely opposite endings. Here's the consulting read on India's edtech reset 👇 The pandemic handed this sector free demand. When classrooms reopened, that demand vanished and th",
+              "sentiment": "negative",
+              "author": "Davinder Singh",
+              "url": "https://www.linkedin.com/posts/davinder-singh-9b0a80361_edtech-startupindia-physicswallah-activity-7479820675688607745-BkIZ",
+              "published_at": "2026-07-06T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 5
+        }
+      ]
+    },
+    "youtube": {
+      "platform": "youtube",
+      "label": "YouTube",
+      "source_count": 112,
+      "clustered_source_count": 14,
+      "cluster_scope": "negative evidence",
+      "sentiment": {
+        "positive": 38,
+        "neutral": 60,
+        "negative": 14
+      },
+      "cluster_count": 3,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "500e7620-758b-5834-bb45-794ad4dda658",
+          "label": "Teacher clips and controversy",
+          "summary": "Short-form clips recycle teacher moments and controversy, sometimes without their original context. Repeated semantic signals include viral, गलत, alakh.",
+          "why_it_matters": "Escalation should depend on whether viewers question faculty credibility, not views alone.",
+          "count": 8,
+          "share": 57.1,
+          "cohesion": 0.664,
+          "prototype_similarity": 0.301,
+          "confidence": "medium",
+          "subthemes": [
+            "viral",
+            "गलत",
+            "alakh",
+            "सकत"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 8
+          },
+          "source_ids": [
+            "8194da8f-27bc-4bb8-8d67-606fd4070f33",
+            "7f04cf17-4eba-4aec-9629-02e1a45578b3",
+            "09c3290a-75db-48ea-bfe5-4074153fbb7d",
+            "0a251030-9434-49ab-bb7c-872cf2748e09",
+            "f5826d1a-a182-4bbf-9900-2d4df4ef5b5e",
+            "5441e7ca-379c-46bf-a75b-8fd750f790a2",
+            "Ugz_EqaTZyiXliGzDPx4AaABAg.AV8rX28PkEPAV8tk6deufq",
+            "Ugzwl6prJPcd1QS_CWB4AaABAg"
+          ],
+          "representative_evidence": [
+            {
+              "id": "09c3290a-75db-48ea-bfe5-4074153fbb7d",
+              "text": "[Transcript: Jhute ho tum💔 Ft. Alakh Pandey !! alakhsir physicswallah pw viral new motivation] कुछ [संगीत] देखो अपने को आईने में जाओ देखो क्या लगता [संगीत] है तुम्हें झूठे हो तुम बेटा कबूल हो यार अपनी सच्चाई कबूल हो इधर उधर जाके मत बोलो कि इसकी गलती है उसकी गलती है ये नहीं हुआ वो नहीं हुआ गालिब साहब ने बोला था ना जिंदगी भर गालिब यही भूल करता रहा धूल चेहरे पे थी पर वो आईना साफ करता हां।",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "other"
+            },
+            {
+              "id": "7f04cf17-4eba-4aec-9629-02e1a45578b3",
+              "text": "[Transcript: IIT and AIIMS STUDENTS SUICIDE physics wallah yt shorts jee neet alakh sir Zakir Khan] सकते हैं। फिर जेल में कौन बंद है जो बच्चों के",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "other"
+            },
+            {
+              "id": "8194da8f-27bc-4bb8-8d67-606fd4070f33",
+              "text": "Jhute ho tum💔 Ft. Alakh Pandey !! alakhsir physicswallah pw viral new motivation. Jhute ho tum💔 Ft. Alakh Pandey !! alakhsir physicswallah pw viral new motivation",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "meme"
+            },
+            {
+              "id": "5441e7ca-379c-46bf-a75b-8fd750f790a2",
+              "text": "[Transcript: IIT and AIIMS STUDENTS SUICIDE physics wallah yt shorts jee neet alakh sir Zakir Khan] लोग अपने बच्चों को ना इतना ज्यादा पुश कर रहे हैं आज के समय में और 90% टाइम [संगीत] ये ब्लेम बच्चों को जो दिया जाता है ये सच्चाई है कहीं ना कहीं पेरेंट्स से आता है। मैंने एक बार इंटरनेट पे एक बात बोल दी थी कि कुछ मां-बाप जो होते हैं वो दानव का रूप होते हैं। और सबने आकर बोला गलत बात है। एकदम गलत बात है। मां-बाप कभी दानव नहीं हो सकते। मैंने कहा हो सकते हैं। मैंने सबको नहीं बोला। कुछ तो डे",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "Ugzwl6prJPcd1QS_CWB4AaABAg",
+              "text": "Sir mujhe patna saman samaronme bulaya gaya tha likin mere ghar ke paristhiti ayese nhi the ki may aap saku likin may live dekha sir aapka ham sab bachho ke parti parem or jindge bhar ek apsos ke sath may jiuge ki may sir se milane nhi ja pai agar ye message raushani sir tak ja rahi hai to please sir aap ek bar reply jarur kijiye sir please",
+              "sentiment": "negative",
+              "author": "@Sonalikamehta-1",
+              "url": null,
+              "published_at": null,
+              "issue_type": "other"
+            },
+            {
+              "id": "f5826d1a-a182-4bbf-9900-2d4df4ef5b5e",
+              "text": "😒 nidhimambiology nidhimam biharboardclasses physicswallah viral. 😒 nidhimambiology nidhimam biharboardclasses physicswallah viral 🎓 Credit: Nidhi Ma’am Science ( PW Educator ) This short clip is shared only for educational purposes. All rights belong to the original creator. No copyright infringement intended. nidhimambiology biharboardclasses nidhimam",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "2c38c5fc-8445-5306-b270-6a72d068d6ff",
+          "label": "Batch reviews and purchase decisions",
+          "summary": "Review videos evaluate whether paid batches deliver the promised teachers, schedules and learning experience. Repeated semantic signals include mistake, arjuna, batch.",
+          "why_it_matters": "These narratives can influence conversion at the point of purchase.",
+          "count": 3,
+          "share": 21.4,
+          "cohesion": 0.81,
+          "prototype_similarity": 0.269,
+          "confidence": "low",
+          "subthemes": [
+            "mistake",
+            "arjuna",
+            "batch",
+            "jee"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 3
+          },
+          "source_ids": [
+            "736c89d4-0c0b-48de-abcb-ed2de61debb8",
+            "UgzZ_n_nHLxYbMMyb0B4AaABAg",
+            "e7ea2110-5346-480c-8c8a-8282d2dc01fb"
+          ],
+          "representative_evidence": [
+            {
+              "id": "e7ea2110-5346-480c-8c8a-8282d2dc01fb",
+              "text": "Non sense 😂😂.. exam k pehele din relax karo...padhne se kuch nehi hone wala",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "UgzZ_n_nHLxYbMMyb0B4AaABAg",
+              "text": "Sir ji class 9th ka option nhi aaraha hai😢😢😢😢😢😢😢😢😢😢",
+              "sentiment": "negative",
+              "author": "@Ayush_Raj8",
+              "url": null,
+              "published_at": null,
+              "issue_type": "app_issue"
+            },
+            {
+              "id": "736c89d4-0c0b-48de-abcb-ed2de61debb8",
+              "text": "pw arjuna jee batch mistake pw",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "course_review"
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "9e5debc2-715f-53c7-a14f-44d4d985e322",
+          "label": "Student results and learning outcomes",
+          "summary": "Videos discuss exam outcomes, ranks and student-success stories associated with PW. Repeated semantic signals include सर मह, पह सर, मह सय.",
+          "why_it_matters": "Outcome evidence is a strong positive trust signal when claims are verifiable.",
+          "count": 3,
+          "share": 21.4,
+          "cohesion": 0.821,
+          "prototype_similarity": 0.335,
+          "confidence": "low",
+          "subthemes": [
+            "सर मह",
+            "पह सर",
+            "मह सय",
+            "rajwantsir"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 3
+          },
+          "source_ids": [
+            "c8e3f7ac-ab90-4870-95fa-8de96227782c",
+            "08487172-2ad4-4849-97ad-3667f55759cc",
+            "Ugz_EqaTZyiXliGzDPx4AaABAg"
+          ],
+          "representative_evidence": [
+            {
+              "id": "08487172-2ad4-4849-97ad-3667f55759cc",
+              "text": "IIT and AIIMS STUDENTS SUICIDE physics wallah yt shorts jee neet alakh sir Zakir Khan. IIT and AIIMS STUDENTS SUICIDE physics wallah yt shorts jee neet alakh sir Zakir Khan PWkabalak rjsir birthd pwfun sachinsir SKILLSRevolution rajwantsir rajwantsir pizza vegpizza pizzalover sachinsir rjsir rajwantsir ytshorts ststus motivation physicswallah akakh pandey",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "c8e3f7ac-ab90-4870-95fa-8de96227782c",
+              "text": "[Transcript: IIT and AIIMS STUDENTS SUICIDE physics wallah yt shorts jee neet alakh sir Zakir Khan] पिछले 5 साल में मेरे पढ़ाए हुए ऐसे दो आईआईटीएल हैं और ऐसी एक एम्स की बच्ची जिसने अपनी जान ले सेक्ट होने के बाद तो अब तो जीवन में सब हासिल हो गया था। उन बच्चों के लिए बोल रहा हूं जिनको लगता है कि आईआईटी एम्स ही जीवन में सब कुछ डॉक्टर बनना सब कुछ आईआईटी बनना। तो इन बच्चों ने तो सब हासिल कर लिया था ना लाइफ में। फिर भी कुछ तो रह गया उनकी जिंदगी में कि उनको अभी भी डिप्रेशन हो रहा है। तो मुझ",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "other"
+            },
+            {
+              "id": "Ugz_EqaTZyiXliGzDPx4AaABAg",
+              "text": "कुछ दिन बाद पहिला दूसरा क्लास का बैच लाएंगे महासय😂😂😂😂",
+              "sentiment": "negative",
+              "author": "@sipakreddy7118",
+              "url": null,
+              "published_at": null,
+              "issue_type": "other"
+            }
+          ],
+          "rank": 3
+        }
+      ]
+    },
+    "freshdesk": {
+      "platform": "freshdesk",
+      "label": "Freshdesk",
+      "source_count": 47,
+      "clustered_source_count": 47,
+      "cluster_scope": "negative evidence",
+      "sentiment": {
+        "positive": 0,
+        "neutral": 0,
+        "negative": 47
+      },
+      "cluster_count": 6,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "7f03909f-90f4-5002-a4c7-a4b7ad4e632a",
+          "label": "Tests, admit cards and registrations",
+          "summary": "Students cannot access tests or admit cards, or find incorrect registration and test-series information. Repeated semantic signals include admit, card, test.",
+          "why_it_matters": "Assessment access is time-sensitive and needs a dedicated operational resolution path.",
+          "count": 9,
+          "share": 19.1,
+          "cohesion": 0.646,
+          "prototype_similarity": 0.399,
+          "confidence": "medium",
+          "subthemes": [
+            "admit",
+            "card",
+            "test",
+            "real"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 9
+          },
+          "source_ids": [
+            "16059595",
+            "16059579",
+            "16059577",
+            "16059576",
+            "16059574",
+            "16059568",
+            "16059551",
+            "16059496",
+            "16059494"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059576",
+              "text": "Other. recieve wrong registration no in admit card",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059574",
+              "text": "Other. My admit card doesn't have a barcode ,it's missing please provide a new admit card which have barcode in it . Why there are mistakes like this the exam is on 26 july.",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059568",
+              "text": "Other. I joined real test pass and i got an admit card but in this registration no is wrong",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059595",
+              "text": "Unable to download admit card. My exam on 26 july and now on 24 July no admit card download option is see pls help where from I download my admit card payment is done but what if I miss the test bcz of pw team fault then me aapko kabhi bhi maaf nhi krunga",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Payment & Refund"
+            },
+            {
+              "id": "16059579",
+              "text": "Unable to download admit card. As per the website the number is not registered ..... but i put the given or registered number",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059551",
+              "text": "Other. Hi, I recently purchased the PW Real Test Pass Pro which was supposed to include the Rankers Kit material, but I haven't received it yet. Please look into this and arrange for my material as soon as possible.",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "5510985e-9647-5575-b179-0a2c96598027",
+          "label": "Batch entitlement and content visibility",
+          "summary": "Purchased batches or course content are not visible to the student account. Repeated semantic signals include live, playing, unable.",
+          "why_it_matters": "Entitlement failures should share one diagnostic path across Support and Product.",
+          "count": 9,
+          "share": 19.1,
+          "cohesion": 0.588,
+          "prototype_similarity": 0.309,
+          "confidence": "medium",
+          "subthemes": [
+            "live",
+            "playing",
+            "unable",
+            "portal"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 9
+          },
+          "source_ids": [
+            "16059584",
+            "16059581",
+            "16059569",
+            "16059565",
+            "16059553",
+            "16059548",
+            "16059545",
+            "16059531",
+            "16059504"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059545",
+              "text": "Live class not Playing. My live and recorded lectures are not playing ??????????????????????????????????????????????????????????????????????????????????",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059553",
+              "text": "Live class not Playing. My live and recorded lectures are not playing ????????",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059548",
+              "text": "Live class not Playing. My live and recorded lectures are not playing ????????????????????????????????????????????????????????????????????????????????????????????????????????",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059531",
+              "text": "Unblock from Batch content. I will promised you to I am not use pirated PW against sorry for distributing, and your time sorry please unblock me so I continue my study and my unit test is also coming from next week",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059504",
+              "text": "Unblock from Batch content. WHEN I WAS STUDY... SUDDENLY MY ACCOUNT IS LOGGED OUT...AND AFTER LOGIN, NOT LIVE LECTURE RUNNING EVEN NOT ANY RECORDED LECTURE WORKING... PLEASE RESOLVE THIS ISSUE IMMEDIATELY...",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059565",
+              "text": "Unable to download admit card. I am unable to download my admit card. When i opened the portal it is showing to log in but my exam session is not showing. Please help me",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "bc2eb4b3-0720-5681-88bf-e6ae71e3bfe3",
+          "label": "Academic and batch operations",
+          "summary": "Tickets concern teachers, schedules, tests, syllabus and day-to-day batch operation. Repeated semantic signals include batch, test, problem.",
+          "why_it_matters": "Academic operations require different owners and service levels from technical support.",
+          "count": 8,
+          "share": 17.0,
+          "cohesion": 0.611,
+          "prototype_similarity": 0.366,
+          "confidence": "medium",
+          "subthemes": [
+            "batch",
+            "test",
+            "problem",
+            "report"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 8
+          },
+          "source_ids": [
+            "16059594",
+            "16059588",
+            "16059586",
+            "16059587",
+            "16059575",
+            "16059571",
+            "16059552",
+            "16059502"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059587",
+              "text": "E2E public enquiry scheduleId=6a625e8a76c09c0816bf7007 Report / Audio. Report Cohort Name: Dropper - IIT JEE",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Uncategorized / Needs Routing"
+            },
+            {
+              "id": "16059586",
+              "text": "E2E public enquiry scheduleId=6a625e8a76c09c0816bf7007 Report / Audio. Report Cohort Name: Dropper - IIT JEE",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Uncategorized / Needs Routing"
+            },
+            {
+              "id": "16059588",
+              "text": "E2E public enquiry scheduleId=6a625e8a76c09c0816bf7007 Report / Audio. Report Cohort Name: Dropper - IIT JEE",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Uncategorized / Needs Routing"
+            },
+            {
+              "id": "16059571",
+              "text": "Other. What is the syllabus for the next test on 26th july",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059575",
+              "text": "Other. All test is locked not open when starts 15 july so I want attemped the test it is locked.my batch is parishram pro why is create problem",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Access & Entitlement"
+            },
+            {
+              "id": "16059552",
+              "text": "Concern regarding class. Hi... I have enrolled my child Samaira Ahuja in mental maths batch 26-27 class 6th. My concern is regarding the concept taught in class. Everyday there is a new topic, due to which a child can't excel in any of them. Other than this, no one is giving review or feedback for child performance. No one is asking if the homework that is undone. I don't want to co",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Student Wellbeing"
+            }
+          ],
+          "rank": 3
+        },
+        {
+          "id": "734f3d53-64ba-5a4d-b385-a6ac260e7518",
+          "label": "Login, account and OTP access",
+          "summary": "Students cannot authenticate or regain access to their accounts. Repeated semantic signals include login, number, admit card.",
+          "why_it_matters": "Identity and access failures block the entire learner journey.",
+          "count": 7,
+          "share": 14.9,
+          "cohesion": 0.681,
+          "prototype_similarity": 0.401,
+          "confidence": "medium",
+          "subthemes": [
+            "login",
+            "number",
+            "admit card",
+            "unable"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 7
+          },
+          "source_ids": [
+            "16059572",
+            "16059564",
+            "16059563",
+            "16059561",
+            "16059559",
+            "16059570",
+            "16059520"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059561",
+              "text": "Unable to download admit card. Admit card download option invisible and the site isn't showing any 2026-27 session",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059572",
+              "text": "Unable to download admit card. the website said that the no is not registered",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059559",
+              "text": "Didn't receive login credentials. Didn't receive my admit card till now for rts to be held on 26th of July...kindly see to it asap",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Access & Entitlement"
+            },
+            {
+              "id": "16059564",
+              "text": "Unable to login. I cannot login in pw web. I clicking the login/Register button but it is not responding.",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Access & Entitlement"
+            },
+            {
+              "id": "16059570",
+              "text": "Number Change. My phone number which is logined in this app is expired I don't have that number now so I am not able to change my number with otp",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059563",
+              "text": "Unable to login. laptop mai login ke option par click karne ke baad bhi nahi khul Raha hai",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Access & Entitlement"
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "0bbf189a-a02e-51f5-996c-0c1d6e569214",
+          "label": "Social comments and moderation",
+          "summary": "Captured social comments require moderation or triage rather than learner product support. Repeated semantic signals include link, वस लकर, कर अरब.",
+          "why_it_matters": "Social moderation signals should not inflate product-support issue volume.",
+          "count": 5,
+          "share": 10.6,
+          "cohesion": 0.701,
+          "prototype_similarity": 0.305,
+          "confidence": "medium",
+          "subthemes": [
+            "link",
+            "वस लकर",
+            "कर अरब",
+            "अगर"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 5
+          },
+          "source_ids": [
+            "16059593",
+            "16059591",
+            "16059582",
+            "16059573",
+            "16059562"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059582",
+              "text": "Arey Pandey ji...thoda Desh virodhi so called students k liye bhi bol do...damm hai? Sentiment - Negative Post url - [link] ReplyUrl - [link] ViewTicket - [",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059591",
+              "text": "अबे धूर्त।। अगर तुझे नीट के बच्चों की इतनी ही फिक्र है तो वो जो तू कोचिंग के नाम पर बच्चों से लाखों रूपए की फीस वसूलकर करोड़ों अरबों की संपति बनाई है उसमें से नीट",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059593",
+              "text": "अबे धूर्त।। अगर तुझे नीट के बच्चों की इतनी ही फिक्र है तो वो जो तू कोचिंग के नाम पर बच्चों से लाखों रूपए की फीस वसूलकर करोड़ों अरबों की संपति बनाई है उसमें से नीट",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059573",
+              "text": "Tu bhi pgla gya h lut ke Sentiment - Negative Post url - [link] ReplyUrl - [link] ViewTicket - [link]",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059562",
+              "text": "Unblock the community chat in lashya neet 2027.",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Batch Operations"
+            }
+          ],
+          "rank": 5
+        },
+        {
+          "id": "800f6e1c-2c3f-5a41-a182-6bfa969a1db3",
+          "label": "General unresolved support",
+          "summary": "Tickets request follow-up but lack enough structured detail for confident routing. Repeated semantic signals include change, number, বলছ.",
+          "why_it_matters": "Improving L1 and L2 taxonomy is required before this volume can drive product decisions.",
+          "count": 5,
+          "share": 10.6,
+          "cohesion": 0.636,
+          "prototype_similarity": 0.219,
+          "confidence": "medium",
+          "subthemes": [
+            "change",
+            "number",
+            "বলছ",
+            "science"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 5
+          },
+          "source_ids": [
+            "16059583",
+            "16059567",
+            "16059558",
+            "16059540",
+            "16059527"
+          ],
+          "representative_evidence": [
+            {
+              "id": "16059567",
+              "text": "Niroj Patra Hello..... Kya karte ho? Humanity khtm ho chuki hai kya ? And dhyan se sun lo Alakh Sir ke saath SAKSHAT Mata Parwati Pita Kashi Vishwanath ke ch",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059540",
+              "text": "Other. Maina NRTS pro plan liya h toh maina city sahi select Kiya h west bengal par mujhe center galat choose kar liya mujhe kalyani chahiye center please update kar dijiye mera first test k centre m kolkata HDSM INFOTECH dikh Raha kalyani k centre update de",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "App & Video Technical"
+            },
+            {
+              "id": "16059583",
+              "text": "তাদের আপনি বাচ্চা বলছেন যারা দেশ বিরোধী স্লোগান দিচ্ছে, কারা বলছেন নাম রহেগা আল্লা নাকি সিতাকাপতি এরা বাচ্চা নয় এরা হচ্ছে খানকির ছেলে গুদমারানির ব্যাটা মা বে গো মাদার",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059558",
+              "text": "Number Change. I have requested again and again that please change the contact number but there is no response, please change the number PW team please or contact me [phone] please!! I am facing lots of problems",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            },
+            {
+              "id": "16059527",
+              "text": "Pickup Done, Refund Pending. Pw class 10 cbse board PYQ sample paper 2016 2026 math , science, social science english",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "Store & Logistics"
+            }
+          ],
+          "rank": 6
+        }
+      ]
+    },
+    "reddit": {
+      "platform": "reddit",
+      "label": "Reddit",
+      "source_count": 136,
+      "clustered_source_count": 39,
+      "cluster_scope": "negative evidence",
+      "sentiment": {
+        "positive": 32,
+        "neutral": 65,
+        "negative": 39
+      },
+      "cluster_count": 5,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "89bef774-dc50-5233-83df-ff7f14bcc555",
+          "label": "Batch selection and course decisions",
+          "summary": "Students compare batches, ask which course to choose and seek peer validation before purchasing or switching. Repeated semantic signals include batch, alakh, course.",
+          "why_it_matters": "Confusion before purchase signals a need for clearer course-positioning and comparison guidance.",
+          "count": 18,
+          "share": 46.2,
+          "cohesion": 0.57,
+          "prototype_similarity": 0.293,
+          "confidence": "medium",
+          "subthemes": [
+            "batch",
+            "alakh",
+            "course",
+            "upload"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 18
+          },
+          "source_ids": [
+            "236ac89d-d208-4dda-8d96-96d0800bb97e",
+            "13891538-c751-480f-9567-ad06f622bfd7",
+            "1a84f3b8-24ac-4c01-9013-be6b98be0c6c",
+            "4554314c-e290-44b5-b5fa-528a50a89d60",
+            "a41902a3-c1f2-49de-9c1f-becc442fe4ee",
+            "d0223265-b2d8-4e16-89d8-f0765ffab17c",
+            "9225b49b-6a4b-4fd9-87e0-c180cc9b756c",
+            "9550127d-2d15-401c-aa6b-377ff32a1324",
+            "4b845922-dcf4-4697-a8ee-5645b21bfbcb",
+            "1s8ho5w",
+            "1qjum24",
+            "1r1vz82",
+            "1kj3c0w",
+            "1qwiomm",
+            "1qp4h5q",
+            "1rawrja",
+            "1pfucxw",
+            "d48fedcd-7ef0-42b7-8f20-8213b07a279f"
+          ],
+          "representative_evidence": [
+            {
+              "id": "4554314c-e290-44b5-b5fa-528a50a89d60",
+              "text": "PW ke iitians jhatu lagte hai tbh",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "1r1vz82",
+              "text": "PW getting wilder day by day 💀 Kyu nahi ho rhi padhai 🥱",
+              "sentiment": "negative",
+              "author": "Suspicious-Oil-8437",
+              "url": "https://reddit.com/r/CBSE/comments/1r1vz82/pw_getting_wilder_day_by_day/",
+              "published_at": null,
+              "issue_type": "course_review"
+            },
+            {
+              "id": "236ac89d-d208-4dda-8d96-96d0800bb97e",
+              "text": "Found this in PW vidyapeeth💔",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": "course_review"
+            },
+            {
+              "id": "1s8ho5w",
+              "text": "RA SIR AFTER LEAVING PW 🥀😭",
+              "sentiment": "negative",
+              "author": "Slow_Ad2427",
+              "url": "https://reddit.com/r/JEENEETards/comments/1s8ho5w/ra_sir_after_leaving_pw/",
+              "published_at": null,
+              "issue_type": "teacher_quality"
+            },
+            {
+              "id": "1pfucxw",
+              "text": "Need.. sources... gareeb ki madat kar doo 🙏 Toh mera problem ye hai ki Yt pe ek coder hai.. \"code army\" naam se.. uss ne.. ek batch lunch kiya hai.. sticke kar ke hai.. uska monthy shayad arounf 5k something hai. toh as middle clas affordable nahu hai.. toh kyaa woh free me.. as a telegram pe mil sakta h(streaming) ???? Just like some content of physics wallah",
+              "sentiment": "negative",
+              "author": "Jaded-Leg-5604",
+              "url": "https://reddit.com/r/Btechtards/comments/1pfucxw/need_sources_gareeb_ki_madat_kar_doo/",
+              "published_at": null,
+              "issue_type": "other"
+            },
+            {
+              "id": "1qp4h5q",
+              "text": "Alakh pandey sir gave me Erectile dysfunction. TL;DR- OP got Erectile dysfunction and premature ejacuation after watching too much alecc pandey's physics lectures- My confession I am a dropper Pichhle Sal 75%ile lane ke bad, bohot painfully Maine Drop year start Kiya. Lekin due to my p\\ rn/m\\ sturbation addiction kuch nhi padh pa rha tha, meine apne 2 mahine aise hi waste kardiye, tab Maine ek alakh Pandey Sir Ki video dekhi \"\\ Aag Laga Do! study motivation video\"\\ Uss video ko dekhne ke bad mere andar Ek alag Si Aag Jaag gai. And I started to study with alakh Pandey sir's old lectures, lekin Fir Bhi utna motivation nahin tha to Fir Maine Ek plan Banaya, I started listening to Alakh pandey s",
+              "sentiment": "negative",
+              "author": "TrueLuck2677",
+              "url": "https://reddit.com/r/JEENEETards/comments/1qp4h5q/alakh_pandey_sir_gave_me_erectile_dysfunction/",
+              "published_at": null,
+              "issue_type": "other"
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "a8196f24-7731-5ae8-84d4-569c6ab0d34c",
+          "label": "Teacher and faculty conversation",
+          "summary": "Community discussion centres on faculty quality, teacher loyalty, classroom moments and educator-related news. Repeated semantic signals include teacher, class, course.",
+          "why_it_matters": "Faculty sentiment is a major source of both community goodwill and rapid controversy.",
+          "count": 11,
+          "share": 28.2,
+          "cohesion": 0.587,
+          "prototype_similarity": 0.356,
+          "confidence": "medium",
+          "subthemes": [
+            "teacher",
+            "class",
+            "course",
+            "lectures"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 11
+          },
+          "source_ids": [
+            "9de24c0b-6218-4e14-abff-7d932922b020",
+            "62836390-c3fc-480d-a5cf-763a940bba17",
+            "5846762b-c23e-42ad-8b03-fc8ea49ff13a",
+            "a4306159-ce19-4050-b64a-7a2a3ce13e08",
+            "acb981d7-dadb-44cb-9b6c-5c6e0d9352c7",
+            "eecaa247-834d-4c5a-9274-998d7d47e661",
+            "1abc0032-e809-45f5-b1ab-08d58fa13183",
+            "8e6c6610-b893-427f-977f-c1bdc73e7007",
+            "202d7fe0-02ba-4cc7-9d24-2f19888b323f",
+            "1rx7jvz",
+            "1rjwyhj"
+          ],
+          "representative_evidence": [
+            {
+              "id": "202d7fe0-02ba-4cc7-9d24-2f19888b323f",
+              "text": "HELP PLEASEEE, NEXT TOPPERS OR PHYSICS WALLAH?? I purchased both batches for NT for my 10th, and it went pretty well tbh. However, I watched Ritik sir's lectures for 11th and yea, he is a really good teacher. I've seen so many people shit talking Next Toppers for valid reasons, but personally, I don't rely like completely on these lectures. I know that 11th is way way way harder than 10th, and I feel like PW app is confusing. What should I choose for 11th PCM?? If I do choose PW, which batch do",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "1rx7jvz",
+              "text": "NEVER BUY ANY COURSE FROM UNACADEMY. THEY ARE A COMPLETE SCAM. SCUM OF THE EARTH. so around holi time i bought a batch on unacademy for GATE XE. I checked on Physics Wallah but they did not have any batches which were only for XE exam. So i had to buy from Unacademy. when i opened the recorded lectures to study, i noticed there were no boards/slides on the screen, the lectures only showed the instructor's face and nothing else. how is one supposed to follow along with what they are saying if one can't even see what they are writing? I checked many recorded lectures and there was no change, all of them were only showing the instructors face and no boards on which they were writing on, even th",
+              "sentiment": "negative",
+              "author": "Fun-Collection4076",
+              "url": "https://reddit.com/r/Btechtards/comments/1rx7jvz/never_buy_any_course_from_unacademy_they_are_a/",
+              "published_at": null,
+              "issue_type": "scam"
+            },
+            {
+              "id": "1abc0032-e809-45f5-b1ab-08d58fa13183",
+              "text": "NEVER BUY ANY COURSE FROM UNACADEMY. THEY ARE A COMPLETE SCAM. SCUM OF THE EARTH. so around holi time i bought a batch on unacademy for GATE XE. I checked on Physics Wallah but they did not have any batches which were only for XE exam. So i had to buy from Unacademy. when i opened the recorded lectures to study, i noticed there were no boards/slides on the screen, the lectures only showed the instructor's face and nothing else. how is one supposed to follow along with what they are saying if on",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "8e6c6610-b893-427f-977f-c1bdc73e7007",
+              "text": "My Honest Experience with PW Skills DevOps Course. I want to share my honest experience so that others can make an informed decision. I purchased the DevOps course from PW Skills after talking to their marketing/sales team. They explained many benefits like good mentorship and support, which sounded promising. However, after joining the course I found that many lectures have very poor explanations and it is difficult to understand the concepts properly. For beginners, the teaching style is not",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "eecaa247-834d-4c5a-9274-998d7d47e661",
+              "text": "Why do PW teachers have to be so dramatic😭?? I mean he's a great teacher and a really humble human being, but what on earth is that 😭",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "acb981d7-dadb-44cb-9b6c-5c6e0d9352c7",
+              "text": "Because of channels like physicswallah I spent most of my high school/competitive prep studying from video lectures and one shots. Now in college I don't know how to study well from textbooks and class slides please help. Title basically. Because of readily available yt channels like physicswallah which I used for my studies and competitive prep since 9th I got into this bad habbit of not reading textbooks. Now I got into a decent uni this is my third sem. The first two sems were closely rela",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "8cff27c3-60fb-5507-bc7b-4bbe903b201e",
+          "label": "Brand memes and creator reactions",
+          "summary": "Community reactions use memes, sarcasm and creator commentary to shape the informal PW narrative. Repeated semantic signals include cooked ad, aakash cooked, roz.",
+          "why_it_matters": "This conversation can spread quickly, but should be separated from verified product incidents.",
+          "count": 5,
+          "share": 12.8,
+          "cohesion": 0.728,
+          "prototype_similarity": 0.273,
+          "confidence": "medium",
+          "subthemes": [
+            "cooked ad",
+            "aakash cooked",
+            "roz",
+            "spotted hamara"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 5
+          },
+          "source_ids": [
+            "236d9fba-0ceb-4d43-b6f5-6a9c2cda4828",
+            "30acd0e3-8b5f-45c8-836d-f85b93096fba",
+            "80ffca34-1c16-4e00-8547-9fa2d886f8c0",
+            "08bfd856-2c9b-495a-aa13-057e309ad7ca",
+            "23477cf3-5040-4a57-ae23-c4b447ece037"
+          ],
+          "representative_evidence": [
+            {
+              "id": "30acd0e3-8b5f-45c8-836d-f85b93096fba",
+              "text": "PW spotted PW be like - Hamara bhut faila hua business hai!",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "23477cf3-5040-4a57-ae23-c4b447ece037",
+              "text": "this guy proved that all pw fanclubs are run by alakh pandey himself",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "08bfd856-2c9b-495a-aa13-057e309ad7ca",
+              "text": "Ab ajju bhai bhi?😡😭 Ye alecc daddy roz roz naye influencers ko kyu la the h😭",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "236d9fba-0ceb-4d43-b6f5-6a9c2cda4828",
+              "text": "Its officially PW vs MISSION JEET vs VIBRANT ACADEMY now Is he mocking 100bit bhaiya and 247 ??",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "80ffca34-1c16-4e00-8547-9fa2d886f8c0",
+              "text": "Aakash cooked PW in Ad",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            }
+          ],
+          "rank": 3
+        },
+        {
+          "id": "c06dab81-d17a-5498-8637-539b23d1d116",
+          "label": "Institution quality and trust",
+          "summary": "Students question whether the institutional experience, education quality or outcomes match PW's public promise. Repeated semantic signals include campus, actually, months.",
+          "why_it_matters": "These are high-consideration trust signals for offline and higher-education products.",
+          "count": 2,
+          "share": 5.1,
+          "cohesion": 0.9,
+          "prototype_similarity": 0.513,
+          "confidence": "low",
+          "subthemes": [
+            "campus",
+            "actually",
+            "months",
+            "management"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 2
+          },
+          "source_ids": [
+            "ba9970ca-dd32-4f2a-885e-be668a1c7003",
+            "31ca1857-c2ac-4611-8d51-d3101e142a3d"
+          ],
+          "representative_evidence": [
+            {
+              "id": "31ca1857-c2ac-4611-8d51-d3101e142a3d",
+              "text": "What wrong with Pw IoI I am currently a student at the Physics Wallah Institution of Innovation, and to be honest, being here is completely not the truth that they show online over there. I agree that their academic curriculum is actually good and the faculty is really great, but actually the college management is shit. These college management people are real fools and scammers, as they promise some things and also fulfill them, but only for a few months, and in those few months, these mfs ju",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "ba9970ca-dd32-4f2a-885e-be668a1c7003",
+              "text": "Is PW IOI worth it? Hu ll My doubts 1) Is it worth joining IOI? 2) Is it better than tier 2-3 engineering colleges? 3) Is this college UGC and AICTE approved ? (For govt. exams and others) 4) How is the college life and campus area? 5) On campus placement is there? As medhavi has very poor placement records! 6) I have seen that it doesn't have a campus,it was just few rooms and halls.Is this true? 7) What's the main difference in all the campuses? 8) Anyone plzz answer to my doubts..and also p",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "8b16252d-f10c-5a26-84fb-092d59466efa",
+          "label": "Study progress, exams and motivation",
+          "summary": "Students share preparation progress, exam results, study routines and motivation with peers. Repeated semantic signals include toppers cringe, slowly, turning.",
+          "why_it_matters": "This is primarily community engagement rather than a product incident.",
+          "count": 2,
+          "share": 5.1,
+          "cohesion": 0.74,
+          "prototype_similarity": 0.249,
+          "confidence": "low",
+          "subthemes": [
+            "toppers cringe",
+            "slowly",
+            "turning",
+            "didn"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 2
+          },
+          "source_ids": [
+            "34097f78-e78d-4d83-b10a-b8e624d9ac57",
+            "1njug5d"
+          ],
+          "representative_evidence": [
+            {
+              "id": "34097f78-e78d-4d83-b10a-b8e624d9ac57",
+              "text": "PW slowly turning into next toppers So cringe",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": null,
+              "published_at": null,
+              "issue_type": null
+            },
+            {
+              "id": "1njug5d",
+              "text": "I am stuck in life I passed 12th last yr. Did CUET got 585 but didn't know how to make a proper priority list so didn't get a college. I didn't study for CUET last yr much because I had just given boards but a friend of mine used to force me to study by literally coming to my house so his involvement was half the reason for those marks. I never knew what to actually do after school. My social life was non existent due to me being bad at socialising, a people pleaser, and because in 11th I was 1 month late to the session due to my school starting a month before the actual board result so I didn't have people in my class that I could actually call \"friends\". There were people that I knew and t",
+              "sentiment": "negative",
+              "author": "mayank_888",
+              "url": "https://reddit.com/r/IndianAcademia/comments/1njug5d/i_am_stuck_in_life/",
+              "published_at": null,
+              "issue_type": "other"
+            }
+          ],
+          "rank": 5
+        }
+      ]
+    },
+    "x": {
+      "platform": "x",
+      "label": "X",
+      "source_count": 92,
+      "clustered_source_count": 92,
+      "cluster_scope": "all evidence",
+      "sentiment": {
+        "positive": 4,
+        "neutral": 84,
+        "negative": 4
+      },
+      "cluster_count": 6,
+      "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+      "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
+      "clusters": [
+        {
+          "id": "8397ecde-7916-5a79-b849-981e6b2ae757",
+          "label": "Founder and public-interest narrative",
+          "summary": "Posts focus on Alakh Pandey's public actions, statements and founder-led initiatives. Repeated semantic signals include alakh, pandey, assam.",
+          "why_it_matters": "Founder perception has a direct and unusually strong influence on the wider brand narrative.",
+          "count": 56,
+          "share": 60.9,
+          "cohesion": 0.633,
+          "prototype_similarity": 0.318,
+          "confidence": "high",
+          "subthemes": [
+            "alakh",
+            "pandey",
+            "assam",
+            "flood"
+          ],
+          "sentiment": {
+            "positive": 2,
+            "neutral": 54,
+            "negative": 0
+          },
+          "source_ids": [
+            "2084597029330960638",
+            "2084590715594805492",
+            "2084587577085210686",
+            "2084584043287548093",
+            "2084581875411218750",
+            "2084569270487568720",
+            "2084564126672863488",
+            "2084562778824831306",
+            "2084555906805887189",
+            "2084555060680540607",
+            "2084551371093881235",
+            "2084549910355923270",
+            "2084547562921734275",
+            "2084540551941308745",
+            "2084539759670767655",
+            "2084536103357575199",
+            "2084534222010904991",
+            "2084527963228541043",
+            "2084525858455474493",
+            "2084525070358356466",
+            "2084524977261625456",
+            "2084521837833367920",
+            "2084516071298510982",
+            "2084516066001338627",
+            "2084511128454123871",
+            "2084509295581053303",
+            "2084507981912158477",
+            "2084501364428951968",
+            "2084492170782986553",
+            "2084482705253921245",
+            "2084473497536110662",
+            "2084471457753801162",
+            "2084457988165906910",
+            "2084324242271969481",
+            "2084322798026244143",
+            "2084310964019818810",
+            "2084308697304662083",
+            "2084294406157512744",
+            "2084293691003515340",
+            "2084288782317363354",
+            "2084286420450222224",
+            "2084276331198791703",
+            "2084273637063049230",
+            "2084268408053649874",
+            "2084267139742244910",
+            "2084262834507063734",
+            "2084255491044315506",
+            "2084255140048179621",
+            "2084249507672609218",
+            "2084247844756865079",
+            "2084246109640380578",
+            "2084245340673413244",
+            "2084244854121648385",
+            "2084243314816295212",
+            "2084238357161271793",
+            "2084230919569961009"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084247844756865079",
+              "text": "❤️‍🩹HEART-WARMING Alakh Pandey brings smiles to Assam’s flood-Hit kids; 👇🏻: Read More Amid Assam’s devastating floods that have claimed 85 lives and affected lakhs, Physics Wallah founder Alakh Pandey stepped in to help. He visited flood-affected children, played with them in",
+              "sentiment": "neutral",
+              "author": "thetruthin",
+              "url": "https://x.com/thetruthin/status/2084247844756865079",
+              "published_at": "2026-08-03T11:59:44.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084509295581053303",
+              "text": "🌊❤️ In times of crisis, every helping hand matters. Physics Wallah founder Alakh Pandey has joined relief efforts in flood-affected areas of Assam. AssamFloods AlakhPandey PhysicsWallah ReliefWork Assam FloodRelief Humanity IndiaNews HelpingHands InstantMedical",
+              "sentiment": "neutral",
+              "author": "instant_scoops",
+              "url": "https://x.com/instant_scoops/status/2084509295581053303",
+              "published_at": "2026-08-04T05:18:39.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084273637063049230",
+              "text": "@pathshalagurug True humanity shines brightest in times of crisis. ❤️ PW's Alakh Pandey is doing more than distributing relief in Assam. By spending time with flood-affected children, taking them shopping, and treating them to meals, he's helping restore smiles during a difficult time. Acts of",
+              "sentiment": "neutral",
+              "author": "DhruvRatheNx",
+              "url": "https://x.com/DhruvRatheNx/status/2084273637063049230",
+              "published_at": "2026-08-03T13:42:13.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084507981912158477",
+              "text": "Caption 🌊❤️ In times of crisis, every helping hand matters. Physics Wallah founder Alakh Pandey has joined relief efforts in flood-affected areas of Assam . AssamFloods AlakhPandey PhysicsWallah ReliefWork Assam FloodRelief Humanity IndiaNews HelpingHands",
+              "sentiment": "neutral",
+              "author": "instant_scoopss",
+              "url": "https://x.com/instant_scoopss/status/2084507981912158477",
+              "published_at": "2026-08-04T05:13:25.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084536103357575199",
+              "text": "Massive respect for @PhysicswallahAP @Alakh PandeyPW sir for stepping up to help the flood-affected people of Assam. True heroes don't just teach in classrooms, they lead by example when society needs them the most! 🙏❤️ AssamFloods AlakhPandey Physicswallah RealHero",
+              "sentiment": "neutral",
+              "author": "_Sunny_tripathi",
+              "url": "https://x.com/_Sunny_tripathi/status/2084536103357575199",
+              "published_at": "2026-08-04T07:05:10.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084310964019818810",
+              "text": "असम की बाढ़ में Physics Wallah के Founder अलख पांडे Sir ने सिर्फ़ मदद नहीं भेजी, बल्कि खुद ज़मीन पर उतरकर राहत सामग्री बाँटी, बच्चों को गले लगाया, उन्हें खाना खिलाया और उनके चेहरों पर मुस्कान लौटाने की कोशिश की। यही वजह है कि आज लोग उनकी दौलत से ज़्यादा, उनके दिल की बात कर रहे",
+              "sentiment": "neutral",
+              "author": "Pa54165611Sumit",
+              "url": "https://x.com/Pa54165611Sumit/status/2084310964019818810",
+              "published_at": "2026-08-03T16:10:33.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 1
+        },
+        {
+          "id": "fb8f0908-8571-5ca9-9782-2bb4c52a1f03",
+          "label": "Teaching and learning outcomes",
+          "summary": "The conversation evaluates teachers, courses, examinations and student learning outcomes. Repeated semantic signals include classroom, physicswallahap, alakhsir.",
+          "why_it_matters": "Teaching credibility is central to the brand promise and can drive both advocacy and criticism.",
+          "count": 20,
+          "share": 21.7,
+          "cohesion": 0.673,
+          "prototype_similarity": 0.239,
+          "confidence": "high",
+          "subthemes": [
+            "classroom",
+            "physicswallahap",
+            "alakhsir",
+            "wingalaxyf70pro fameupwithgalaxyf70pro"
+          ],
+          "sentiment": {
+            "positive": 2,
+            "neutral": 18,
+            "negative": 0
+          },
+          "source_ids": [
+            "2084559438774677731",
+            "2084547839527710876",
+            "2084536760013398368",
+            "2084530624556302727",
+            "2084530115736907800",
+            "2084527729412608450",
+            "2084527361471709501",
+            "2084511547020525957",
+            "2084508838980637066",
+            "2084503397055742391",
+            "2084471126772912584",
+            "2084401977661014348",
+            "2084342061395034365",
+            "2084324129310941534",
+            "2084318292462997816",
+            "2084296842473562250",
+            "2084266996414447671",
+            "2084264449532461203",
+            "2084264339880681886",
+            "2084237882102083724"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084508838980637066",
+              "text": "@gharkekalesh Physics wallah 😭",
+              "sentiment": "neutral",
+              "author": "GahanVibes",
+              "url": "https://x.com/GahanVibes/status/2084508838980637066",
+              "published_at": "2026-08-04T05:16:50.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084503397055742391",
+              "text": "@AdolfKD2004 Are physics wallah ka classroom",
+              "sentiment": "neutral",
+              "author": "Prashantsh1507",
+              "url": "https://x.com/Prashantsh1507/status/2084503397055742391",
+              "published_at": "2026-08-04T04:55:12.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084471126772912584",
+              "text": "@nekinsankx Ye to physics wallah ko bol rha",
+              "sentiment": "neutral",
+              "author": "jumlefake",
+              "url": "https://x.com/jumlefake/status/2084471126772912584",
+              "published_at": "2026-08-04T02:46:58.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084342061395034365",
+              "text": "Physics wallah🍌",
+              "sentiment": "neutral",
+              "author": "Prashantsh1507",
+              "url": "https://x.com/Prashantsh1507/status/2084342061395034365",
+              "published_at": "2026-08-03T18:14:07.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084324129310941534",
+              "text": "Never regret hearing this at the age of 17 @physicswallah @alakhsir pw @startupindiastories @last24hrsnews @sharktankabc @narendramodi",
+              "sentiment": "neutral",
+              "author": "PawanSi40212903",
+              "url": "https://x.com/PawanSi40212903/status/2084324129310941534",
+              "published_at": "2026-08-03T17:02:51.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084527361471709501",
+              "text": "Students Kalesh at Physics Wallah Institute",
+              "sentiment": "neutral",
+              "author": "LokBrief",
+              "url": "https://x.com/LokBrief/status/2084527361471709501",
+              "published_at": "2026-08-04T06:30:26.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "235fdfe8-2aa1-589f-bea9-4c4ee64f0f85",
+          "label": "Brand trust and misconduct allegations",
+          "summary": "Posts make or repeat severe claims about brand conduct, authenticity or misleading behaviour. Repeated semantic signals include physicswallahap, pandey, alakh.",
+          "why_it_matters": "High-severity allegations require source verification before response or escalation.",
+          "count": 10,
+          "share": 10.9,
+          "cohesion": 0.711,
+          "prototype_similarity": 0.277,
+          "confidence": "medium",
+          "subthemes": [
+            "physicswallahap",
+            "pandey",
+            "alakh",
+            "delhi"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 8,
+            "negative": 2
+          },
+          "source_ids": [
+            "2084592159664295962",
+            "2084578367891022050",
+            "2084574038895255743",
+            "2084559108146164184",
+            "2084558090603790438",
+            "2084540589337715134",
+            "2084524918910435674",
+            "2084524288858837159",
+            "2084497638070861966",
+            "2084244760290893828"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084524288858837159",
+              "text": "Physics Wallah Founder Alakh Pandey Moves Delhi High Court Seeking Protection Of Personality Rights Court said it is willing to pass orders against those using Pandey's name to make money. @PhysicswallahAP @physics wallah PersonalityRights",
+              "sentiment": "neutral",
+              "author": "LiveLawIndia",
+              "url": "https://x.com/LiveLawIndia/status/2084524288858837159",
+              "published_at": "2026-08-04T06:18:13.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084540589337715134",
+              "text": "Physics Wallah Founder Alakh Pandey Moves Delhi High Court Over Alleged Misuse Of Personality Rights. Read more:",
+              "sentiment": "neutral",
+              "author": "LivelawBiz",
+              "url": "https://x.com/LivelawBiz/status/2084540589337715134",
+              "published_at": "2026-08-04T07:23:00.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084592159664295962",
+              "text": "Physics Wallah Founder Alakh Pandey Moves Delhi High Court Seeking Protection Of Personality Rights",
+              "sentiment": "neutral",
+              "author": "AnilSurolia2",
+              "url": "https://x.com/AnilSurolia2/status/2084592159664295962",
+              "published_at": "2026-08-04T10:47:55.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084578367891022050",
+              "text": "The Delhi High Court on Tuesday asked PhysicsWallah founder Alakh Pandey to clearly categorize the online content he claims infringes on his personality rights before it passes an interim order.",
+              "sentiment": "neutral",
+              "author": "livemint",
+              "url": "https://x.com/livemint/status/2084578367891022050",
+              "published_at": "2026-08-04T09:53:07.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084574038895255743",
+              "text": "Delhi HC to pass order on PhysicsWallah founder's personality rights suit on Wednesday (@yashtiwari81 reports )",
+              "sentiment": "neutral",
+              "author": "livemint",
+              "url": "https://x.com/livemint/status/2084574038895255743",
+              "published_at": "2026-08-04T09:35:55.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084524918910435674",
+              "text": "Delhi High Court to pass orders tomorrow in the personality rights suit filed by founder of edtech firm PhysicsWallah, Alakh Pandey. The matter was listed before Justice Anup Jairam Bhambhani.",
+              "sentiment": "neutral",
+              "author": "barandbench",
+              "url": "https://x.com/barandbench/status/2084524918910435674",
+              "published_at": "2026-08-04T06:20:43.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 3
+        },
+        {
+          "id": "6435dfd7-3dcd-54fa-8b3f-365edaf075f1",
+          "label": "Student support and refund complaints",
+          "summary": "Public posts describe unresolved payments, refunds or support interactions affecting students. Repeated semantic signals include july, jee, support.",
+          "why_it_matters": "Public recovery failures can spread beyond the original support case and weaken trust.",
+          "count": 2,
+          "share": 2.2,
+          "cohesion": 0.845,
+          "prototype_similarity": 0.333,
+          "confidence": "low",
+          "subthemes": [
+            "july",
+            "jee",
+            "support",
+            "data analytics"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 2
+          },
+          "source_ids": [
+            "2084578607931015329",
+            "2084499582810268086"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084578607931015329",
+              "text": "@PhysicsWallah @PW Support My Arjuna JEE 2026 batch access issue has remained unresolved for 72+ hours despite repeatedly contacting the support team My complaint is not being properly addressed, and this is affecting my JEE preparation and creating a backlog.Ticket 16278756",
+              "sentiment": "negative",
+              "author": "Raajnn6a",
+              "url": "https://x.com/Raajnn6a/status/2084578607931015329",
+              "published_at": "2026-08-04T09:54:04.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084499582810268086",
+              "text": "I purchased the PW Skills Data Analytics course on 19 July. I was told the batch would start on 25 July, then postponed to 1 Aug, but classes still haven't started. My refund request is also pending. Please help. @physics wallah PWSkills",
+              "sentiment": "negative",
+              "author": "mishrsadanandSP",
+              "url": "https://x.com/mishrsadanandSP/status/2084499582810268086",
+              "published_at": "2026-08-04T04:40:03.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "3e420afd-fb90-5deb-b156-0e25a2727422",
+          "label": "Reference-only and unrelated posts",
+          "summary": "Physics Wallah is referenced, but the post does not contain a meaningful brand experience or claim. Repeated semantic signals include walone rcb, copy karli, rcb jersey.",
+          "why_it_matters": "Removing reference-only results prevents false themes and misleading sentiment counts.",
+          "count": 2,
+          "share": 2.2,
+          "cohesion": 0.786,
+          "prototype_similarity": 0.198,
+          "confidence": "low",
+          "subthemes": [
+            "walone rcb",
+            "copy karli",
+            "rcb jersey",
+            "prashantsh1507 walone"
+          ],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 2,
+            "negative": 0
+          },
+          "source_ids": [
+            "2084511717988749774",
+            "2084464393547624753"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084464393547624753",
+              "text": "Boy &amp; Girl Clash at PW Vidyapeeth Goes Viral 😳🔥",
+              "sentiment": "neutral",
+              "author": "AjayIntelX",
+              "url": "https://x.com/AjayIntelX/status/2084464393547624753",
+              "published_at": "2026-08-04T02:20:13.000Z",
+              "issue_type": null
+            },
+            {
+              "id": "2084511717988749774",
+              "text": "@Prashantsh1507 YE physicswallah walone rcb jersey copy karli ?",
+              "sentiment": "neutral",
+              "author": "Abhijee05948507",
+              "url": "https://x.com/Abhijee05948507/status/2084511717988749774",
+              "published_at": "2026-08-04T05:28:16.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 5
+        },
+        {
+          "id": "3a6f9c5c-d9bc-53d0-9f0b-3534ba637112",
+          "label": "Workplace and employment narrative",
+          "summary": "Employees, candidates and observers discuss workplace culture, hiring and employment decisions. Repeated semantic signals include the representative evidence.",
+          "why_it_matters": "Employment narratives affect recruiting, retention and leadership reputation.",
+          "count": 1,
+          "share": 1.1,
+          "cohesion": 1.0,
+          "prototype_similarity": 0.291,
+          "confidence": "low",
+          "subthemes": [],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 1,
+            "negative": 0
+          },
+          "source_ids": [
+            "2084401843409752299"
+          ],
+          "representative_evidence": [
+            {
+              "id": "2084401843409752299",
+              "text": "@PhysicswallahAP Respected @AlakhPandeyPW Sir 🙏 The accusations against Lucknow DW Centre Head &amp; English Mentor Lokesh Sharma Sir are completely false. Internal politics forced him to resign! JusticeForLokeshSir SaveLucknowDW PhysicsWallah @PhysicswallahAP",
+              "sentiment": "neutral",
+              "author": "AkshatShukzrs",
+              "url": "https://x.com/AkshatShukzrs/status/2084401843409752299",
+              "published_at": "2026-08-03T22:11:40.000Z",
+              "issue_type": null
+            }
+          ],
+          "rank": 6
+        }
+      ]
+    }
+  }
+}

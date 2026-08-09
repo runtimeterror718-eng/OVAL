@@ -1,902 +1,919 @@
 [
  {
-  "pulledAt": "2026-06-17T08:48:06.489981+00:00",
+  "pulledAt": "2026-07-20T20:29:12.218743+00:00",
+  "package": "ai.ncert.physicswala",
   "status": "ok",
-  "fetched": 1345,
-  "new": 1,
+  "fetched": 423,
+  "new": 22,
   "updated": 0,
-  "totalStored": 2285,
-  "message": null
+  "totalStored": 5714,
+  "message": null,
+  "supabaseUpserted": 423
  },
  {
-  "pulledAt": "2026-06-17T08:45:42.581639+00:00",
+  "pulledAt": "2026-07-20T20:28:55.416859+00:00",
+  "package": "xyz.penpencil.physicswala",
   "status": "ok",
-  "fetched": 1344,
-  "new": 1,
+  "fetched": 1116,
+  "new": 63,
   "updated": 0,
-  "totalStored": 2284,
-  "message": null
+  "totalStored": 5692,
+  "message": null,
+  "supabaseUpserted": 1116
  },
  {
-  "pulledAt": "2026-06-17T08:40:30.444548+00:00",
+  "pulledAt": "2026-07-20T13:03:55.368737+00:00",
+  "package": "ai.ncert.physicswala",
   "status": "ok",
-  "fetched": 1344,
-  "new": 1,
+  "fetched": 435,
+  "new": 435,
   "updated": 0,
-  "totalStored": 2283,
-  "message": null
+  "totalStored": 5629,
+  "message": "HTTPSConnectionPool(host='bieocyzyybjetzornlfw.supabase.co', port=443): Max retries exceeded with url: /rest/v1/playstore_reviews?on_conflict=review_id (Caused by NameResolutionError(\"HTTPSConnection(host='bieocyzyybjetzornlfw.supabase.co', port=443): Failed to resolve 'bieocyzyybjetzornlfw.supabase",
+  "supabaseUpserted": 0
  },
  {
-  "pulledAt": "2026-06-17T08:35:16.277490+00:00",
+  "pulledAt": "2026-07-20T13:03:41.234129+00:00",
+  "package": "xyz.penpencil.physicswala",
   "status": "ok",
-  "fetched": 1343,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2282,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:30:05.066850+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2281,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:24:53.450004+00:00",
-  "status": "ok",
-  "fetched": 1344,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2279,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:19:41.733164+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2277,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:14:29.988183+00:00",
-  "status": "ok",
-  "fetched": 1344,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2277,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:09:19.100794+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2275,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T08:04:06.678985+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 1,
-  "updated": 11,
-  "totalStored": 2274,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T07:58:53.726623+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2273,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T07:53:41.321960+00:00",
-  "status": "ok",
-  "fetched": 1339,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2271,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T07:48:29.798159+00:00",
-  "status": "ok",
-  "fetched": 1338,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2270,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T07:40:35.850000+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 15,
-  "updated": 2,
-  "totalStored": 2270,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T06:09:08.923213+00:00",
-  "status": "ok",
-  "fetched": 1338,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2255,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T06:02:21.593182+00:00",
-  "status": "ok",
-  "fetched": 1337,
-  "new": 1,
-  "updated": 7,
-  "totalStored": 2254,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:51:26.557447+00:00",
-  "status": "ok",
-  "fetched": 1337,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2253,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:46:13.685125+00:00",
-  "status": "ok",
-  "fetched": 1338,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2253,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:34:12.334671+00:00",
-  "status": "ok",
-  "fetched": 1340,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2252,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:20:44.617912+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2251,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:15:33.336350+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 3,
-  "updated": 0,
-  "totalStored": 2250,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:10:19.937989+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2247,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T05:05:08.687198+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 1,
-  "updated": 7,
-  "totalStored": 2247,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:59:58.222507+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2246,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:54:47.998379+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2246,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:49:35.494149+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2246,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:44:23.884472+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2244,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:39:11.044843+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2243,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:33:59.617706+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2243,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:28:45.987759+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2243,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-17T04:23:35.448548+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 29,
+  "fetched": 1130,
+  "new": 1129,
   "updated": 1,
-  "totalStored": 2243,
+  "totalStored": 5194,
+  "message": "HTTPSConnectionPool(host='bieocyzyybjetzornlfw.supabase.co', port=443): Max retries exceeded with url: /rest/v1/playstore_reviews?on_conflict=review_id (Caused by NameResolutionError(\"HTTPSConnection(host='bieocyzyybjetzornlfw.supabase.co', port=443): Failed to resolve 'bieocyzyybjetzornlfw.supabase",
+  "supabaseUpserted": 0
+ },
+ {
+  "pulledAt": "2026-06-25T10:42:25.408249+00:00",
+  "package": "ai.ncert.physicswala",
+  "status": "ok",
+  "fetched": 40,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 4065,
+  "message": null,
+  "supabaseUpserted": 40
+ },
+ {
+  "pulledAt": "2026-06-25T10:42:04.791869+00:00",
+  "package": "xyz.penpencil.physicswala",
+  "status": "ok",
+  "fetched": 976,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 4065,
+  "message": null,
+  "supabaseUpserted": 976
+ },
+ {
+  "pulledAt": "2026-06-25T10:41:36.894386+00:00",
+  "package": "ai.ncert.physicswala",
+  "status": "ok",
+  "fetched": 40,
+  "new": 40,
+  "updated": 0,
+  "totalStored": 4065,
+  "message": "500 Server Error: Internal Server Error for url: https://bieocyzyybjetzornlfw.supabase.co/rest/v1/playstore_reviews?on_conflict=review_id",
+  "supabaseUpserted": 0
+ },
+ {
+  "pulledAt": "2026-06-25T10:41:19.893169+00:00",
+  "package": "xyz.penpencil.physicswala",
+  "status": "ok",
+  "fetched": 976,
+  "new": 976,
+  "updated": 0,
+  "totalStored": 4025,
+  "message": "500 Server Error: Internal Server Error for url: https://bieocyzyybjetzornlfw.supabase.co/rest/v1/playstore_reviews?on_conflict=review_id",
+  "supabaseUpserted": 0
+ },
+ {
+  "pulledAt": "2026-06-22T12:43:04.174093+00:00",
+  "status": "ok",
+  "fetched": 1103,
+  "new": 5,
+  "updated": 0,
+  "totalStored": 3049,
+  "message": null,
+  "supabaseUpserted": 3049
+ },
+ {
+  "pulledAt": "2026-06-22T12:09:44.873840+00:00",
+  "status": "ok",
+  "fetched": 1115,
+  "new": 252,
+  "updated": 13,
+  "totalStored": 3044,
   "message": null
  },
  {
-  "pulledAt": "2026-06-17T03:43:50.633893+00:00",
+  "pulledAt": "2026-06-22T12:09:44.873817+00:00",
+  "status": "ok",
+  "fetched": 1115,
+  "new": 252,
+  "updated": 13,
+  "totalStored": 3044,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-20T11:46:23.724808+00:00",
+  "status": "ok",
+  "fetched": 1217,
+  "new": 49,
+  "updated": 5,
+  "totalStored": 2792,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-20T08:44:19.360688+00:00",
   "status": "error",
   "fetched": 0,
   "new": 0,
   "updated": 0,
-  "totalStored": 2214,
+  "totalStored": 2743,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-20T06:24:24.325466+00:00",
+  "status": "ok",
+  "fetched": 1233,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2743,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-20T06:18:16.241017+00:00",
+  "status": "ok",
+  "fetched": 1234,
+  "new": 154,
+  "updated": 4,
+  "totalStored": 2742,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-20T01:38:04.087792+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2588,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-19T19:02:14.343244+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2588,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-19T14:31:28.939361+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2588,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-19T10:07:14.549764+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2588,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-19T06:16:28.156017+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2588,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-19T05:31:32.777073+00:00",
+  "status": "ok",
+  "fetched": 1305,
+  "new": 23,
+  "updated": 4,
+  "totalStored": 2588,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-19T04:30:48.072996+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2565,
   "message": "HTTPSConnectionPool(host='androidpublisher.googleapis.com', port=443): Read timed out. (read timeout=30)"
  },
  {
-  "pulledAt": "2026-06-17T01:51:14.143026+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2214,
-  "message": "HTTPSConnectionPool(host='androidpublisher.googleapis.com', port=443): Read timed out. (read timeout=30)"
- },
- {
-  "pulledAt": "2026-06-16T23:39:42.700865+00:00",
+  "pulledAt": "2026-06-19T02:28:11.161360+00:00",
   "status": "ok",
-  "fetched": 1342,
-  "new": 1,
-  "updated": 1,
-  "totalStored": 2214,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T20:34:16.719556+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2213,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T20:29:07.232818+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2213,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T20:23:57.820610+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2213,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T20:18:47.320097+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 2,
-  "updated": 2,
-  "totalStored": 2213,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:40:02.268114+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2211,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:34:49.852095+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2211,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:29:39.820493+00:00",
-  "status": "ok",
-  "fetched": 1344,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2210,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:24:29.098970+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2210,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:19:16.597459+00:00",
-  "status": "ok",
-  "fetched": 1346,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2210,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:14:07.111019+00:00",
-  "status": "ok",
-  "fetched": 1346,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2210,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:08:57.292353+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2209,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T18:03:44.659691+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 54,
-  "updated": 2,
-  "totalStored": 2209,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T17:21:53.974312+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2155,
-  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
- },
- {
-  "pulledAt": "2026-06-16T17:16:05.684153+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2155,
-  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
- },
- {
-  "pulledAt": "2026-06-16T16:13:32.193044+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2155,
-  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
- },
- {
-  "pulledAt": "2026-06-16T13:58:02.300574+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2155,
-  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
- },
- {
-  "pulledAt": "2026-06-16T13:08:23.377285+00:00",
-  "status": "ok",
-  "fetched": 1348,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2155,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T13:03:12.974599+00:00",
-  "status": "ok",
-  "fetched": 1348,
-  "new": 1,
-  "updated": 17,
-  "totalStored": 2154,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:58:02.335258+00:00",
-  "status": "ok",
-  "fetched": 1348,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2153,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:52:46.731385+00:00",
-  "status": "ok",
-  "fetched": 1347,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2151,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:47:34.584521+00:00",
-  "status": "ok",
-  "fetched": 1346,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2149,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:42:22.502089+00:00",
-  "status": "ok",
-  "fetched": 1346,
-  "new": 2,
-  "updated": 1,
-  "totalStored": 2149,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:37:08.840826+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2147,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:31:52.215286+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 4,
-  "updated": 0,
-  "totalStored": 2145,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:26:39.722093+00:00",
-  "status": "ok",
-  "fetched": 1340,
-  "new": 3,
-  "updated": 0,
-  "totalStored": 2141,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:21:29.712824+00:00",
-  "status": "ok",
-  "fetched": 1339,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2138,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:16:18.326864+00:00",
-  "status": "ok",
-  "fetched": 1339,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2137,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:11:05.383276+00:00",
-  "status": "ok",
-  "fetched": 1338,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2135,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:05:54.746664+00:00",
-  "status": "ok",
-  "fetched": 1339,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2135,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T12:00:44.465762+00:00",
-  "status": "ok",
-  "fetched": 1339,
-  "new": 1,
-  "updated": 12,
-  "totalStored": 2135,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:55:33.885221+00:00",
-  "status": "ok",
-  "fetched": 1344,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2134,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:50:22.588273+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2134,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:45:09.995107+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2132,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:39:57.301359+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2130,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:34:46.298127+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2128,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:29:33.213183+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2127,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:24:21.914240+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2127,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:19:08.165232+00:00",
-  "status": "ok",
-  "fetched": 1345,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2126,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:13:56.447706+00:00",
-  "status": "ok",
-  "fetched": 1346,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2126,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:08:31.857684+00:00",
-  "status": "ok",
-  "fetched": 1344,
-  "new": 2,
-  "updated": 0,
-  "totalStored": 2124,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T11:03:18.896742+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 0,
-  "updated": 15,
-  "totalStored": 2122,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T10:58:05.749821+00:00",
-  "status": "ok",
-  "fetched": 1343,
-  "new": 3,
-  "updated": 0,
-  "totalStored": 2122,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T10:52:05.633113+00:00",
-  "status": "error",
-  "fetched": 0,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2119,
-  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
- },
- {
-  "pulledAt": "2026-06-16T10:46:38.713926+00:00",
-  "status": "ok",
-  "fetched": 1343,
+  "fetched": 1313,
   "new": 6,
   "updated": 0,
-  "totalStored": 2119,
+  "totalStored": 2565,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:28:15.545982+00:00",
+  "pulledAt": "2026-06-19T01:27:11.258975+00:00",
   "status": "ok",
-  "fetched": 1342,
+  "fetched": 1311,
+  "new": 0,
+  "updated": 1,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T22:14:05.765394+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T21:08:00.334556+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T21:02:48.216867+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T20:57:37.285225+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T20:52:24.593022+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T20:47:12.734858+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T20:42:01.574633+00:00",
+  "status": "ok",
+  "fetched": 1313,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T20:03:17.557320+00:00",
+  "status": "ok",
+  "fetched": 1315,
+  "new": 0,
+  "updated": 1,
+  "totalStored": 2559,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T19:58:05.547951+00:00",
+  "status": "ok",
+  "fetched": 1316,
   "new": 1,
   "updated": 0,
-  "totalStored": 2113,
+  "totalStored": 2559,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:23:04.722195+00:00",
+  "pulledAt": "2026-06-18T19:40:16.884695+00:00",
   "status": "ok",
-  "fetched": 1342,
+  "fetched": 1315,
+  "new": 2,
+  "updated": 1,
+  "totalStored": 2558,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T18:20:08.617467+00:00",
+  "status": "ok",
+  "fetched": 1314,
+  "new": 1,
+  "updated": 7,
+  "totalStored": 2556,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T18:00:08.580008+00:00",
+  "status": "ok",
+  "fetched": 1315,
+  "new": 40,
+  "updated": 15,
+  "totalStored": 2555,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T15:58:38.435570+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2515,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-18T13:53:59.922471+00:00",
+  "status": "ok",
+  "fetched": 1318,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2515,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:48:46.539807+00:00",
+  "status": "ok",
+  "fetched": 1318,
   "new": 2,
   "updated": 0,
-  "totalStored": 2112,
+  "totalStored": 2514,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:17:50.962153+00:00",
+  "pulledAt": "2026-06-18T13:43:35.200239+00:00",
   "status": "ok",
-  "fetched": 1340,
+  "fetched": 1320,
   "new": 1,
   "updated": 0,
-  "totalStored": 2110,
+  "totalStored": 2512,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:12:36.465860+00:00",
+  "pulledAt": "2026-06-18T13:38:24.561078+00:00",
   "status": "ok",
-  "fetched": 1340,
+  "fetched": 1319,
+  "new": 3,
+  "updated": 0,
+  "totalStored": 2511,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:33:14.468992+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2508,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:28:04.393758+00:00",
+  "status": "ok",
+  "fetched": 1322,
   "new": 1,
   "updated": 0,
-  "totalStored": 2109,
+  "totalStored": 2508,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:07:26.325574+00:00",
+  "pulledAt": "2026-06-18T13:22:53.810321+00:00",
   "status": "ok",
-  "fetched": 1340,
+  "fetched": 1323,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2507,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:17:41.900957+00:00",
+  "status": "ok",
+  "fetched": 1323,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2506,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:12:30.028052+00:00",
+  "status": "ok",
+  "fetched": 1326,
+  "new": 3,
+  "updated": 0,
+  "totalStored": 2505,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:07:18.455546+00:00",
+  "status": "ok",
+  "fetched": 1323,
+  "new": 1,
+  "updated": 1,
+  "totalStored": 2502,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T13:02:07.144003+00:00",
+  "status": "ok",
+  "fetched": 1322,
+  "new": 12,
+  "updated": 4,
+  "totalStored": 2501,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T12:16:38.170900+00:00",
+  "status": "ok",
+  "fetched": 1317,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2489,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T12:11:18.238356+00:00",
+  "status": "ok",
+  "fetched": 1316,
+  "new": 7,
+  "updated": 10,
+  "totalStored": 2488,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:57:30.291953+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2481,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-18T11:47:55.092121+00:00",
+  "status": "ok",
+  "fetched": 1322,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2481,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:42:41.531428+00:00",
+  "status": "ok",
+  "fetched": 1323,
+  "new": 2,
+  "updated": 1,
+  "totalStored": 2480,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:37:28.978586+00:00",
+  "status": "ok",
+  "fetched": 1322,
+  "new": 1,
+  "updated": 1,
+  "totalStored": 2478,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:32:16.729559+00:00",
+  "status": "ok",
+  "fetched": 1323,
   "new": 2,
   "updated": 0,
-  "totalStored": 2108,
+  "totalStored": 2477,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T10:02:16.062406+00:00",
+  "pulledAt": "2026-06-18T11:27:04.795946+00:00",
   "status": "ok",
-  "fetched": 1338,
+  "fetched": 1322,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2475,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:21:52.640758+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 2,
+  "updated": 0,
+  "totalStored": 2474,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:16:40.905086+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2472,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:11:29.381614+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2472,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:06:19.154028+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2471,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T11:01:07.012235+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 0,
+  "updated": 9,
+  "totalStored": 2471,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:55:56.964038+00:00",
+  "status": "ok",
+  "fetched": 1320,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2471,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:50:45.245198+00:00",
+  "status": "ok",
+  "fetched": 1320,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2470,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:45:34.334254+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2469,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:40:21.687750+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2468,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:35:08.893497+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2468,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:29:56.517737+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2468,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:24:46.606403+00:00",
+  "status": "ok",
+  "fetched": 1320,
+  "new": 3,
+  "updated": 0,
+  "totalStored": 2467,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:19:35.215926+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2464,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:14:24.688797+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2464,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:09:13.811455+00:00",
+  "status": "ok",
+  "fetched": 1318,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2463,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T10:04:02.575669+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 7,
+  "totalStored": 2462,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T09:58:49.300809+00:00",
+  "status": "ok",
+  "fetched": 1322,
+  "new": 1,
+  "updated": 0,
+  "totalStored": 2462,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T09:53:39.266241+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2461,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T09:48:26.919293+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2461,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T09:43:14.551230+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 13,
+  "updated": 4,
+  "totalStored": 2461,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:31:27.039122+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2448,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:26:15.775753+00:00",
+  "status": "ok",
+  "fetched": 1322,
+  "new": 2,
+  "updated": 0,
+  "totalStored": 2448,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:21:04.844650+00:00",
+  "status": "ok",
+  "fetched": 1320,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2446,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:15:54.715690+00:00",
+  "status": "ok",
+  "fetched": 1320,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2446,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:10:39.042021+00:00",
+  "status": "ok",
+  "fetched": 1321,
+  "new": 2,
+  "updated": 0,
+  "totalStored": 2446,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T08:05:24.761655+00:00",
+  "status": "ok",
+  "fetched": 1319,
   "new": 0,
   "updated": 10,
-  "totalStored": 2106,
+  "totalStored": 2444,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T09:57:04.791241+00:00",
+  "pulledAt": "2026-06-18T08:00:14.541475+00:00",
   "status": "ok",
-  "fetched": 1339,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2106,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:51:47.027421+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2106,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:46:37.020726+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2106,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:41:21.258797+00:00",
-  "status": "ok",
-  "fetched": 1342,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2105,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:36:09.658579+00:00",
-  "status": "ok",
-  "fetched": 1342,
+  "fetched": 1319,
   "new": 2,
   "updated": 0,
-  "totalStored": 2105,
+  "totalStored": 2444,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T09:30:57.940694+00:00",
+  "pulledAt": "2026-06-18T07:55:03.837442+00:00",
   "status": "ok",
-  "fetched": 1341,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2103,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:25:46.800956+00:00",
-  "status": "ok",
-  "fetched": 1340,
-  "new": 0,
-  "updated": 0,
-  "totalStored": 2102,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:20:35.214065+00:00",
-  "status": "ok",
-  "fetched": 1340,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2102,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:15:22.595035+00:00",
-  "status": "ok",
-  "fetched": 1341,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2101,
-  "message": null
- },
- {
-  "pulledAt": "2026-06-16T09:10:11.864654+00:00",
-  "status": "ok",
-  "fetched": 1341,
+  "fetched": 1319,
   "new": 2,
   "updated": 0,
-  "totalStored": 2100,
+  "totalStored": 2442,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T09:05:01.831368+00:00",
+  "pulledAt": "2026-06-18T07:49:53.066445+00:00",
   "status": "ok",
-  "fetched": 1339,
-  "new": 2,
-  "updated": 11,
-  "totalStored": 2098,
+  "fetched": 1318,
+  "new": 15,
+  "updated": 1,
+  "totalStored": 2440,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T08:59:50.149877+00:00",
-  "status": "ok",
-  "fetched": 1337,
+  "pulledAt": "2026-06-18T06:20:32.087348+00:00",
+  "status": "error",
+  "fetched": 0,
   "new": 0,
   "updated": 0,
-  "totalStored": 2096,
-  "message": null
+  "totalStored": 2425,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
  },
  {
-  "pulledAt": "2026-06-16T08:54:37.332319+00:00",
+  "pulledAt": "2026-06-18T06:07:23.829235+00:00",
   "status": "ok",
-  "fetched": 1337,
+  "fetched": 1310,
   "new": 1,
-  "updated": 0,
-  "totalStored": 2096,
+  "updated": 17,
+  "totalStored": 2425,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T08:49:23.678839+00:00",
+  "pulledAt": "2026-06-18T05:59:08.269951+00:00",
   "status": "ok",
-  "fetched": 1336,
-  "new": 1,
-  "updated": 0,
-  "totalStored": 2095,
+  "fetched": 1311,
+  "new": 22,
+  "updated": 8,
+  "totalStored": 2424,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T08:44:13.102270+00:00",
+  "pulledAt": "2026-06-18T03:49:20.618959+00:00",
   "status": "ok",
-  "fetched": 1335,
+  "fetched": 1302,
+  "new": 6,
+  "updated": 0,
+  "totalStored": 2402,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T03:13:55.024233+00:00",
+  "status": "ok",
+  "fetched": 1299,
+  "new": 11,
+  "updated": 1,
+  "totalStored": 2396,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-18T02:39:35.531510+00:00",
+  "status": "error",
+  "fetched": 0,
   "new": 0,
   "updated": 0,
-  "totalStored": 2094,
+  "totalStored": 2385,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-18T00:07:17.267652+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2385,
+  "message": "HTTPSConnectionPool(host='androidpublisher.googleapis.com', port=443): Read timed out. (read timeout=30)"
+ },
+ {
+  "pulledAt": "2026-06-17T21:03:50.183825+00:00",
+  "status": "ok",
+  "fetched": 1298,
+  "new": 2,
+  "updated": 4,
+  "totalStored": 2385,
   "message": null
  },
  {
-  "pulledAt": "2026-06-16T08:39:02.794692+00:00",
+  "pulledAt": "2026-06-17T18:58:01.681309+00:00",
   "status": "ok",
-  "fetched": 1335,
-  "new": 2,
+  "fetched": 1299,
+  "new": 3,
+  "updated": 1,
+  "totalStored": 2383,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T18:26:21.208747+00:00",
+  "status": "ok",
+  "fetched": 1298,
+  "new": 4,
+  "updated": 6,
+  "totalStored": 2380,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T17:54:34.206707+00:00",
+  "status": "ok",
+  "fetched": 1297,
+  "new": 36,
+  "updated": 8,
+  "totalStored": 2376,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T14:50:48.295626+00:00",
+  "status": "error",
+  "fetched": 0,
+  "new": 0,
   "updated": 0,
-  "totalStored": 2094,
+  "totalStored": 2340,
+  "message": "HTTPSConnectionPool(host='oauth2.googleapis.com', port=443): Max retries exceeded with url: /token (Caused by NameResolutionError(\"HTTPSConnection(host='oauth2.googleapis.com', port=443): Failed to resolve 'oauth2.googleapis.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+ },
+ {
+  "pulledAt": "2026-06-17T14:29:15.789015+00:00",
+  "status": "ok",
+  "fetched": 1304,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2340,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T14:24:04.143434+00:00",
+  "status": "ok",
+  "fetched": 1308,
+  "new": 0,
+  "updated": 0,
+  "totalStored": 2340,
+  "message": null
+ },
+ {
+  "pulledAt": "2026-06-17T14:18:53.538279+00:00",
+  "status": "ok",
+  "fetched": 1319,
+  "new": 3,
+  "updated": 0,
+  "totalStored": 2340,
   "message": null
  }
 ]

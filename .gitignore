@@ -36,10 +36,13 @@ lid.176.bin
 # Node / Next.js
 node_modules/
 .next/
+.next-*/
+.next.*/
 out/
 
 # Celery
 celerybeat-schedule
+celerybeat-schedule*
 celerybeat.pid
 
 # Logs
@@ -49,6 +52,8 @@ logs/
 # Sessions
 *.session
 *.session-journal
+transcripts/
+web_output/
 
 # Temp files
 tmp/
@@ -67,3 +72,16 @@ oval/.env
 CLAUDE.local.md
 .claude/settings.local.json
 .claude/.mcp.json
+.claude/launch.json
+
+# Local agent and MCP configuration
+.cursor/
+.mcp.json
+
+# Local snapshots and duplicate working copies
+oval-live-source-*/
+oval234543/
+
+# Runtime state and local planning exports
+oval/src/data/playstore-slack-state.json
+OVAL_2.0_PRD.docx

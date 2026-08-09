@@ -26,7 +26,28 @@ def get_all_brands() -> list[dict]:
 
 
 def upsert_brand(brand: dict) -> dict:
-    resp = get_service_client().table("brands").upsert(brand).execute()
+    name = str(brand.get("name") or "").strip()
+    if name:
+        existing = (
+            get_service_client()
+            .table("brands")
+            .select("*")
+            .eq("name", name)
+            .order("created_at", desc=False)
+            .limit(1)
+            .execute()
+        )
+        if existing.data:
+            brand_id = existing.data[0]["id"]
+            updated = (
+                get_service_client()
+                .table("brands")
+                .update(brand)
+                .eq("id", brand_id)
+                .execute()
+            )
+            return updated.data[0]
+    resp = get_service_client().table("brands").insert(brand).execute()
     return resp.data[0]
 
 

@@ -14,6 +14,9 @@ load_dotenv(_project_root / ".env")
 load_dotenv(_project_root / "secrets" / ".env.keys", override=True)
 # Layer 3: Legacy .env.local support (if still present)
 load_dotenv(_project_root / ".env.local", override=True)
+# Layer 4: Next.js local secrets, reused by explicit Python sync jobs only.
+# Existing process or root secret values remain authoritative.
+load_dotenv(_project_root / "oval" / ".env.local", override=False)
 
 
 def _first_env(*names: str, default: str = "") -> str:
@@ -66,6 +69,18 @@ ANTHROPIC_API_KEY: str = os.environ.get("ANTHROPIC_API_KEY", "")
 ANTHROPIC_MODEL: str = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
 OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_MODEL: str = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+
+# --- Qdrant ---
+QDRANT_URL: str = _first_env("QDRANT_URL", "SECRET_QDRANT_URL")
+QDRANT_API_KEY: str = _first_env("QDRANT_API_KEY", "SECRET_QDRANT_API_KEY")
+QDRANT_COLLECTION: str = _first_env(
+    "QDRANT_COLLECTION",
+    default="oval_channel_mentions_v1",
+)
+QDRANT_EMBEDDING_MODEL: str = _first_env(
+    "QDRANT_EMBEDDING_MODEL",
+    default="text-embedding-3-small",
+)
 
 # --- Telegram ---
 TELEGRAM_API_ID: str = os.environ.get("TELEGRAM_API_ID", "")
@@ -153,6 +168,7 @@ TELEGRAM_ACTIVITY_COUNT_SCAN_LIMIT: int = _env_int(
 )
 
 # --- Twitter / X ---
+X_BEARER_TOKEN: str = _first_env("X_BEARER_TOKEN", "TWITTER_BEARER_TOKEN")
 TWITTER_USERNAME: str = os.environ.get("TWITTER_USERNAME", "")
 TWITTER_PASSWORD: str = os.environ.get("TWITTER_PASSWORD", "")
 
@@ -305,6 +321,9 @@ PROXY_URL: str = os.environ.get("PROXY_URL", "")
 
 # --- Alerts ---
 SLACK_WEBHOOK_URL: str = os.environ.get("SLACK_WEBHOOK_URL", "")
+# Slack bot (for DMing the CPO Play Store digests/alerts via chat.postMessage)
+SLACK_BOT_TOKEN: str = os.environ.get("SLACK_BOT_TOKEN", "")
+SLACK_CPO_USER_ID: str = os.environ.get("SLACK_CPO_USER_ID", "")
 EMAIL_SMTP_HOST: str = os.environ.get("EMAIL_SMTP_HOST", "smtp.gmail.com")
 EMAIL_SMTP_PORT: int = int(os.environ.get("EMAIL_SMTP_PORT", "587"))
 EMAIL_USERNAME: str = os.environ.get("EMAIL_USERNAME", "")
