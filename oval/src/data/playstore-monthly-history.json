@@ -1,0 +1,21 @@
+{
+  "source": "Google Play Console monthly review exports",
+  "coverage": {
+    "from": "2026-01-01",
+    "to": "2026-05-31"
+  },
+  "sourceFiles": [
+    "reviews_reviews_xyz.penpencil.physicswala_202601.csv",
+    "reviews_reviews_xyz.penpencil.physicswala_202602.csv",
+    "reviews_reviews_xyz.penpencil.physicswala_202603.csv",
+    "reviews_reviews_xyz.penpencil.physicswala_202604.csv",
+    "reviews_reviews_xyz.penpencil.physicswala_202605.csv"
+  ],
+  "monthlyTrend": [
+    { "month": "2026-01", "reviews": 16477, "averageRating": 4.72, "lowRatingRate": 5.0, "replyRate": 18.6 },
+    { "month": "2026-02", "reviews": 10702, "averageRating": 4.67, "lowRatingRate": 6.1, "replyRate": 19.1 },
+    { "month": "2026-03", "reviews": 19309, "averageRating": 4.69, "lowRatingRate": 5.2, "replyRate": 19.3 },
+    { "month": "2026-04", "reviews": 22007, "averageRating": 4.69, "lowRatingRate": 5.5, "replyRate": 19.9 },
+    { "month": "2026-05", "reviews": 22325, "averageRating": 4.71, "lowRatingRate": 5.0, "replyRate": 20.3 }
+  ]
+}

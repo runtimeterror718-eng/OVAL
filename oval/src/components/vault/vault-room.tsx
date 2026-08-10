@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowUpRight, ChevronLeft, ChevronRight, CirclePause, Circle
 import { VaultNav } from "./vault-nav";
 import { VAULT_CHANNEL_META, type EvidencePeriod, type VaultChannel, type VaultMood } from "@/lib/vault-types";
 import { trackVaultEvent } from "@/lib/vault-analytics";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 
 const periods: Array<{ id: EvidencePeriod; label: string }> = [
   { id: "today", label: "Today" }, { id: "yesterday", label: "Yesterday" }, { id: "7d", label: "Last 7 Days" }, { id: "30d", label: "Last 30 Days" }, { id: "month", label: "Month Wise" },
@@ -56,7 +57,7 @@ export function VaultRoom() {
 
   return <main className={`vault-page vault-room tone-${mood?.mood.valence || "mixed"}`}>
     <VaultNav role={role} />
-    {loading ? <section className="vault-state"><Disc3 className="spin" /><p>Opening the {meta?.label || "channel"} room…</p></section> : error || !mood ? <section className="vault-state"><p>{error || "No mood is available."}</p><Link href="/vault">Back to Vault</Link></section> : <>
+    {loading ? <OvalLoadingSkeleton embedded variant="vault" /> : error || !mood ? <section className="vault-state"><p>{error || "No mood is available."}</p><Link href="/vault">Back to Vault</Link></section> : <>
       <section className="vault-room-heading"><Link href="/vault"><ArrowLeft size={16} /> All rooms</Link><div><Image src={meta.icon} width={38} height={38} alt="" /><span><p>{meta.label.toUpperCase()} · {mood.coverage.signalCount} QUALIFYING SIGNALS</p><h1>{mood.mood.label}</h1></span></div><strong>{mood.mood.confidence}%<small>confidence</small></strong></section>
       <section className="vault-room-filter"><div>{periods.map((item) => <button key={item.id} className={period === item.id ? "active" : ""} onClick={() => selectPeriod(item.id)}>{item.label}</button>)}</div><p>{new Date(mood.coverage.from).toLocaleDateString("en-IN")} — {new Date(mood.coverage.to).toLocaleDateString("en-IN")}</p></section>
       <section className="vault-stage">

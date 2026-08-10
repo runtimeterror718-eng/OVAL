@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, Clock3, Plus, RefreshCw, Search, Users } from "lucide-react";
 import { toast } from "sonner";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import type { CrmMember, CrmTeam, Issue, IssueCandidate } from "@/lib/crm-types";
 import { cn } from "@/lib/utils";
 
@@ -70,7 +71,7 @@ export default function IssuesPage() {
     } catch (value: any) { toast.error(value.message); }
   }
 
-  if (loading) return <div className="grid min-h-[60vh] place-items-center text-sm text-muted-foreground"><RefreshCw className="mr-2 inline h-4 w-4 animate-spin" />Loading issue workflow…</div>;
+  if (loading) return <OvalLoadingSkeleton embedded variant="issues" />;
   if (error) return <SetupState error={error} />;
   const manager = data?.currentMember.role === "admin" || data?.currentMember.role === "manager";
   return (

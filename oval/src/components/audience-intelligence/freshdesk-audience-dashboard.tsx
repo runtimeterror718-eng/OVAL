@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, Bell, ChevronLeft, ChevronRight, LifeBuoy, Search, Sparkles, TrendingUp, X } from "lucide-react";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
+import { openPwYtVerse } from "@/lib/youtube-navigation";
 
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
 type Ticket = { ticketId: string; status: string; group: string; category?: string; subject: string; description: string };
@@ -17,8 +19,8 @@ const PERIODS: { id: Period; label: string }[] = [
   { id: "month", label: "Month Wise" },
 ];
 
-const NAV = ["playstore", "freshdesk", "linkedin", "x", "facebook", "instagram", "youtube"] as const;
-const LABELS: Record<(typeof NAV)[number], string> = { playstore: "Play Store", freshdesk: "Fresh Desk", linkedin: "LinkedIn", x: "X", facebook: "Facebook", instagram: "Instagram", youtube: "YouTube" };
+const NAV = ["playstore", "freshdesk", "linkedin", "x", "instagram", "youtube"] as const;
+const LABELS: Record<(typeof NAV)[number], string> = { playstore: "Play Store", freshdesk: "Fresh Desk", linkedin: "LinkedIn", x: "X", instagram: "Instagram", youtube: "YouTube" };
 
 const ISSUE_COPY: Record<string, { summary: string; pm: string; em: string; action: string }> = {
   "Uncategorized / Needs Routing": { summary: "Tickets have enough learner context to require action, but lack a dependable L1/L2 route.", pm: "Support Operations", em: "Routing Automation EM", action: "Classify and route the oldest unassigned cohort before adding new taxonomy." },
@@ -96,17 +98,17 @@ export function FreshdeskAudienceDashboard() {
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
       <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
-      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}<button onClick={() => router.replace(`/vault/freshdesk?period=${period}`)}>Vault</button><button onClick={() => router.replace("/integrations")}>Integrations</button></nav>
+      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}</nav>
       <div className="ai-top-actions"><div className="ai-search"><Search size={16} /></div><button className="ai-icon-button ai-notification" aria-label="Freshdesk alerts"><Bell size={16} /></button><button className="ai-avatar">AT</button></div>
     </header>
 
-    {loading ? <section className="ai-loading"><span /><p>Loading Freshdesk intelligence…</p></section> : error || !model ? <section className="ai-loading"><p>{error || "Freshdesk data is unavailable."}</p><button onClick={() => location.reload()}>Retry</button></section> : <>
+    {loading ? <OvalLoadingSkeleton embedded /> : error || !model ? <section className="ai-loading"><p>{error || "Freshdesk data is unavailable."}</p><button onClick={() => location.reload()}>Retry</button></section> : <>
       <section className="fd-hero">
-        <div><p className="ai-eyebrow">SUPPORT EXPERIENCE · FRESHDESK</p><h1>Turn support demand into <em>owned action.</em></h1><p>{semantic?.summary?.what_is_happening || "Understand the biggest learner blockers, the evidence behind them and the product-engineering owner responsible for recovery."}</p></div>
+        <div><p className="ai-eyebrow">SUPPORT EXPERIENCE · FRESHDESK</p><h1>What every ticket<br /><em>is trying to tell you.</em></h1><p>{semantic?.summary?.what_is_happening || "Understand the biggest learner blockers, the evidence behind them and the product-engineering owner responsible for recovery."}</p></div>
         <div className="fd-csat fd-ssat"><span><LifeBuoy size={18} /> SSAT Score</span><strong>3.31</strong></div>
       </section>
 
-      <section className="ai-filter-row fd-filter-row"><span>Ticket window</span><div className="ai-filters">{PERIODS.map((item) => <button key={item.id} className={period === item.id ? "active" : ""} onClick={() => { setPeriod(item.id); setSelected(null); }}>{item.label}</button>)}</div><p><strong>{fmt(model.total)}</strong> tickets <button className="ai-vault-link" onClick={() => router.push(`/vault/freshdesk?period=${period}`)}>Open in Vault</button></p></section>
+      <section className="ai-filter-row fd-filter-row"><span>Ticket window</span><div className="ai-filters">{PERIODS.map((item) => <button key={item.id} className={period === item.id ? "active" : ""} onClick={() => { setPeriod(item.id); setSelected(null); }}>{item.label}</button>)}</div><p><strong>{fmt(model.total)}</strong> tickets</p></section>
       <p className="fd-window-note">Filters use the latest available export day ending {data.dataWindow?.createdAtMax || "23 Jul 2026"}. This snapshot contains no separate previous-day export.</p>
 
       <section className="fd-metrics">

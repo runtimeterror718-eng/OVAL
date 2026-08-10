@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowUpRight, Camera, ChevronDown, Globe2, Link2, Loader2, Plus, RefreshCw, Unplug, X } from "lucide-react";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import "../audience-intelligence/audience-intelligence.css";
 import "./integrations.css";
 
@@ -62,7 +63,7 @@ export default function IntegrationsPage() {
     <section className="integrations-hero"><p className="ai-eyebrow">OFFICIAL CHANNEL ACCESS</p><h1>Integrations</h1><p>Connect Physics Wallah’s official accounts through provider OAuth. OVAL never asks for or stores channel passwords.</p></section>
     {notice && <div className="integrations-notice">{notice}<button onClick={() => setNotice("")}><X size={14} /></button></div>}
 
-    {loading ? <section className="ai-loading"><span /><p>Checking official channel connections…</p></section> : <section className="integration-grid">
+    {loading ? <OvalLoadingSkeleton embedded variant="integrations" /> : <section className="integration-grid">
       {PROVIDERS.map((provider) => { const state = providers[provider.id] || { provider: provider.id, configured: false, canManage: false, connections: [] }; const Icon = provider.icon; return <article className="integration-card" key={provider.id} style={{ "--provider": provider.color } as React.CSSProperties}>
         <header><span className="integration-provider-icon"><Icon size={24} /></span><div><h2>{provider.label}</h2><p>{provider.description}</p></div><i className={state.connections.length ? "connected" : ""}>{state.connections.length ? `${state.connections.length} connected` : state.configured ? "Ready" : "Setup required"}</i></header>
         {state.error && <p className="integration-error">{state.error}</p>}

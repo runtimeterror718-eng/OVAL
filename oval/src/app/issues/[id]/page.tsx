@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, MessageSquare, Plus, RefreshCw } from "lucide-react";
+import { ArrowLeft, CheckCircle2, MessageSquare, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import type { CrmMember, CrmTeam, Issue, IssueStatus } from "@/lib/crm-types";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,7 @@ export default function IssueDetailPage() {
   async function addComment() { if (!comment.trim()) return; try { await requestJson(`/api/issues/${id}/comments`, { method: "POST", body: JSON.stringify({ body: comment, mentionedMemberIds: mentionIds }) }); setComment(""); setMentionIds([]); await load(); } catch (error: any) { toast.error(error.message); } }
   async function addTask() { if (!task.trim()) return; try { await requestJson(`/api/issues/${id}/tasks`, { method: "POST", body: JSON.stringify({ title: task, assigneeId: owner || null }) }); setTask(""); await load(); } catch (error: any) { toast.error(error.message); } }
   async function updateTask(taskId: string, status: "open" | "in_progress" | "done", expectedVersion: number) { try { await requestJson(`/api/issues/${id}/tasks`, { method: "PATCH", body: JSON.stringify({ taskId, status, expectedVersion }) }); await load(); } catch (error: any) { toast.error(error.message); if (/changed by another/.test(error.message)) await load(); } }
-  if (loading) return <div className="grid min-h-[60vh] place-items-center text-sm text-muted-foreground"><RefreshCw className="mr-2 inline h-4 w-4 animate-spin" />Loading issue…</div>;
+  if (loading) return <OvalLoadingSkeleton embedded variant="issues" />;
   if (!issue || !current) return <div className="p-10 text-center">Issue not found.</div>;
   const manager = current.role === "admin" || current.role === "manager";
   const availableStatuses = nextStatuses[issue.status].filter((status) => manager || (issue.owner_id === current.id && !["triaged", "assigned", "closed"].includes(status) && !["resolved", "closed"].includes(issue.status)));

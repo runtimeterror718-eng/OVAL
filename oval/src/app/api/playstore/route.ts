@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import insights from "@/data/playstore-insights.json";
+import monthlyHistory from "@/data/playstore-monthly-history.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 
 export const dynamic = "force-dynamic";
@@ -70,6 +71,24 @@ function monthKey(date?: string | null) {
 
 function normalizeText(review: any) {
   return String(review.text || "").toLowerCase();
+}
+
+function jsonSafeText(value: unknown) {
+  let output = "";
+  for (const character of String(value ?? "")) {
+    const code = character.charCodeAt(0);
+    output += character.length === 1 && code >= 0xd800 && code <= 0xdfff ? "�" : character;
+  }
+  return output;
+}
+
+function jsonSafePayload(value: any): any {
+  if (typeof value === "string") return jsonSafeText(value);
+  if (Array.isArray(value)) return value.map(jsonSafePayload);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, jsonSafePayload(child)]));
+  }
+  return value;
 }
 
 function sampleReview(review: any, theme?: string | null) {
@@ -290,16 +309,17 @@ async function readSupabaseLiveReviews() {
       .map((row: any) => ({
         packageName: row.package_name || "xyz.penpencil.physicswala",
         reviewId: row.review_id,
-        author: row.author,
+        author: jsonSafeText(row.author),
         rating: row.rating,
-        text: row.review_text,
-        version: row.app_version,
+        text: jsonSafeText(row.review_text),
+        version: jsonSafeText(row.app_version),
         date: row.posted_at ? String(row.posted_at).slice(0, 10) : null,
         postedAt: row.posted_at,
         replied: row.replied,
-        replyText: row.reply_text,
-        language: row.language,
-        device: row.device,
+        replyText: jsonSafeText(row.reply_text),
+        language: jsonSafeText(row.language),
+        device: jsonSafeText(row.device),
+        androidOs: jsonSafeText(row.android_os_version),
         thumbsUpCount: row.thumbs_up_count || 0,
         source: row.source || `supabase:${table}`,
       }));
@@ -337,6 +357,18 @@ export async function GET() {
     ...((insights as any).apps || {}),
     ...liveApps,
   };
+  const historyRows = (monthlyHistory as any).monthlyTrend || [];
+  const historyPackage = (insights as any).primaryPackage || "xyz.penpencil.physicswala";
+  if (apps[historyPackage]) {
+    const mergedMonths = new Map<string, any>();
+    historyRows.forEach((row: any) => mergedMonths.set(String(row.month), row));
+    (apps[historyPackage].monthlyTrend || []).forEach((row: any) => mergedMonths.set(String(row.month), row));
+    apps[historyPackage] = {
+      ...apps[historyPackage],
+      monthlyTrend: Array.from(mergedMonths.values()).sort((a, b) => String(a.month).localeCompare(String(b.month))),
+      monthlyTrendSource: `${(monthlyHistory as any).source}; live Supabase rows override overlapping months`,
+    };
+  }
   const primaryPackage = apps[(insights as any).primaryPackage] ? (insights as any).primaryPackage : Object.keys(apps)[0] || (insights as any).primaryPackage;
   const primary = apps[primaryPackage] || {};
   const latestLiveDate = allReviews[0]?.date || null;
@@ -387,7 +419,7 @@ export async function GET() {
     return buildChannelContract({
       channel: "playstore",
       sourceStatus: buildSourceStatus({
-        mode: "supabase_playstore_reviews",
+        mode: "live",
         generatedAt: new Date().toISOString(),
         publishedAtValues: [...reviewSignals.map((signal) => signal.publishedAt)],
         limitations: [
@@ -416,7 +448,7 @@ export async function GET() {
   const contracts = Object.fromEntries(Object.entries(apps).map(([packageName, app]) => [packageName, buildContractForApp(app)]));
   const contract = contracts[primaryPackage];
 
-  return NextResponse.json({
+  return NextResponse.json(jsonSafePayload({
     live: true,
     contract,
     contracts,
@@ -434,7 +466,7 @@ export async function GET() {
     livePulledAt: livePayload.livePulledAt,
     liveSource: livePayload.liveSource,
     liveRefreshCadenceHours: 1,
-  }, {
+  }), {
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
     },

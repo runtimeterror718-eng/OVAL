@@ -7,6 +7,7 @@ import { ArrowUpRight, CalendarDays, Disc3, Sparkles } from "lucide-react";
 import { VaultNav } from "./vault-nav";
 import { VAULT_CHANNEL_META, type EvidencePeriod, type VaultMood } from "@/lib/vault-types";
 import { trackVaultEvent } from "@/lib/vault-analytics";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 
 const periods: Array<{ id: EvidencePeriod; label: string }> = [
   { id: "today", label: "Today" }, { id: "yesterday", label: "Yesterday" }, { id: "7d", label: "Last 7 Days" }, { id: "30d", label: "Last 30 Days" }, { id: "month", label: "Month Wise" },
@@ -43,7 +44,7 @@ export function VaultOverview() {
       <div className="vault-hero-orbit"><span /><span /><span /><Disc3 /></div>
     </section>
     <section className="vault-filter"><span>Evidence window</span><div>{periods.map((item) => <button key={item.id} onClick={() => setPeriod(item.id)} className={period === item.id ? "active" : ""}>{item.label}</button>)}</div><small>Music never autoplays</small></section>
-    {loading ? <section className="vault-state"><Disc3 className="spin" /><p>Reading the current channel moods…</p></section> : error ? <section className="vault-state"><p>{error}</p><button onClick={() => location.reload()}>Retry</button></section> : <>
+    {loading ? <OvalLoadingSkeleton embedded variant="vault" /> : error ? <section className="vault-state"><p>{error}</p><button onClick={() => location.reload()}>Retry</button></section> : <>
       <section className="vault-section-head"><div><p>LIVE CHANNEL ROOMS</p><h2>Eight signals. Eight soundtracks.</h2></div><span>{moods.reduce((sum, mood) => sum + mood.coverage.signalCount, 0).toLocaleString("en-IN")} qualifying signals</span></section>
       <section className="vault-grid">{moods.map((mood, index) => { const meta = VAULT_CHANNEL_META[mood.channel]; const total = mood.sentiment.positive + mood.sentiment.neutral + mood.sentiment.negative; return <Link key={mood.channel} href={`/vault/${mood.channel}?period=${period}`} className={`vault-channel-card tone-${mood.mood.valence} ${index === 0 ? "featured" : ""}`}>
         <header><span><Image src={meta.icon} width={34} height={34} alt="" />{meta.label}</span><ArrowUpRight size={18} /></header>

@@ -8,6 +8,9 @@ const PREVIEW_APIS = ["/api/playstore", "/api/youtube", "/api/youtube-owned/nega
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (!pathname.startsWith("/api/") && (pathname === "/vault" || pathname.startsWith("/vault/") || pathname === "/integrations" || pathname.startsWith("/integrations/"))) {
+    return NextResponse.redirect(new URL("/audience-intelligence/overview", request.url));
+  }
   if (OPEN_PATHS.has(pathname)) return NextResponse.next();
   const requiresAuth = RESTRICTED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) || process.env.PLAYSTORE_ONLY === "true";
   if (!requiresAuth) return NextResponse.next();
