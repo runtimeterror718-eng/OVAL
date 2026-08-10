@@ -21,7 +21,7 @@ import urllib.parse
 import urllib.request
 import uuid
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -59,6 +59,8 @@ SEMANTIC_ARTIFACT = ROOT / "oval" / "src" / "data" / "semantic-clusters.json"
 X_QUERY = '(PhysicsWallah OR "Physics Wallah" OR "PW Skills" OR "PW Vidyapeeth" OR "PW OnlyIAS" OR "PW app" OR "PW batch" OR "Alakh Pandey") -is:retweet'
 NEGATIVE_RE = re.compile(r"scam|fraud|refund|toxic|worst|bad|poor|issue|problem|crash|mislead|layoff|fired|termination|complaint|cheat|fake|unpaid|overpriced|waste|delay|buffer|not working|disappoint|controvers|critici", re.I)
 POSITIVE_RE = re.compile(r"great|good|best|excellent|proud|success|congrat|inspiring|growth|achievement|helpful|affordable|love", re.I)
+LINKEDIN_HIRING_PROMO_RE = re.compile(r"\b(?:we(?:['’]re| are) hiring|now hiring|hiring alert|job opening|job vacancy|open roles?|apply now|walk[- ]?in interview|recruitment drive|join our team|send (?:your )?(?:cv|resume)|career opportunit(?:y|ies))\b", re.I)
+LINKEDIN_COMPLAINT_RE = re.compile(r"\b(?:complaint|concern regarding recruitment|candidate communication|interview experience|offer (?:revoked|withdrawn)|ghosted|rejection without|toxic work culture|termination|terminated|forced resign|layoff|fired|unfair|fraud|scam|mislead|harass|corruption|retaliat|humiliat|broken promise|misconduct|support failure|no response)\b", re.I)
 
 
 def stable_point_id(platform: str, source_id: Any) -> str:
@@ -157,11 +159,21 @@ def fetch_linkedin_rows(limit: int) -> list[dict[str, Any]]:
         .execute().data or []
     )
     result = []
+    cutoff = datetime.now(timezone.utc) - timedelta(days=90)
     for row in rows:
         text = redact_text(row.get("post_text"))
-        if not text:
-            continue
         raw = row.get("raw_data") or {}
+        published_at = row.get("published_date")
+        # Keep the semantic index aligned with the public LinkedIn API. Legacy
+        # imports that do not mention PW, or contain only a tiny fragment, must
+        # not contribute issue counts that the dashboard cannot evidence.
+        source_copy = f"{text} {raw.get('title') or ''}"
+        if (published_at and str(published_at) < cutoff.isoformat()) or len(text) <= 20 or not re.search(
+            r"\b(physics\s*wallah|physicswallah|pw skills|pw vidyapeeth|alakh pandey|infinity pro|pwians?|pwstories|gyaan-e|gate wallah)\b|#pw\b",
+            source_copy,
+            flags=re.I,
+        ) or (LINKEDIN_HIRING_PROMO_RE.search(source_copy) and not LINKEDIN_COMPLAINT_RE.search(source_copy)):
+            continue
         sentiment = str(raw.get("sentiment") or "neutral").lower()
         result.append({
             "id": stable_point_id("linkedin", row.get("id")),

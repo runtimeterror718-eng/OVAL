@@ -54,7 +54,7 @@ export default function LinkedInPage() {
   const { data, loading } = useLiveData<any>("/api/linkedin", null, { refreshMs: 60 * 60 * 1000, noStore: true });
   const [filter, setFilter] = useState<"all" | "negative" | "neutral" | "positive">("all");
   const [cat, setCat] = useState<string>("all");
-  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("90d");
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("30d");
   const [sort, setSort] = useState<"risk" | "recent">("risk");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);

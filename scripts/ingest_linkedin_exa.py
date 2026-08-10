@@ -30,6 +30,19 @@ BRAND_ID = "166d8523-79a0-4b1c-b56f-8b40b6cc2f1f"
 
 NEG_RE = re.compile(r"\b(scam|fraud|toxic|layoff|laid off|fired|terminat|resign|overrated|worst|complaint|mislead|refund|ex-?employee|harass|overpriced|overvalued|cheat|disappoint|regret|avoid|unpaid|salary|byju|loss|caution|beware|fear|humiliat)\b", re.I)
 POS_RE = re.compile(r"\b(proud|congratulations|grateful|thankful|milestone|success|inspiring|excellent|best teacher|love|amazing|great initiative|kudos)\b", re.I)
+HIRING_PROMO_RE = re.compile(
+    r"\b(?:we(?:['’]re| are) hiring|now hiring|hiring alert|job opening|job vacancy|open roles?|"
+    r"apply now|walk[- ]?in interview|recruitment drive|join our team|send (?:your )?(?:cv|resume)|"
+    r"career opportunit(?:y|ies))\b",
+    re.I,
+)
+COMPLAINT_CONTEXT_RE = re.compile(
+    r"\b(?:complaint|concern regarding recruitment|candidate communication|interview experience|"
+    r"offer (?:revoked|withdrawn)|ghosted|rejection without|toxic work culture|termination|terminated|"
+    r"forced resign|layoff|fired|unfair|fraud|scam|mislead|harass|corruption|retaliat|humiliat|"
+    r"broken promise|misconduct|support failure|no response)\b",
+    re.I,
+)
 
 
 def _stable_id(*parts) -> str:
@@ -74,8 +87,42 @@ def classify(text: str, summary: str) -> str:
     return "neutral"
 
 
+def parse_exa_search_text(value: str) -> list[dict]:
+    """Convert Exa MCP's human-readable search blocks into ingest rows."""
+    pattern = re.compile(
+        r"(?:^|\n---\n\n)Title:\s*(?P<title>.*?)\n"
+        r"URL:\s*(?P<url>.*?)\n"
+        r"(?:Published:\s*(?P<published>.*?)\n)?"
+        r"(?:Author:\s*(?P<author>.*?)\n)?"
+        r"Highlights:\s*\n(?P<text>.*?)(?=\n---\n\nTitle:|\Z)",
+        re.S,
+    )
+    return [
+        {
+            "title": match.group("title").strip(),
+            "url": match.group("url").strip(),
+            "publishedDate": (match.group("published") or "").strip() or None,
+            "author": (match.group("author") or "").strip(),
+            "text": match.group("text").strip(),
+            "summary": "",
+        }
+        for match in pattern.finditer(value)
+    ]
+
+
 def load_results(path: str) -> list[dict]:
-    d = json.loads(open(path).read())
+    raw = open(path).read()
+    if raw.lstrip().startswith("event:"):
+        rows = []
+        for line in raw.splitlines():
+            if not line.startswith("data: "):
+                continue
+            message = json.loads(line[6:])
+            for item in message.get("result", {}).get("content", []):
+                if item.get("type") == "text":
+                    rows.extend(parse_exa_search_text(item.get("text") or ""))
+        return rows
+    d = json.loads(raw)
     if isinstance(d, dict):
         return d.get("results") or d.get("data", {}).get("results") or []
     return d if isinstance(d, list) else []
@@ -97,7 +144,7 @@ def main():
     # URLs already in linkedin_posts — repeated runs must not re-insert them.
     existing = sb.table("linkedin_posts").select("post_url").eq("brand_id", BRAND_ID).limit(5000).execute().data
     existing_urls = {(e.get("post_url") or "").split("?")[0] for e in existing}
-    seen, stored, skipped_irrelevant = set(), 0, 0
+    seen, stored, skipped_irrelevant, skipped_hiring = set(), 0, 0, 0
     sentiment_counts = {"negative": 0, "positive": 0, "neutral": 0}
     for r in rows:
         url = (r.get("url") or "").split("?")[0]
@@ -111,6 +158,9 @@ def main():
         # names Physics Wallah, so it would match for every result.
         if not PW_TERMS_RE.search(f"{title} {text}"):
             skipped_irrelevant += 1
+            continue
+        if HIRING_PROMO_RE.search(f"{title} {text}") and not COMPLAINT_CONTEXT_RE.search(f"{title} {text}"):
+            skipped_hiring += 1
             continue
         pid = _stable_id(url)
         if pid in seen:
@@ -170,6 +220,7 @@ def main():
 
     print(f"\nDONE — stored {stored} LinkedIn posts under {BRAND_ID[:8]}")
     print(f"skipped (no PW mention in post text/title): {skipped_irrelevant}")
+    print(f"skipped (recruitment promotion): {skipped_hiring}")
     print(f"sentiment: {sentiment_counts}")
 
 

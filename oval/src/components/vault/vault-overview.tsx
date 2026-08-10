@@ -16,7 +16,7 @@ const format = (value: number) => new Intl.NumberFormat("en-IN", { notation: val
 const pct = (value: number, total: number) => total ? value / total * 100 : 0;
 
 export function VaultOverview() {
-  const [period, setPeriod] = useState<EvidencePeriod>("7d");
+  const [period, setPeriod] = useState<EvidencePeriod>("30d");
   const [moods, setMoods] = useState<VaultMood[]>([]);
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);

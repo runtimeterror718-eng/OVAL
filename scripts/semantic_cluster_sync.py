@@ -220,7 +220,11 @@ def build_platform(platform: str, rows: list[dict[str, Any]], model: SentenceTra
         ):
             continue
         source_id = row.get("platform_ref_id") or row.get("id")
-        key = f"text:{text.lower()}" if platform in {"reddit", "linkedin", "youtube", "x"} else (f"id:{source_id}" if source_id else f"text:{text.lower()}")
+        # LinkedIn intentionally keeps every captured row because the audience
+        # view exposes every ingested post and its semantic counts must reconcile
+        # with that feed. Other public collectors still collapse exact text
+        # duplicates before clustering.
+        key = f"text:{text.lower()}" if platform in {"reddit", "youtube", "x"} else (f"id:{source_id}" if source_id else f"text:{text.lower()}")
         if len(text) < 12 or key in seen:
             continue
         seen.add(key)
@@ -240,7 +244,13 @@ def build_platform(platform: str, rows: list[dict[str, Any]], model: SentenceTra
     count = cluster_count(len(issue_rows), override)
     candidates = [
         item for item in LABELS[platform]
-        if not (platform == "linkedin" and item["label"] == "Positive growth and student outcomes")
+        if not (
+            platform == "linkedin"
+            and item["label"] in {
+                "Positive growth and student outcomes",
+                "Hiring and candidate experience",
+            }
+        )
     ]
     candidate_vectors = np.asarray(model.encode(
         [f"{item['label']}. {item['description']}" for item in candidates],

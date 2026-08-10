@@ -11,10 +11,12 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import { PlayStoreDeviceIntelligence } from "./playstore-device-intelligence";
 
 type Channel = "playstore" | "reddit" | "linkedin" | "youtube" | "x" | "facebook" | "instagram";
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
 type SourceFilter = "all" | "owned" | "external";
+type EvidenceSentiment = "all" | "positive" | "neutral" | "negative";
 type Evidence = {
   id: string;
   author: string;
@@ -39,9 +41,11 @@ type Issue = {
   summary: string;
   sentiment?: string;
   evidence: Evidence[];
+  semanticEvidenceComplete?: boolean;
   children?: { name: string; count?: number; share?: number; note?: string }[];
 };
 const COMMENTS_PER_PAGE = 10;
+const EVIDENCE_PER_PAGE = 10;
 type Version = { name: string; score: number; count: number };
 type DeepAnalysis = {
   headline: string;
@@ -118,6 +122,7 @@ const short = (value: unknown, size = 145) => {
 };
 const initials = (value: string) => value.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase() || "PW";
 const fmt = (value: number) => new Intl.NumberFormat("en-IN", { notation: value > 9999 ? "compact" : "standard", maximumFractionDigits: 1 }).format(value);
+const canonicalSourceUrl = (value: unknown) => String(value || "").trim().replace(/[?#].*$/, "").replace(/\/$/, "");
 
 function asEvidence(item: any, index: number, channel: Channel): Evidence {
   return {
@@ -261,12 +266,12 @@ function normalizeLinkedIn(data: any): Model {
   });
   return {
     channel: "linkedin", name: "LinkedIn", eyebrow: "PROFESSIONAL NARRATIVE · PUBLIC POSTS",
-    headline: "How the brand story is travelling.",
+    headline: "What your Network is saying?",
     description: data?.summary?.narrative || `${fmt(number(stats.totalPosts))} posts show the professional conversation around Physics Wallah.`,
     score: clamp(100 - number(stats.negRate)), scoreMax: 100, scoreLabel: "Narrative health", scoreNote: `${number(stats.negRate)}% critical · ${fmt(number(stats.positive))} positive`,
     total: number(stats.totalPosts), totalLabel: "posts analysed", issues, evidence, versions: (data?.summary?.themes || []).slice(0, 7).map((v: any) => ({ name: v.label, score: clamp(100 - number(v.count) / total * 100), count: number(v.count) })),
     sentiment: { positive: number(stats.positive), neutral: number(stats.neutral), negative: number(stats.negative) },
-    sourceNote: `Public LinkedIn evidence · ${data?.window || "current window"}`,
+    sourceNote: "",
   };
 }
 
@@ -349,7 +354,14 @@ function applySemanticClusters(base: Model, semantic: any): Model {
   if (!semantic?.live || !Array.isArray(semantic.clusters) || !semantic.clusters.length) return base;
   const issues: Issue[] = semantic.clusters.slice(0, 5).map((cluster: any, clusterIndex: number) => {
     const sourceIds = new Set((cluster.source_ids || []).map(String));
-    const fullEvidence = sourceIds.size ? base.evidence.filter((item) => sourceIds.has(String(item.id))) : [];
+    const representativeUrls = new Set((cluster.representative_evidence || []).map((item: any) => canonicalSourceUrl(item.url)).filter(Boolean));
+    const evidenceById = sourceIds.size ? base.evidence.filter((item) => sourceIds.has(String(item.id))) : [];
+    // Older imports can contain the same LinkedIn post under more than one row
+    // ID. Match the representative source URL as a compatibility fallback so
+    // those records remain connected to their semantic issue.
+    const fullEvidence = evidenceById.length >= sourceIds.size
+      ? evidenceById
+      : base.evidence.filter((item) => sourceIds.has(String(item.id)) || (item.url && representativeUrls.has(canonicalSourceUrl(item.url))));
     const representativeEvidence = (cluster.representative_evidence || []).map((item: any, index: number) => asEvidence({
       ...item,
       text: item.text,
@@ -366,6 +378,7 @@ function applySemanticClusters(base: Model, semantic: any): Model {
       summary: clean(cluster.summary || cluster.why_it_matters),
       sentiment: number(cluster.sentiment?.negative) > number(cluster.sentiment?.positive) ? "negative" : "mixed",
       evidence: fullEvidence.length ? fullEvidence : representativeEvidence,
+      semanticEvidenceComplete: sourceIds.size > 0 && evidenceById.length >= sourceIds.size,
       children: (cluster.subthemes || []).slice(0, 4).map((name: string) => ({ name: clean(name), note: "Recurring semantic phrase" })),
     };
   });
@@ -404,7 +417,10 @@ function filterModel(base: Model, period: Period, query: string, sourceFilter: S
   const issueDrafts = base.issues.map((issue) => {
     const matchingEvidence = issue.evidence.filter(matches);
     const ratio = issue.evidence.length ? matchingEvidence.length / issue.evidence.length : 0;
-    const count = Math.round(issue.count * ratio);
+    // When every semantic source row is linked, use the actual number of
+    // matching records. Fall back to proportional estimation only for legacy
+    // clusters that expose representative samples rather than their full set.
+    const count = issue.semanticEvidenceComplete ? matchingEvidence.length : Math.round(issue.count * ratio);
     const children = issue.children?.map((child) => {
       if (child.count === undefined) return child;
       const childCount = Math.round(child.count * ratio);
@@ -470,7 +486,7 @@ function MiniBars({ seed = 0 }: { seed?: number }) {
 export function AudienceIntelligenceDashboard({ initialChannel }: { initialChannel: Channel }) {
   const router = useRouter();
   const [channel, setChannel] = useState<Channel>(initialChannel);
-  const [period, setPeriod] = useState<Period>(initialChannel === "playstore" ? "yesterday" : "today");
+  const [period, setPeriod] = useState<Period>("30d");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [raw, setRaw] = useState<any>(null);
   const [semantic, setSemantic] = useState<any>(null);
@@ -484,6 +500,8 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
   const [ratingOpen, setRatingOpen] = useState(false);
   const [clusterIndex, setClusterIndex] = useState(0);
   const [commentPage, setCommentPage] = useState(0);
+  const [evidencePage, setEvidencePage] = useState(0);
+  const [evidenceSentiment, setEvidenceSentiment] = useState<EvidenceSentiment>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -501,19 +519,45 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
 
   const baseModel = useMemo(() => raw ? applySemanticClusters(normalize(channel, raw), semantic) : null, [channel, raw, semantic]);
   const model = useMemo(() => baseModel ? filterModel(baseModel, period, query, sourceFilter) : null, [baseModel, period, query, sourceFilter]);
-  const evidence = model?.evidence || [];
+  const evidence = useMemo(() => channel === "linkedin" ? [...(model?.evidence || [])] : [...(model?.evidence || [])].sort((a, b) => {
+    const aTime = a.date ? new Date(a.date).getTime() : 0;
+    const bTime = b.date ? new Date(b.date).getTime() : 0;
+    const safeA = Number.isFinite(aTime) ? aTime : 0;
+    const safeB = Number.isFinite(bTime) ? bTime : 0;
+    return safeB - safeA;
+  }), [channel, model?.evidence]);
   const currentCluster = model?.issues[Math.min(clusterIndex, Math.max(0, (model?.issues.length || 1) - 1))];
   const negativeAlerts = (model?.evidence || []).filter((item) => item.sentiment === "negative").slice(0, 3);
+  const evidenceSentimentCounts = useMemo(() => evidence.reduce((counts, item) => {
+    const sentiment = item.sentiment === "positive" || item.sentiment === "negative" ? item.sentiment : "neutral";
+    counts[sentiment] += 1;
+    return counts;
+  }, { positive: 0, neutral: 0, negative: 0 }), [evidence]);
+  const filteredEvidence = useMemo(() => evidenceSentiment === "all"
+    ? evidence
+    : evidence.filter((item) => (item.sentiment === "positive" || item.sentiment === "negative" ? item.sentiment : "neutral") === evidenceSentiment), [evidence, evidenceSentiment]);
+  const evidencePageCount = Math.max(1, Math.ceil(filteredEvidence.length / EVIDENCE_PER_PAGE));
+  const visibleEvidence = filteredEvidence.slice(evidencePage * EVIDENCE_PER_PAGE, (evidencePage + 1) * EVIDENCE_PER_PAGE);
+  const evidencePageNumbers = useMemo(() => Array.from(new Set([
+    0,
+    1,
+    evidencePage - 1,
+    evidencePage,
+    evidencePage + 1,
+    evidencePageCount - 2,
+    evidencePageCount - 1,
+  ].filter((page) => page >= 0 && page < evidencePageCount))).sort((a, b) => a - b), [evidencePage, evidencePageCount]);
   const issueEvidence = selectedIssue?.evidence || [];
   const commentPages = Math.max(1, Math.ceil(issueEvidence.length / COMMENTS_PER_PAGE));
   const visibleIssueEvidence = issueEvidence.slice(commentPage * COMMENTS_PER_PAGE, (commentPage + 1) * COMMENTS_PER_PAGE);
 
   useEffect(() => { setCommentPage(0); }, [selectedIssue?.name, period, query]);
+  useEffect(() => { setEvidencePage(0); }, [channel, period, query, sourceFilter, evidenceSentiment]);
 
   const openIssue = (issue: Issue) => { setSelectedIssue(issue); setCommentPage(0); };
 
   const changeChannel = (next: Channel) => {
-    setChannel(next); setPeriod(next === "playstore" ? "yesterday" : "today"); setQuery(""); setSourceFilter("all");
+    setChannel(next); setPeriod("30d"); setQuery(""); setSourceFilter("all");
     router.replace(`/audience-intelligence/${next}`);
   };
 
@@ -563,8 +607,9 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
           <div className="ai-analysis-body"><div className="ai-analysis-themes"><p className="ai-eyebrow">CRITICAL THEMES</p>{model.analysis.themes.length ? model.analysis.themes.map((theme) => <article key={theme.name}><div><strong>{theme.name}</strong><b>{fmt(theme.count)} <small>{theme.share.toFixed(0)}%</small></b></div><p>{theme.summary}</p><span><i style={{ width: `${clamp(theme.share)}%` }} /></span></article>) : <p>No recurring critical theme was established.</p>}</div><div className="ai-analysis-evidence"><p className="ai-eyebrow">MOST ENGAGED CRITICAL EVIDENCE</p>{model.analysis.evidence.slice(0, 5).map((item) => <button key={item.id} onClick={() => setSelectedEvidence(item)}><span><strong>{item.author}</strong><small>{item.meta}</small></span><p>{short(item.text, 130)}</p><ArrowUpRight size={14} /></button>)}</div></div>
         </section>}
 
-        <section className="ai-evidence-section"><div className="ai-section-heading"><div><p className="ai-eyebrow">SOURCE EVIDENCE</p><h2>Latest audience signals</h2></div><p>{model.sourceNote}</p></div><div className="ai-evidence-list">{evidence.slice(0, 8).map((item) => <button key={item.id} onClick={() => setSelectedEvidence(item)}><span className="ai-post-avatar">{initials(item.author)}</span><span><span className="ai-post-byline"><strong>{item.author}</strong><i className={`signal-${item.sentiment}`}>{item.sentiment || "signal"}</i></span><p>{short(item.title || item.text, 160)}</p><small>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Current brief"} · {item.meta}</small></span><span className="ai-open-circle"><ArrowUpRight size={14} /></span></button>)}{!evidence.length && <div className="ai-empty"><Sparkles size={18} /><p>No dated evidence falls inside this exact window. Choose a broader period to inspect the captured feed.</p></div>}</div></section>
+        <section className="ai-evidence-section"><div className="ai-section-heading"><div><p className="ai-eyebrow">SOURCE EVIDENCE</p><h2>Latest audience signals</h2></div>{filteredEvidence.length ? <p>Showing {evidencePage * EVIDENCE_PER_PAGE + 1}–{Math.min((evidencePage + 1) * EVIDENCE_PER_PAGE, filteredEvidence.length)} of {fmt(filteredEvidence.length)} · {channel === "linkedin" ? "critical signals first" : "newest first"}</p> : null}</div><div className="ai-evidence-sentiment-filters" role="group" aria-label="Filter audience signals by sentiment">{(["all", "positive", "neutral", "negative"] as EvidenceSentiment[]).map((sentiment) => <button key={sentiment} className={evidenceSentiment === sentiment ? "active" : ""} onClick={() => setEvidenceSentiment(sentiment)}><span>{sentiment === "all" ? "All signals" : sentiment}</span><b>{sentiment === "all" ? evidence.length : evidenceSentimentCounts[sentiment]}</b></button>)}</div><div className="ai-evidence-list">{visibleEvidence.map((item) => <button key={item.id} onClick={() => setSelectedEvidence(item)}><span className="ai-post-avatar">{initials(item.author)}</span><span><span className="ai-post-byline"><strong>{item.author}</strong></span><span className="ai-post-title-row"><p>{short(item.title || item.text, 160)}</p><i className={`signal-${item.sentiment}`}>{item.sentiment || "signal"}</i></span><small>{item.date ? new Date(item.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Current brief"} · {item.meta}</small></span><span className="ai-open-circle"><ArrowUpRight size={14} /></span></button>)}{!filteredEvidence.length && <div className="ai-empty"><Sparkles size={18} /><p>No {evidenceSentiment === "all" ? "dated" : evidenceSentiment} evidence falls inside this window. Choose another sentiment or broaden the date filter.</p></div>}</div>{evidencePageCount > 1 && <nav className="ai-evidence-pagination" aria-label="Audience signal pages"><button className="page-arrow" aria-label="Previous page" disabled={evidencePage === 0} onClick={() => setEvidencePage((page) => Math.max(0, page - 1))}><ChevronLeft size={15} /></button>{evidencePageNumbers.map((page, index) => <span key={page} className="ai-evidence-page-slot">{index > 0 && page - evidencePageNumbers[index - 1] > 1 ? <i>…</i> : null}<button className={`page-number ${evidencePage === page ? "active" : ""}`} onClick={() => setEvidencePage(page)}>{page + 1}</button></span>)}<button className="page-arrow" aria-label="Next page" disabled={evidencePage >= evidencePageCount - 1} onClick={() => setEvidencePage((page) => Math.min(evidencePageCount - 1, page + 1))}><ChevronRight size={15} /></button></nav>}</section>
 
+        {channel === "playstore" && <PlayStoreDeviceIntelligence data={raw} />}
         <section className="fd-emerging fd-emerging-bottom"><header><span><Sparkles size={17} /> Emerging trends <b>BETA</b></span><small>Directional prediction</small></header><h2>What may grow next</h2><p>Directional signals derived from the selected evidence window and the stable issue taxonomy.</p><div>{model.issues.slice(0, 3).map((issue, index) => <article key={issue.name}><span>0{index + 1}</span><div><strong>{issue.count ? `${issue.name} is likely to remain visible` : `${issue.name} remains on the watchlist`}</strong><p>{issue.count ? `${fmt(issue.count)} matched signals account for ${issue.share.toFixed(1)}% of classified issues in this view.` : "No dated signal appears in this window, but the established topic remains monitored for recurrence."}</p></div><i>{issue.count ? (index === 0 ? "High signal" : "Monitor") : "Watch"}</i></article>)}</div></section>
       </>}
 

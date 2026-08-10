@@ -52,7 +52,7 @@ export function FreshdeskAudienceDashboard() {
   const [semantic, setSemantic] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [period, setPeriod] = useState<Period>("today");
+  const [period, setPeriod] = useState<Period>("30d");
   const [selected, setSelected] = useState<Category | null>(null);
   const [commentPage, setCommentPage] = useState(0);
 

@@ -14,6 +14,9 @@ export const fetchCache = "force-no-store";
 export const revalidate = 0;
 
 const NEG_RE = /\b(scam|fraud|toxic|layoff|laid off|fired|terminat|resign|overrated|worst|complaint|mislead|refund|ex-?employee|harass|overpriced|overvalued|cheat|disappoint|regret|avoid|unpaid|salary|byju|loss|caution|beware|fear|humiliat)\b/gi;
+const HIRING_PROMO_RE = /\b(we(?:['’]re| are) hiring|now hiring|hiring alert|job opening|job vacancy|open roles?|apply now|walk[- ]?in interview|recruitment drive|join our team|send (?:your )?(?:cv|resume)|career opportunit(?:y|ies))\b/i;
+const COMPLAINT_CONTEXT_RE = /\b(complaint|concern regarding recruitment|candidate communication|interview experience|offer (?:revoked|withdrawn)|ghosted|rejection without|toxic work culture|termination|terminated|forced resign|layoff|fired|unfair|fraud|scam|mislead|harass|corruption|retaliat|humiliat|broken promise|misconduct|support failure|no response)\b/i;
+const CONTROVERSY_RE = /\b(fraud|scam|corruption|misconduct|harass|retaliat|humiliat|toxic|unfair|forced resign|terminat|layoff|fired|mislead|false promise|refund|unpaid|complaint|legal|governance|pressure|threat|broken promise)\b/gi;
 
 // Complaint categories for negative posts. Order matters — most specific
 // first (a parent's refund complaint is a parent complaint, not a support one).
@@ -88,21 +91,17 @@ export async function GET() {
     .order("published_date", { ascending: false })
     .limit(1000);
 
-  // Dedupe repeated ingests by post_url (rows are newest-first, keep the first).
-  const seenUrls = new Set<string>();
-  const deduped = (rows || []).filter((r: any) => {
-    const u = (r.post_url || "").split("?")[0];
-    if (u && seenUrls.has(u)) return false;
-    if (u) seenUrls.add(u);
-    return true;
-  });
   // Brand-relevance gate: mirror of PW_TERMS_RE in scrapers/linkedin.py —
   // legacy rows stored before the ingest-side gate must not reach the UI.
   const PW_RE = /\b(physics\s*wallah|physicswallah|pw skills|pw vidyapeeth|alakh pandey|infinity pro|pwians?|pwstories|gyaan-e|gate wallah)\b|#pw\b/i;
-  const all = deduped.filter(
+  // Keep every stored source row. Semantic clusters retain the original row
+  // IDs, so URL-level deduplication here can orphan a cluster from its dated
+  // evidence and incorrectly make its selected-window count zero.
+  const all = (rows || []).filter(
     (r: any) =>
       (r.post_text || "").trim().length > 20 &&
-      PW_RE.test(`${r.post_text || ""} ${(r.raw_data || {}).title || ""}`)
+      PW_RE.test(`${r.post_text || ""} ${(r.raw_data || {}).title || ""}`) &&
+      !(HIRING_PROMO_RE.test(`${r.post_text || ""} ${(r.raw_data || {}).title || ""}`) && !COMPLAINT_CONTEXT_RE.test(`${r.post_text || ""} ${(r.raw_data || {}).title || ""}`))
   );
   // window filter on published_date, keeping undated rows
   const inWindow = all.filter((r: any) => !r.published_date || r.published_date >= since);
@@ -130,11 +129,15 @@ export async function GET() {
         comments: r.comments_count || 0,
       };
     })
-    // negative first, then most recent
+    // Put critical and mixed audience signals before positive brand news. Within
+    // each sentiment, stronger controversy language wins, then recency.
     .sort((a: any, b: any) => {
-      const rank = { negative: 0, neutral: 1, positive: 2 } as any;
-      if (rank[a.sentiment] !== rank[b.sentiment]) return rank[a.sentiment] - rank[b.sentiment];
-      return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+      const sentimentRank = { negative: 0, neutral: 1, positive: 2 } as const;
+      const sentimentDelta = sentimentRank[a.sentiment as keyof typeof sentimentRank] - sentimentRank[b.sentiment as keyof typeof sentimentRank];
+      if (sentimentDelta) return sentimentDelta;
+      const risk = (post: any) => (`${post.title || ""} ${post.text || ""}`.match(CONTROVERSY_RE) || []).length;
+      const riskDelta = risk(b) - risk(a);
+      return riskDelta || String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
     });
 
   const counts = { positive: 0, negative: 0, neutral: 0 };

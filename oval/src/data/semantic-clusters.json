@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "brand_id": "166d8523-79a0-4b1c-b56f-8b40b6cc2f1f",
-  "generated_at": "2026-08-04T11:27:48.076523+00:00",
+  "generated_at": "2026-08-10T09:44:13.719355+00:00",
   "platforms": {
     "playstore": {
       "platform": "playstore",
@@ -476,142 +476,75 @@
     "linkedin": {
       "platform": "linkedin",
       "label": "LinkedIn",
-      "source_count": 261,
-      "clustered_source_count": 30,
+      "source_count": 377,
+      "clustered_source_count": 49,
       "cluster_scope": "negative evidence",
       "sentiment": {
-        "positive": 128,
-        "neutral": 103,
-        "negative": 30
+        "positive": 152,
+        "neutral": 176,
+        "negative": 49
       },
-      "cluster_count": 5,
+      "cluster_count": 6,
       "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
       "method": "multilingual normalized sentence embeddings + semantic prototype clustering",
       "clusters": [
         {
-          "id": "bba97bd6-18df-5cae-b286-ed424ea41447",
-          "label": "Workplace culture and employee dignity",
-          "summary": "Employees or former employees allege disrespect, intimidation, retaliation or ignored internal complaints. Repeated semantic signals include employee, senior, kumar.",
-          "why_it_matters": "Workplace claims can affect hiring, retention and leadership credibility.",
-          "count": 9,
-          "share": 30.0,
-          "cohesion": 0.835,
-          "prototype_similarity": 0.301,
-          "confidence": "medium",
-          "subthemes": [
-            "employee",
-            "senior",
-            "kumar",
-            "experience"
-          ],
-          "sentiment": {
-            "positive": 0,
-            "neutral": 0,
-            "negative": 9
-          },
-          "source_ids": [
-            "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
-            "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
-            "d527f262-8cce-4f33-97c3-b43ed352d22b",
-            "2ffdf98d-3f73-4af2-bfbe-f42994b0d57a",
-            "4cd8a2e8-9faa-4109-a916-280872b78971",
-            "45cbf935-211e-482b-aff1-04ca8c206b7c",
-            "0f38f46c-96b6-4d5b-8161-466e945197cd",
-            "4c9deb12-efd5-4d57-9547-0e6ad5084af6",
-            "40ed565b-9e65-4903-a3cb-c8cf4bef7a19"
-          ],
-          "representative_evidence": [
-            {
-              "id": "2ffdf98d-3f73-4af2-bfbe-f42994b0d57a",
-              "text": "Alakh Pandeysir PW (PhysicsWallah) PW Skills PW Support My Experience with Work Culture at PW Skills rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Alakh Pandeysir PW (PhysicsWallah). My first meeting with my new Senior Manager, Mrs. Sherya, was one of the most negative professional meetings I have experienced. Instead of discussing my return, expectations, onboarding, or understanding the circumstances, the conversat",
-              "sentiment": "negative",
-              "author": "rajeev kumar",
-              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_workculture-edtech-pwskills-activity-7483394813719924737-sYX6",
-              "published_at": "2026-07-16T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "d527f262-8cce-4f33-97c3-b43ed352d22b",
-              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual le",
-              "sentiment": "negative",
-              "author": "rajeev kumar",
-              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
-              "published_at": "2026-07-20T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
-              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual leadership don't mean shit there—you just have to be a top-tier ass-l",
-              "sentiment": "negative",
-              "author": "rajeev kumar",
-              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
-              "published_at": "2026-07-20T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
-              "text": "My Experience as an Employee PW Support PW (PhysicsWallah) Prateek Maheshwari Alakh Pandey rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- My Experience as an Employee PW Support]( Prateek Maheshwari. Shockingly, on just the second day of the PIP, my employment was terminated. The attached screenshot is evidence that I had already complained internally about disrespectful behavior and an unhealthy work environment. I c",
-              "sentiment": "negative",
-              "author": "rajeev kumar",
-              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pwskills-edtech-activity-7483542681336426497-cPqW",
-              "published_at": null,
-              "issue_type": null
-            },
-            {
-              "id": "0f38f46c-96b6-4d5b-8161-466e945197cd",
-              "text": "Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. Sagar Sharma · · 2026-07-01 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. In my experience with Physics Wallah (PW), I found the sales process deeply disappointing. Instead of transparent guidance, I encountered promises that were difficult to verify. When I raised questions and chose not to proceed, the interaction became unprofessional, ",
-              "sentiment": "negative",
-              "author": "Sagar Sharma",
-              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_physicswallah-pwskills-edtech-activity-7478081308682911744-yPK8",
-              "published_at": "2026-07-01T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "45cbf935-211e-482b-aff1-04ca8c206b7c",
-              "text": "Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. Sagar Sharma · · 2026-07-01 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- Two faces of PW(PhysicWalah) I believe every edtech company should learn from what happened to BYJU’S. In my experience with Physics Wallah (PW), I found the sales process deeply disappointing. Instead of transparent guidance, I encountered promises that were difficult to verify. When I raised questions and chose not to proceed, the interaction became unprofessional, ",
-              "sentiment": "negative",
-              "author": "Sagar Sharma",
-              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_physicswallah-pwskills-edtech-activity-7478081308682911744-yPK8",
-              "published_at": "2026-07-01T00:00:00+00:00",
-              "issue_type": null
-            }
-          ],
-          "rank": 1
-        },
-        {
           "id": "0fa1525f-61a0-5757-aeec-fecb68b80506",
           "label": "Sales conduct and misleading promises",
-          "summary": "Prospects allege aggressive or misleading counselling and difficulty validating outcomes before purchase. Repeated semantic signals include kumar, big, learning.",
+          "summary": "Prospects allege aggressive or misleading counselling and difficulty validating outcomes before purchase. Repeated semantic signals include product, nism, kumar.",
           "why_it_matters": "Sales-governance failures can create both compliance risk and high-visibility warnings to other buyers.",
-          "count": 8,
-          "share": 26.7,
-          "cohesion": 0.719,
-          "prototype_similarity": 0.274,
-          "confidence": "medium",
+          "count": 22,
+          "share": 44.9,
+          "cohesion": 0.721,
+          "prototype_similarity": 0.249,
+          "confidence": "high",
           "subthemes": [
+            "product",
+            "nism",
             "kumar",
-            "big",
-            "learning",
-            "000"
+            "rajesh"
           ],
           "sentiment": {
             "positive": 0,
             "neutral": 0,
-            "negative": 8
+            "negative": 22
           },
           "source_ids": [
-            "7f6b6e1b-4777-40b5-8f67-9ce4c581fedd",
             "074e46a0-c148-4776-92c2-ef839e636279",
-            "70421dd3-96b0-4bf1-b45f-7e3f4c331c89",
-            "f7442678-af76-4f7f-9c08-234670d64547",
-            "740566b3-e2ed-4827-a0ac-653a813b21e7",
+            "15cc703b-5b14-4399-96e6-844c0a547972",
+            "232f2d60-304e-4d02-9551-9f4ec0051769",
+            "9dca838f-f13a-4367-b7b5-f4ad8190a7dc",
+            "d5aa71b1-ac6b-463e-92e8-c2b292c169d7",
+            "feaa2740-d543-4eab-b3e0-541d219bd8d7",
+            "3d2a0b02-c926-4e67-bb83-15534a751342",
+            "c0d47f9d-d729-463a-ba33-595bd571182d",
+            "54600973-246d-4b71-a978-336a12eb40d3",
+            "b13d2133-e554-4d7c-ad5b-23bd4370ffc5",
+            "7d304a98-02c9-4328-99ec-9855db02bb93",
+            "08d59c35-d7db-4dc6-a47a-18a7eb518e24",
             "dfea55f4-af71-4eac-869e-13926ec6cfa1",
             "5ce8d581-f13e-4603-8279-eddd2b1d9607",
-            "078d4949-a280-4855-9bfa-03d6994e1868"
+            "c6219516-c68c-4b71-aaab-b3b2cd0bfb27",
+            "740566b3-e2ed-4827-a0ac-653a813b21e7",
+            "83a2ad84-c98e-4de1-aaa4-54cb92a41a6e",
+            "9b616786-2c1e-4e2b-9cca-418d43701dfd",
+            "c89cb228-5e10-434c-800c-100d7077cb8d",
+            "f7442678-af76-4f7f-9c08-234670d64547",
+            "078d4949-a280-4855-9bfa-03d6994e1868",
+            "98e20079-7684-45c6-b670-7f3b49adf226"
           ],
           "representative_evidence": [
             {
               "id": "5ce8d581-f13e-4603-8279-eddd2b1d9607",
+              "text": "Dear PW Support Team, PW (PhysicsWallah) Alakh Pandey sir Sinha Arvind · · 2026-06-30 Sinha Arvind : Sales Specialist at Self-employed with 24 years 5 months of experience. Previous roles include Co-Founder at Dirghayu Bharat, Sales And Marketing Specialist at Dirghayu Bharat, and Operation Manager at Reliance Retail. Based in Rajarhat, West Bengal, India [IN]. --- Dear PW Support Team, [PW (PhysicsWallah)]( [Alakh Pandey]( sir This is regarding the cancellation of my daughter's JEE Prayas Dropper Batch enrollment and the continuous EMI demands being raised despite our cancellation request. My daughter attended only approximately one week of classes. As soon as we decided to discontinue the ",
+              "sentiment": "negative",
+              "author": "Sinha Arvind",
+              "url": "https://www.linkedin.com/posts/sinha-arvind-5b6663269_dear-pw-support-team-pw-physicswallah-activity-7477800112782733313-MWe6",
+              "published_at": "2026-06-30T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "08d59c35-d7db-4dc6-a47a-18a7eb518e24",
               "text": "Dear PW Support Team, PW (PhysicsWallah) Alakh Pandey sir Sinha Arvind · · 2026-06-30 Sinha Arvind : Sales Specialist at Self-employed with 24 years 5 months of experience. Previous roles include Co-Founder at Dirghayu Bharat, Sales And Marketing Specialist at Dirghayu Bharat, and Operation Manager at Reliance Retail. Based in Rajarhat, West Bengal, India [IN]. --- Dear PW Support Team, [PW (PhysicsWallah)]( [Alakh Pandey]( sir This is regarding the cancellation of my daughter's JEE Prayas Dropper Batch enrollment and the continuous EMI demands being raised despite our cancellation request. My daughter attended only approximately one week of classes. As soon as we decided to discontinue the ",
               "sentiment": "negative",
               "author": "Sinha Arvind",
@@ -629,83 +562,12 @@
               "issue_type": null
             },
             {
-              "id": "078d4949-a280-4855-9bfa-03d6994e1868",
-              "text": "⚠️ A Word of Caution for Students Considering Physics Wallah (PW) Courses Sagar Sharma · · 2026-06-24 Sagar Sharma : Business Analyst at Wipro with 5 years 9 months of experience. Previous roles include Analyst at Wipro and Associate at Aegis Noida. Based in Ghaziabad, Uttar Pradesh, India [IN]. --- ⚠️ A Word of Caution for Students Considering Physics Wallah (PW) Courses Before investing your hard-earned money in any paid course, please do thorough research and ask tough questions. My personal experience with the sales process was disappointing. I found the sales approach unprofessional, and I was unable to obtain sufficient verifiable evidence regarding placement outcomes despite seeking c",
+              "id": "83a2ad84-c98e-4de1-aaa4-54cb92a41a6e",
+              "text": "Dear PW Support Team, PW (PhysicsWallah) Alakh Pandey sir Sinha Arvind · · 2026-06-30 Sinha Arvind : Sales Specialist at Self-employed with 24 years 5 months of experience. Previous roles include Co-Founder at Dirghayu Bharat, Sales And Marketing Specialist at Dirghayu Bharat, and Operation Manager at Reliance Retail. Based in Rajarhat, West Bengal, India [IN]. --- Dear PW Support Team, [PW (PhysicsWallah)]( [Alakh Pandey]( sir This is regarding the cancellation of my daughter's JEE Prayas Dropper Batch enrollment and the continuous EMI demands being raised despite our cancellation request. My daughter attended only approximately one week of classes. As soon as we decided to discontinue the ",
               "sentiment": "negative",
-              "author": "Sagar Sharma",
-              "url": "https://www.linkedin.com/posts/contact-ba-sagar-sharma_dataanalytics-careeradvice-onlinelearning-activity-7475637164957937665-GeqI",
-              "published_at": "2026-06-24T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "70421dd3-96b0-4bf1-b45f-7e3f4c331c89",
-              "text": "I never thought I would have to write a post like this. Prashant kumar · · 2026-07-07 Prashant kumar : Based in Samastipur, Bihar, India [IN]. --- I never thought I would have to write a post like this. I am sharing my experience publicly in the hope that it reaches the leadership team at Physics Wallah and helps prevent similar situations for other students. Here's what happened: 📅 My batch was valid until 30 June 2026. 📞 Before making any payment, I called a PW counselor and specifically asked: \"If I pay ₹3,000 today, will my batch validity be extended?\" I was clearly informed that my batch validity would be extended by approximately 6 months, until 31 December 2026. Trusting this assuranc",
-              "sentiment": "negative",
-              "author": "Prashant kumar",
-              "url": "https://www.linkedin.com/posts/prashant-kumar-74377a21b_physicswallah-edtech-studentexperience-activity-7480208430478213121-19fw",
-              "published_at": "2026-07-07T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "740566b3-e2ed-4827-a0ac-653a813b21e7",
-              "text": "This is not expected from PW (PhysicsWallah). How can you accept money for the product and don't take responsibility of product delivery? The product was delivered somewhere without OTP. There is no … Rajesh Kumar · · 2026-06-30 Rajesh Kumar : Rajesh Kumar has held roles including Design Verification Engineer at Amazon Lab126, Senior Lead Engineer at Qualcomm, and Senior Engineer at Qualcomm. Based in Bengaluru, Karnataka, India [IN]. --- This is not expected from PW (PhysicsWallah) ![This is not expected from PW (PhysicsWallah). How can you accept money for the product and don't take responsibility of product delivery? The product was delivered somewhere without OTP. There is no … Rajesh Ku",
-              "sentiment": "negative",
-              "author": "Rajesh Kumar",
-              "url": "https://www.linkedin.com/posts/rajeshkumar107_physicswallah-support-alakhpandey-activity-7477719052480638976-nixl",
+              "author": "Sinha Arvind",
+              "url": "https://www.linkedin.com/posts/sinha-arvind-5b6663269_dear-pw-support-team-pw-physicswallah-activity-7477800112782733313-MWe6",
               "published_at": "2026-06-30T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "074e46a0-c148-4776-92c2-ef839e636279",
-              "text": "A friend of mine bought an annual learning during the summer sale for ₹4,999, slashed from ₹12,000. Prabakaran Mathivanan · · 2026-07-06 Prabakaran Mathivanan : Associate Project Manager at Trigent Software Inc with 16 years 3 months of experience. Previous roles include Business Analyst cum Module Lead at Trigent Software Inc, Founder at Shopunleashed, and Technical Test Lead at Edgeverve. Based in Greater Bengaluru Area [IN]. --- GotoMarket Buyerjourney ProductManagament A friend of mine bought an annual learning subscription during the summer sale for ₹4,999, slashed from ₹12,000. Here's the full journey which explains where it broke. Thinking: He wasn't looking to learn anything specific",
-              "sentiment": "negative",
-              "author": "Prabakaran Mathivanan",
-              "url": "https://www.linkedin.com/posts/prabakaran-mathivanan-58637411b_gotomarket-buyerjourney-productmanagament-activity-7479732325497573376-55eQ",
-              "published_at": null,
-              "issue_type": "support"
-            }
-          ],
-          "rank": 2
-        },
-        {
-          "id": "fd67c3c2-1614-565a-9760-c19963f23d6b",
-          "label": "Hiring and candidate experience",
-          "summary": "Posts discuss recruitment treatment, interview experience, offers and aggressive joining incentives. Repeated semantic signals include brand, refund, salary.",
-          "why_it_matters": "Candidate experience shapes employer brand even when it is not an employee-relations incident.",
-          "count": 8,
-          "share": 26.7,
-          "cohesion": 0.742,
-          "prototype_similarity": 0.33,
-          "confidence": "medium",
-          "subthemes": [
-            "brand",
-            "refund",
-            "salary",
-            "nism"
-          ],
-          "sentiment": {
-            "positive": 0,
-            "neutral": 0,
-            "negative": 8
-          },
-          "source_ids": [
-            "3c1f5b86-232e-4a3f-8ba7-12cd35fcf1e0",
-            "cb9baccb-0bca-47be-99aa-101926d830b7",
-            "232f2d60-304e-4d02-9551-9f4ec0051769",
-            "3d2a0b02-c926-4e67-bb83-15534a751342",
-            "7d304a98-02c9-4328-99ec-9855db02bb93",
-            "54600973-246d-4b71-a978-336a12eb40d3",
-            "00470def-3a94-4258-86f7-3d1989e472e4",
-            "9506f510-fb70-45e7-8aee-3b5794f55f40"
-          ],
-          "representative_evidence": [
-            {
-              "id": "54600973-246d-4b71-a978-336a12eb40d3",
-              "text": "Post by yogesh kumar akula · · 2026-07-02 yogesh kumar akula : Graduate Engineer Trainee at Coforge with 1 year 3 months of experience. Previous roles include Growth And Partnership Intern at RideScan, Associate Software Engineer Intern at Accenture in India, and Contributer at Hacktoberfest. Based in Hyderabad, Telangana, India [IN]. --- I rarely call out brands publicly. But this needs to be said. 🧵 I recently enrolled in the NISM Series XII – Securities Markets Foundation course on PW (PhysicsWallah)]( — you've built something incredible for Indian students. Don't let broken support systems erode that trust. I hope this reaches someone who can help. 🙏 Alakh Pandey]( Physics Wallah (PW) Ph",
-              "sentiment": "negative",
-              "author": "yogesh kumar akula",
-              "url": "https://www.linkedin.com/posts/akulayogeshkumar_physicswallah-nism-consumerrights-activity-7478301281976217600-r3JW",
-              "published_at": "2026-07-02T00:00:00+00:00",
               "issue_type": null
             },
             {
@@ -718,79 +580,139 @@
               "issue_type": null
             },
             {
-              "id": "00470def-3a94-4258-86f7-3d1989e472e4",
-              "text": "Post by Praveen Sharma · · 2026-06-28 Praveen Sharma : Test Development Engineer at SII Group India with 10 years of experience. Previous roles include Senior Test Engineer at Incedo Inc., QA Manager at LBB (Little Black Book), and QA Manager at PTC Punjabi Network. Based in Delhi, India [IN]. --- Physics Wallah (PW) has earned the trust of millions of students and parents across India by making quality education accessible. That is exactly why I hope this concern reaches the right people within the organization. My nephew(Gauransh Sharma class 10th) enrolled in a PW online batch. Before enrollment, we were informed that if he chose not to continue, the refund would be processed as per the s",
+              "id": "54600973-246d-4b71-a978-336a12eb40d3",
+              "text": "Post by yogesh kumar akula · · 2026-07-02 yogesh kumar akula : Graduate Engineer Trainee at Coforge with 1 year 3 months of experience. Previous roles include Growth And Partnership Intern at RideScan, Associate Software Engineer Intern at Accenture in India, and Contributer at Hacktoberfest. Based in Hyderabad, Telangana, India [IN]. --- I rarely call out brands publicly. But this needs to be said. 🧵 I recently enrolled in the NISM Series XII – Securities Markets Foundation course on PW (PhysicsWallah)]( — you've built something incredible for Indian students. Don't let broken support systems erode that trust. I hope this reaches someone who can help. 🙏 Alakh Pandey]( Physics Wallah (PW) Ph",
               "sentiment": "negative",
-              "author": "Praveen Sharma",
-              "url": "https://www.linkedin.com/posts/praveen-sharma-sdet_physicswallah-pw-customerexperience-activity-7477022663098421248-8AR1",
-              "published_at": "2026-06-28T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "cb9baccb-0bca-47be-99aa-101926d830b7",
-              "text": "Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. Priyanka Paw · · 2026-07-18 Priyanka Paw : Assistant Sales Manager at TripzyGo with 7 years 8 months of experience. Previous roles include Sales Team Lead at Thrillophilia.com, Travel Sales Consultant at Luxe Comfort Travels, and Intenship at Thomas Cook India Limited. Based in Indore, Madhya Pradesh, India [IN]. --- Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. For almost 2 years, I worked at TripzyGo But this post is bigger than my own salary. During my tenure, I was repeatedly instructed to terminate employees by labelling them “non-performers,” including people who had joined",
-              "sentiment": "negative",
-              "author": "Priyanka Paw",
-              "url": "https://www.linkedin.com/posts/priyanka-paw-28b1a9140_employeerights-salarydelay-labourlaw-activity-7484245279114698752-IOtc",
-              "published_at": "2026-07-18T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "3c1f5b86-232e-4a3f-8ba7-12cd35fcf1e0",
-              "text": "Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. Priyanka Paw · · 2026-07-18 Priyanka Paw : Assistant Sales Manager at TripzyGo with 7 years 8 months of experience. Previous roles include Sales Team Lead at Thrillophilia.com, Travel Sales Consultant at Luxe Comfort Travels, and Intenship at Thomas Cook India Limited. Based in Indore, Madhya Pradesh, India [IN]. --- Two Years of Loyalty. Four Months Without My Salary. Today, I Break My Silence. For almost 2 years, I worked at TripzyGo But this post is bigger than my own salary. During my tenure, I was repeatedly instructed to terminate employees by labelling them “non-performers,” including people who had joined",
-              "sentiment": "negative",
-              "author": "Priyanka Paw",
-              "url": "https://www.linkedin.com/posts/priyanka-paw-28b1a9140_employeerights-salarydelay-labourlaw-activity-7484245279114698752-IOtc",
-              "published_at": "2026-07-18T00:00:00+00:00",
-              "issue_type": null
-            },
-            {
-              "id": "232f2d60-304e-4d02-9551-9f4ec0051769",
-              "text": "An Open Letter to the Leadership Team at Physics Wallah I have always respected Physics Wallah's mission of making quality education affordable and accessible. That is exactly why this experience has been so disappointing. This post is not intended to damage anyone's reputation. It is a sincere request for a fair review of my case. • In 2025, I purchased a complete PW course for ₹4,200 and received 1 year of access. • As my batch approached its expiry date (30 June 2026), I explored the extension options available inside the app. • After that, I began receiving follow-up calls from PW counselors regarding my expiring batch. • Based on those conversations, I understood that by paying ₹3,000, ",
-              "sentiment": "negative",
-              "author": "Prashant kumar",
-              "url": "https://www.linkedin.com/posts/prashant-kumar-74377a21b_physicswallah-edtech-studentexperience-activity-7480198199492931584-ffFr",
-              "published_at": "2026-07-07T00:00:00+00:00",
+              "author": "yogesh kumar akula",
+              "url": "https://www.linkedin.com/posts/akulayogeshkumar_physicswallah-nism-consumerrights-activity-7478301281976217600-r3JW",
+              "published_at": "2026-07-02T00:00:00+00:00",
               "issue_type": null
             }
           ],
-          "rank": 3
+          "rank": 1
         },
         {
-          "id": "7d74bb7f-3ede-5c6c-b986-9cc700f0a7f5",
-          "label": "Termination, PIP and forced resignation",
-          "summary": "Posts connect termination, PIPs or resignation pressure with policy disputes or speaking up internally. Repeated semantic signals include termination, ashish choudhary, jio.",
-          "why_it_matters": "Each claim requires an evidence-led People and Legal review rather than a generic public response.",
-          "count": 2,
-          "share": 6.7,
-          "cohesion": 0.878,
-          "prototype_similarity": 0.34,
-          "confidence": "low",
+          "id": "bba97bd6-18df-5cae-b286-ed424ea41447",
+          "label": "Workplace culture and employee dignity",
+          "summary": "Employees or former employees allege disrespect, intimidation, retaliation or ignored internal complaints. Repeated semantic signals include refund, sales, experience.",
+          "why_it_matters": "Workplace claims can affect hiring, retention and leadership credibility.",
+          "count": 19,
+          "share": 38.8,
+          "cohesion": 0.85,
+          "prototype_similarity": 0.256,
+          "confidence": "high",
           "subthemes": [
-            "termination",
-            "ashish choudhary",
-            "jio",
-            "warehouse"
+            "refund",
+            "sales",
+            "experience",
+            "gajanan"
           ],
           "sentiment": {
             "positive": 0,
             "neutral": 0,
-            "negative": 2
+            "negative": 19
           },
           "source_ids": [
-            "a8be269c-0fad-4f25-9ee3-1d977cc9ae5f",
-            "b6a4b4d2-0b52-4cc3-a49f-570cd581282e"
+            "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
+            "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
+            "d527f262-8cce-4f33-97c3-b43ed352d22b",
+            "784cd5d4-92e1-4a0f-83c0-e5c2b0b8d42f",
+            "eeba89e1-7d51-48ec-838a-82bf4488e08a",
+            "df5aa047-9dc0-4420-9ab1-c3a65e3d0c6f",
+            "9ac9af09-2c8b-4460-81c1-8eeef153c055",
+            "d7bea463-762f-4d19-9463-69a2cfdd97d9",
+            "4cd8a2e8-9faa-4109-a916-280872b78971",
+            "1b72c112-a61a-44b8-83ce-8891545b04e1",
+            "5dbfe437-3634-4526-9a8f-3889491040ea",
+            "0f38f46c-96b6-4d5b-8161-466e945197cd",
+            "45cbf935-211e-482b-aff1-04ca8c206b7c",
+            "96ae76e5-0cfe-4342-9cb1-ee22dbddca4c",
+            "cac9d040-e49b-4cc6-8db4-6b5b1c6cf44b",
+            "00470def-3a94-4258-86f7-3d1989e472e4",
+            "6068685f-5d22-44d7-ab47-1599361d72f9",
+            "846453d6-f76f-4873-8c94-889290e7c35d",
+            "53f778f0-9d43-497d-8ddc-7bab86891fb6"
           ],
           "representative_evidence": [
             {
-              "id": "a8be269c-0fad-4f25-9ee3-1d977cc9ae5f",
-              "text": "Even the HR was in such a hurry that the termination email didn't even mention the correct legal name of the company.PW (PhysicsWallah)Alakh PandeyPrateek Maheshwari Tanya S. rajeev kumar · · 2026-07-17 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Even the HR was in such a hurry that the termination email didn't even mention the correct legal name of the company.PW (PhysicsWallah)Alakh PandeyPrateek Maheshwari Tanya S. The termination email re",
+              "id": "e268ea62-bb36-43a2-a3ee-e7046776f7cb",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual leadership don't mean shit there—you just have to be a top-tier ass-l",
               "sentiment": "negative",
               "author": "rajeev kumar",
-              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workplaceculture-activity-7483782635945738240-kBYx",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "d527f262-8cce-4f33-97c3-b43ed352d22b",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual le",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "784cd5d4-92e1-4a0f-83c0-e5c2b0b8d42f",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual le",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "eeba89e1-7d51-48ec-838a-82bf4488e08a",
+              "text": "Dear PW (PhysicsWallah), Is This the Work Culture You Are Proud Of? Alakh Pandey rajeev kumar · · 2026-07-20 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- Dear PW (PhysicsWallah) and trust me, PW is absolute worst fucking place to be. It’s run by a bunch of completely incompetent, ego-driven assholes who haven't got a clue what they're doing. Skill, qualifications, and actual le",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pw-workculture-activity-7484794753335644160-gBDG",
+              "published_at": "2026-07-20T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "f54735f1-f025-4b82-abb6-5ba0ea765ec7",
+              "text": "My Experience as an Employee PW Support PW (PhysicsWallah) Prateek Maheshwari Alakh Pandey rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- My Experience as an Employee PW Support]( Prateek Maheshwari. Shockingly, on just the second day of the PIP, my employment was terminated. The attached screenshot is evidence that I had already complained internally about disrespectful behavior and an unhealthy work environment. I c",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pwskills-edtech-activity-7483542681336426497-cPqW",
               "published_at": null,
               "issue_type": null
             },
+            {
+              "id": "df5aa047-9dc0-4420-9ab1-c3a65e3d0c6f",
+              "text": "My Experience as an Employee PW Support PW (PhysicsWallah) Prateek Maheshwari Alakh Pandey rajeev kumar · · 2026-07-16 rajeev kumar : Senior Skill Counsellor at PW (PhysicsWallah) with 3 years 10 months of experience. Previous roles include Senior Counselor at Vedantu, Business Development Manager at Motion Education Pvt Ltd, and Senior achedimic counsllor at BYJU'S. Based in Bengaluru, Karnataka, India [IN]. --- My Experience as an Employee PW Support]( Prateek Maheshwari. Shockingly, on just the second day of the PIP, my employment was terminated. The attached screenshot is evidence that I had already complained internally about disrespectful behavior and an unhealthy work environment. I c",
+              "sentiment": "negative",
+              "author": "rajeev kumar",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_physicswallah-pwskills-edtech-activity-7483542681336426497-cPqW",
+              "published_at": "2026-07-16T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 2
+        },
+        {
+          "id": "7d74bb7f-3ede-5c6c-b986-9cc700f0a7f5",
+          "label": "Termination, PIP and forced resignation",
+          "summary": "Posts connect termination, PIPs or resignation pressure with policy disputes or speaking up internally. Repeated semantic signals include the representative evidence.",
+          "why_it_matters": "Each claim requires an evidence-led People and Legal review rather than a generic public response.",
+          "count": 3,
+          "share": 6.1,
+          "cohesion": 1.0,
+          "prototype_similarity": 0.206,
+          "confidence": "low",
+          "subthemes": [],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 3
+          },
+          "source_ids": [
+            "ccfa3f85-06a0-4dd3-bf52-62e94aec9d63",
+            "22568de5-c8f7-45fd-83d1-742aaa718550",
+            "b6a4b4d2-0b52-4cc3-a49f-570cd581282e"
+          ],
+          "representative_evidence": [
             {
               "id": "b6a4b4d2-0b52-4cc3-a49f-570cd581282e",
               "text": "Alakh Pandey Physics Wallah (PW) Ashish K Choudhary · · 2026-07-15 Ashish K Choudhary : Regional Manager -Supply Chain- East (Including North East) at Jio with 27 years 3 months of experience. Previous roles include Regional HUB Warehouse & Logistics Operation Manager - East, at Jio, Warehouse Logistics Manager at Jio, and Manager - State Warehouse & Logistics, Hyderabad, Andhra Pradesh at Jio. Based in Kolkata metropolitan area, West Bengal, India [IN]. --- Alakh Pandey Gopal Sharma Prateek Maheshwari [Ashish K Choudhary]( · 2026-07-16 · 1 Once again false commitment given by PW worst Experience [Ashish K Choudhary]( · 2026-07-16 Unable to access the app [PW Support](",
@@ -799,17 +721,35 @@
               "url": "https://www.linkedin.com/posts/ashishkchoudhary-scm_physicswallah-studentfirst-parentvoice-activity-7483153251220144130-Bdbm",
               "published_at": "2026-07-15T00:00:00+00:00",
               "issue_type": null
+            },
+            {
+              "id": "22568de5-c8f7-45fd-83d1-742aaa718550",
+              "text": "Alakh Pandey Physics Wallah (PW) Ashish K Choudhary · · 2026-07-15 Ashish K Choudhary : Regional Manager -Supply Chain- East (Including North East) at Jio with 27 years 3 months of experience. Previous roles include Regional HUB Warehouse & Logistics Operation Manager - East, at Jio, Warehouse Logistics Manager at Jio, and Manager - State Warehouse & Logistics, Hyderabad, Andhra Pradesh at Jio. Based in Kolkata metropolitan area, West Bengal, India [IN]. --- Alakh Pandey Gopal Sharma Prateek Maheshwari [Ashish K Choudhary]( · 2026-07-16 · 1 Once again false commitment given by PW worst Experience [Ashish K Choudhary]( · 2026-07-16 Unable to access the app [PW Support](",
+              "sentiment": "negative",
+              "author": "Ashish K Choudhary",
+              "url": "https://www.linkedin.com/posts/ashishkchoudhary-scm_physicswallah-studentfirst-parentvoice-activity-7483153251220144130-Bdbm",
+              "published_at": "2026-07-15T00:00:00+00:00",
+              "issue_type": null
+            },
+            {
+              "id": "ccfa3f85-06a0-4dd3-bf52-62e94aec9d63",
+              "text": "Alakh Pandey Physics Wallah (PW) Ashish K Choudhary · · 2026-07-15 Ashish K Choudhary : Regional Manager -Supply Chain- East (Including North East) at Jio with 27 years 3 months of experience. Previous roles include Regional HUB Warehouse & Logistics Operation Manager - East, at Jio, Warehouse Logistics Manager at Jio, and Manager - State Warehouse & Logistics, Hyderabad, Andhra Pradesh at Jio. Based in Kolkata metropolitan area, West Bengal, India [IN]. --- Alakh Pandey Gopal Sharma Prateek Maheshwari [Ashish K Choudhary]( · 2026-07-16 · 1 Once again false commitment given by PW worst Experience [Ashish K Choudhary]( · 2026-07-16 Unable to access the app [PW Support](",
+              "sentiment": "negative",
+              "author": "Ashish K Choudhary",
+              "url": "https://www.linkedin.com/posts/ashishkchoudhary-scm_physicswallah-studentfirst-parentvoice-activity-7483153251220144130-Bdbm",
+              "published_at": "2026-07-15T00:00:00+00:00",
+              "issue_type": null
             }
           ],
-          "rank": 4
+          "rank": 3
         },
         {
           "id": "b9ffa0aa-45e4-57ae-b451-bc59a9079622",
           "label": "IPO, valuation and investor narrative",
           "summary": "Professional discussion evaluates PW's valuation, profitability, growth choices and comparisons with other edtech companies. Repeated semantic signals include focussing th, money, public.",
           "why_it_matters": "This mixed investor narrative should not be treated as entirely negative.",
-          "count": 2,
-          "share": 6.7,
+          "count": 3,
+          "share": 6.1,
           "cohesion": 1.0,
           "prototype_similarity": 0.29,
           "confidence": "low",
@@ -822,15 +762,16 @@
           "sentiment": {
             "positive": 0,
             "neutral": 0,
-            "negative": 2
+            "negative": 3
           },
           "source_ids": [
+            "f9be3cd0-ee18-47f1-b187-302f885e34a3",
             "d75df588-cfdc-4f7f-8ebe-bf69a8166c17",
-            "f9be3cd0-ee18-47f1-b187-302f885e34a3"
+            "0eb31a3a-4e26-4bac-8b02-7b7a6cdff017"
           ],
           "representative_evidence": [
             {
-              "id": "f9be3cd0-ee18-47f1-b187-302f885e34a3",
+              "id": "0eb31a3a-4e26-4bac-8b02-7b7a6cdff017",
               "text": "Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Davinder Singh · · 2026-07-06 Davinder Singh : Founder at Divuu Decode with 1 year 5 months of experience. Previous roles include Fundraiser at Muskurahat Foundation, Product Marketing Intern at Pawzz Foundation, and Financial Research Analyst at Gravitas Masters. Based in Pune City, Maharashtra, India [IN]. --- Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Same sector. Same five years. But completely opposite endings. Here's the consulting read on India's edtech reset 👇 The pandemic handed this sector free demand. When classrooms reopened, that demand vanished and th",
               "sentiment": "negative",
               "author": "Davinder Singh",
@@ -846,9 +787,82 @@
               "url": "https://www.linkedin.com/posts/davinder-singh-9b0a80361_edtech-startupindia-physicswallah-activity-7479820675688607745-BkIZ",
               "published_at": "2026-07-06T00:00:00+00:00",
               "issue_type": null
+            },
+            {
+              "id": "f9be3cd0-ee18-47f1-b187-302f885e34a3",
+              "text": "Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Davinder Singh · · 2026-07-06 Davinder Singh : Founder at Divuu Decode with 1 year 5 months of experience. Previous roles include Fundraiser at Muskurahat Foundation, Product Marketing Intern at Pawzz Foundation, and Financial Research Analyst at Gravitas Masters. Based in Pune City, Maharashtra, India [IN]. --- Byju's went from $22B to zero. Physics Wallah just IPO'd at a nearly $3.6B valuation. Same sector. Same five years. But completely opposite endings. Here's the consulting read on India's edtech reset 👇 The pandemic handed this sector free demand. When classrooms reopened, that demand vanished and th",
+              "sentiment": "negative",
+              "author": "Davinder Singh",
+              "url": "https://www.linkedin.com/posts/davinder-singh-9b0a80361_edtech-startupindia-physicswallah-activity-7479820675688607745-BkIZ",
+              "published_at": "2026-07-06T00:00:00+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 4
+        },
+        {
+          "id": "854e9b79-6859-5531-8a8f-90cc1ac75226",
+          "label": "Fraud and governance allegations",
+          "summary": "Posts allege serious misconduct, document manipulation, corruption or unsafe internal practices. Repeated semantic signals include the representative evidence.",
+          "why_it_matters": "Severe allegations must be verified factually before any communication decision.",
+          "count": 1,
+          "share": 2.0,
+          "cohesion": 1.0,
+          "prototype_similarity": 0.496,
+          "confidence": "low",
+          "subthemes": [],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 1
+          },
+          "source_ids": [
+            "af09489c-1f2e-409f-b83c-922f1658d069"
+          ],
+          "representative_evidence": [
+            {
+              "id": "af09489c-1f2e-409f-b83c-922f1658d069",
+              "text": "Allegations of Financial Misconduct at PW Skills Exposed rajeev kumar posted on the topic Agree & Join By clicking Continue to join or sign in, you agree to ’s User Agreement, Privacy Policy, and Cookie Policy. Allegations of Financial Misconduct at PW Skills Exposed Senior Academic Counselor @ PW AWS, GKE, Machine Learning 1w - Report this post Alakh Pandey Sir Students Deserve Education, Not Risk. I worked at PW (PhysicsWallah) Skills believing I was helping students build their future. Instead, I witnessed practices that deeply disturbed me. I formally submitted an internal complaint supported by documentary evidence, including screenshots, payment records, and other materials, alleging: ",
+              "sentiment": "negative",
+              "author": "Audience signal",
+              "url": "https://www.linkedin.com/posts/rajeev-kumar-943b6a137_whistleblower-ethics-education-activity-7483194012347334656-syme",
+              "published_at": null,
+              "issue_type": null
             }
           ],
           "rank": 5
+        },
+        {
+          "id": "140b85cd-6f35-50cc-a483-61e741ecb80b",
+          "label": "Reference-only or unrelated mentions",
+          "summary": "PW is named or tagged, but the underlying experience concerns another company or is not materially about PW. Repeated semantic signals include the representative evidence.",
+          "why_it_matters": "Reference-only matches must be excluded from PW incident counts before escalation.",
+          "count": 1,
+          "share": 2.0,
+          "cohesion": 1.0,
+          "prototype_similarity": 0.368,
+          "confidence": "low",
+          "subthemes": [],
+          "sentiment": {
+            "positive": 0,
+            "neutral": 0,
+            "negative": 1
+          },
+          "source_ids": [
+            "9506f510-fb70-45e7-8aee-3b5794f55f40"
+          ],
+          "representative_evidence": [
+            {
+              "id": "9506f510-fb70-45e7-8aee-3b5794f55f40",
+              "text": "Sharing Experience from a Recent Interview I recently applied for a job with PhysicsWallah , a highly respected company in the industry. To my surprise, I received an instant call from the HR department shortly after submitting my application, during which they confirmed my initial information. The interview went well, and within the next day, I was informed that I had been selected for the next round. The HR representative asked me to share several documents, including my ID cards, previous organization documents, and a six-month bank statement. They informed me that as soon as I submitted these documents, a panel discussion would be conducted, followed by a discussion about my joining date",
+              "sentiment": "negative",
+              "author": "Debaleena Das Sarkar",
+              "url": "https://www.linkedin.com/posts/debaleena-das-sarkar-14b292131_physicswallah-physicswallah-job-activity-7043444778272722944-wXqB/",
+              "published_at": "2026-06-18T08:10:01.059532+00:00",
+              "issue_type": null
+            }
+          ],
+          "rank": 6
         }
       ]
     },
