@@ -8,12 +8,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  Shield,
   Sparkles,
   X,
 } from "lucide-react";
 import { PlayStoreNegativeIntelligence } from "./playstore-negative-intelligence";
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
+import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
 
 type Channel = "playstore" | "reddit" | "linkedin" | "youtube" | "x" | "facebook" | "instagram";
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
@@ -570,12 +572,13 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
         <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
         <nav className="ai-source-nav" aria-label="Intelligence channels">
           <button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>
+          <button onClick={() => router.replace("/shield")}><Shield size={13} /> Shield</button>
           {PRIMARY_CHANNELS.map((item) => <button key={item.id} className={channel === item.id ? "active" : ""} onClick={() => item.id === "freshdesk" ? router.replace("/audience-intelligence/freshdesk") : changeChannel(item.id)}>{item.label}</button>)}
         </nav>
         <div className="ai-top-actions">
           <div className={`ai-search ${searchOpen ? "open" : ""}`}><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search audience evidence" aria-label="Search audience evidence" /> <button onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setQuery(""); }} aria-label="Toggle search">{searchOpen ? <X size={15} /> : <span />}</button></div>
           <button className="ai-icon-button ai-notification" onClick={() => setNotificationsOpen(!notificationsOpen)} aria-label="Open critical alerts"><Bell size={16} /></button>
-          <button className="ai-avatar" aria-label="OVAL profile">AT</button>
+          <AuthProfileMenu />
           {notificationsOpen && <div className="ai-notification-popover"><div><strong>Critical signals</strong><button onClick={() => setNotificationsOpen(false)}><X size={14} /></button></div>{negativeAlerts.length ? negativeAlerts.map((item) => <button key={item.id} onClick={() => { setSelectedEvidence(item); setNotificationsOpen(false); }}><span>{item.author}</span><p>{short(item.text, 90)}</p></button>) : <p>No critical evidence in this feed.</p>}</div>}
         </div>
       </header>

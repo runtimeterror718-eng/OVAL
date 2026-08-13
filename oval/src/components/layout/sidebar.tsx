@@ -100,7 +100,7 @@ export function Sidebar() {
             <span className="oval-profile-avatar"><UserRound aria-hidden="true" /></span>
             <span className="oval-nav-context"><b>Physics Wallah</b><small>Leadership view</small></span>
           </button>
-          {openPanel === "profile" ? <div className="oval-nav-popover oval-profile-popover"><strong>Physics Wallah</strong><span>OVAL leadership workspace</span></div> : null}
+          {openPanel === "profile" ? <div className="oval-nav-popover oval-profile-popover"><strong>Physics Wallah</strong><span>OVAL leadership workspace</span><form action="/api/auth/logout" method="post"><button type="submit">Sign out</button></form></div> : null}
         </div>
       </div>
     </header>

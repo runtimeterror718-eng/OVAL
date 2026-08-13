@@ -5,10 +5,11 @@ import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import {
   Home, MessageCircle, Camera, Play, Send, Search, Siren, Compass,
-  Users, Trophy, ClipboardCheck, Globe, X, Smartphone, LifeBuoy,
+  Users, Trophy, ClipboardCheck, Globe, X, Smartphone, LifeBuoy, Shield,
 } from "lucide-react";
 
 const PAGES = [
+  { label: "OVAL Shield", href: "/shield", icon: Shield, keywords: "brand content reputation protection piracy phishing impersonation domains enforcement" },
   { label: "Command Center", href: "/command-center", icon: Home, keywords: "home overview dashboard student voice command center" },
   { label: "Incidents", href: "/incidents", icon: Siren, keywords: "incidents work queue severity owner status evidence" },
   { label: "Explore", href: "/fire-tracker", icon: Compass, keywords: "explore mentions student voice search evidence" },

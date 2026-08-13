@@ -14,6 +14,16 @@ How it works:
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
+    "run-gati-wide-discovery-every-6h": {
+        "task": "workers.tasks.run_gati_scheduled_discovery",
+        "schedule": crontab(minute=10, hour="*/6"),
+        "kwargs": {"max_results": 50},
+    },
+    "process-shield-crawl-queue-every-minute": {
+        "task": "workers.tasks.process_shield_crawl_queue",
+        "schedule": crontab(minute="*"),
+        "kwargs": {"max_jobs": 5},
+    },
     # --- Dedicated platform pipelines (Instagram + Reddit) ---
     "scrape-instagram-every-6h": {
         "task": "workers.tasks.scrape_instagram",

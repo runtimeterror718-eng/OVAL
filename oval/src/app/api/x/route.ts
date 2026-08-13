@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import semanticClusters from "@/data/semantic-clusters.json";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -28,7 +29,9 @@ function classify(text: string): XPost["sentiment"] {
   return "neutral";
 }
 
-function buildPayload(posts: XPost[], source: "x-api" | "supabase", setupRequired = false, emptyNarrative?: string, targeted: XPost[] = [], generalCount = posts.length) {
+type XSource = "x-api" | "supabase" | "stored-snapshot";
+
+function buildPayload(posts: XPost[], source: XSource, setupRequired = false, emptyNarrative?: string, targeted: XPost[] = [], generalCount = posts.length) {
   const sentiment = posts.reduce((totals, post) => ({ ...totals, [post.sentiment]: totals[post.sentiment] + 1 }), { positive: 0, neutral: 0, negative: 0 });
   const themes = [
     { name: "Student experience and support", test: /student|support|refund|course|batch|app|class/i, summary: "Posts discuss learner experience, course access, support and product delivery." },
@@ -55,7 +58,9 @@ function buildPayload(posts: XPost[], source: "x-api" | "supabase", setupRequire
     source,
     query: X_QUERY,
     criticalQuery: X_CRITICAL_QUERY,
-    window: "Recent X search · up to 7 days",
+    window: source === "stored-snapshot"
+      ? "Last successful X retrieval · 3–4 Aug 2026"
+      : "Recent X search · up to 7 days",
     retrieval: { generalRequested: 100, criticalRequested: source === "x-api" ? 100 : 0, generalRetrieved: generalCount, criticalRetrieved: targeted.length, uniqueRetrieved: posts.length, verifiedNegative: negativePosts.length, cacheMinutes: 10 },
     stats: { totalPosts: posts.length, ...sentiment },
     summary: { narrative },
@@ -83,6 +88,39 @@ async function storedPosts(): Promise<XPost[]> {
     .eq("brand_id", BRAND_ID).order("created_at", { ascending: false }).limit(250);
   if (error) return [];
   return (data || []).map((item: any) => ({ id: String(item.tweet_id), author: item.author_username || "X user", text: String(item.tweet_text || ""), createdAt: item.created_at, url: item.tweet_url, likes: Number(item.like_count || 0), reposts: Number(item.retweet_count || 0), replies: Number(item.reply_count || 0), sentiment: classify(String(item.tweet_text || "")) }));
+}
+
+function snapshotPosts(): XPost[] {
+  const snapshot = (semanticClusters as any)?.platforms?.x;
+  const unique = new Map<string, XPost>();
+  for (const cluster of snapshot?.clusters || []) {
+    for (const item of cluster.representative_evidence || []) {
+      if (!item?.id || !item?.text) continue;
+      unique.set(String(item.id), {
+        id: String(item.id),
+        author: String(item.author || "X user"),
+        text: String(item.text),
+        createdAt: item.published_at,
+        url: item.url || `https://x.com/i/status/${item.id}`,
+        likes: 0,
+        reposts: 0,
+        replies: 0,
+        sentiment: ["positive", "neutral", "negative"].includes(item.sentiment)
+          ? item.sentiment
+          : classify(String(item.text)),
+      });
+    }
+  }
+  return Array.from(unique.values()).sort((a, b) =>
+    String(b.createdAt || "").localeCompare(String(a.createdAt || "")),
+  );
+}
+
+async function persistedPosts() {
+  const database = await storedPosts();
+  return database.length
+    ? { posts: database, source: "supabase" as const }
+    : { posts: snapshotPosts(), source: "stored-snapshot" as const };
 }
 
 async function fetchRecentQuery(token: string, query: string): Promise<XPost[]> {
@@ -115,16 +153,20 @@ export async function GET() {
       return NextResponse.json(buildPayload(result.posts, "x-api", false, undefined, result.targeted, result.generalCount));
     }
     catch (error) {
-      const stored = await storedPosts();
+      const stored = await persistedPosts();
       const status = error instanceof XApiError ? error.status : 0;
       const emptyNarrative = status === 402
         ? "The X bearer token is connected, but the developer project needs API credits before recent posts can be retrieved."
         : status === 401 || status === 403
           ? "X rejected this bearer token. Regenerate the app bearer token and verify its read access."
           : "The X connection is configured, but recent posts could not be retrieved right now.";
-      return NextResponse.json({ ...buildPayload(stored, "supabase", !stored.length, emptyNarrative), error: `x_api_${status || "unavailable"}` });
+      return NextResponse.json({
+        ...buildPayload(stored.posts, stored.source, !stored.posts.length, emptyNarrative),
+        error: `x_api_${status || "unavailable"}`,
+        fallbackReason: "Live X retrieval unavailable; showing the last successful stored evidence.",
+      });
     }
   }
-  const stored = await storedPosts();
-  return NextResponse.json(buildPayload(stored, "supabase", !stored.length));
+  const stored = await persistedPosts();
+  return NextResponse.json(buildPayload(stored.posts, stored.source, !stored.posts.length));
 }

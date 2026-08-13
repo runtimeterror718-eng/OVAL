@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:shield": "node --test scripts/shield.test.mjs scripts/shield-discovery.test.mjs"
   },
   "dependencies": {
     "@ant-design/graphs": "^2.1.1",
