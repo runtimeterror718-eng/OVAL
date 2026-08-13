@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { crmSessionClient } from "@/lib/crm-server";
+import { verifyPwGoogleWorkspace } from "@/lib/auth-policy";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -11,14 +12,13 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = crmSessionClient();
     const result = await supabase.auth.exchangeCodeForSession(code);
-    if (
-      !result.error &&
-      result.data.user?.email &&
-      /^[a-z0-9._%+-]+@pw\.live$/i.test(result.data.user.email)
-    ) {
+    if (!result.error && await verifyPwGoogleWorkspace(
+      result.data.user,
+      result.data.session?.provider_token,
+    )) {
       return NextResponse.redirect(new URL(next, url.origin));
     }
     await supabase.auth.signOut();
   }
-  return NextResponse.redirect(new URL("/login?error=invalid_link", url.origin));
+  return NextResponse.redirect(new URL("/login?error=workspace_required", url.origin));
 }

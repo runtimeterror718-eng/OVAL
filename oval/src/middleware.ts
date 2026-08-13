@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPwGoogleUser } from "@/lib/auth-policy";
 
 const PUBLIC_PATHS = new Set([
   "/login",
-  "/api/auth/login",
+  "/api/auth/google",
   "/api/auth/logout",
   "/auth/callback",
   "/api/issues/reminders",
@@ -13,8 +14,6 @@ const PUBLIC_PATHS = new Set([
   "/api/shield/gati/scheduled",
   "/api/vault/snapshots/run",
 ]);
-
-const PW_EMAIL = /^[a-z0-9._%+-]+@pw\.live$/i;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -80,10 +79,10 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user?.email || !PW_EMAIL.test(user.email)) {
+  if (!isPwGoogleUser(user)) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
-        { error: "A verified @pw.live account is required" },
+        { error: "A verified @pw.live Google Workspace account is required" },
         { status: 401 },
       );
     }

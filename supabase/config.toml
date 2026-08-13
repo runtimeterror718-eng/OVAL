@@ -218,7 +218,7 @@ web3 = 30
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
-enable_signup = true
+enable_signup = false
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
@@ -226,31 +226,31 @@ double_confirm_changes = true
 enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
-# Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
+# Prevent repeated OTP email requests to the same mailbox.
+max_frequency = "60s"
 # Number of characters used in the email OTP.
 otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Keep internal login codes short-lived.
+otp_expiry = 900
 
-# Use a production-ready SMTP server
+# Hosted production uses Resend through Supabase Auth SMTP settings. Keep this
+# local block disabled unless local Supabase also needs to deliver real mail.
 # [auth.email.smtp]
 # enabled = true
-# host = "smtp.sendgrid.net"
+# host = "smtp.resend.com"
 # port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
+# user = "resend"
+# pass = "env(RESEND_API_KEY)"
+# admin_email = "login@auth.oval.run"
+# sender_name = "OVAL"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
-[auth.email.template.magic_link]
-subject = "Your OVAL sign-in code"
-content_path = "./supabase/templates/oval_login_otp.html"
+# OVAL uses Google Workspace OAuth only. The legacy OTP template is retained in
+# the repository for history but is not active.
 
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
@@ -337,6 +337,15 @@ url = ""
 skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
+
+# Google OAuth is configured in the hosted Supabase dashboard. For a fully
+# local Supabase stack, copy this block, enable it, and keep the secret in an
+# uncommitted environment variable.
+# [auth.external.google]
+# enabled = true
+# client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+# secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET)"
+# skip_nonce_check = false
 
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
 # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
