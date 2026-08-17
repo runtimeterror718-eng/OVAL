@@ -76,6 +76,35 @@ export function accessSessionMaxAge() {
   return SESSION_TTL_SECONDS;
 }
 
+export function resolvePublicOrigin(request: Request) {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  if (configured) {
+    try {
+      return new URL(configured).origin;
+    } catch {
+      // Fall through to trusted proxy headers when configuration is malformed.
+    }
+  }
+
+  const forwardedHost = request.headers
+    .get("x-forwarded-host")
+    ?.split(",")[0]
+    ?.trim();
+  const host = forwardedHost || request.headers.get("host")?.trim();
+  if (host && /^(?:www\.)?oval\.run$/i.test(host)) {
+    return `https://${host}`;
+  }
+  if (host && /^(?:localhost|127\.0\.0\.1)(?::\d+)?$/i.test(host)) {
+    const forwardedProto = request.headers
+      .get("x-forwarded-proto")
+      ?.split(",")[0]
+      ?.trim();
+    return `${forwardedProto === "https" ? "https" : "http"}://${host}`;
+  }
+
+  return new URL(request.url).origin;
+}
+
 function sessionSecret() {
   const secret = process.env.OVAL_AUTH_SECRET || "";
   if (secret.length < 32) {

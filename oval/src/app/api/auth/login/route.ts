@@ -5,6 +5,7 @@ import {
   accessSessionMaxAge,
   createAccessSession,
   passwordsMatch,
+  resolvePublicOrigin,
 } from "@/lib/access-session";
 
 export const dynamic = "force-dynamic";
@@ -12,25 +13,25 @@ export const dynamic = "force-dynamic";
 const DEFAULT_NEXT = "/audience-intelligence/overview";
 
 export async function POST(request: Request) {
-  const requestUrl = new URL(request.url);
+  const publicOrigin = resolvePublicOrigin(request);
   const input = await readInput(request);
   const email = input.email.trim().toLowerCase();
   const next = safeNext(input.next);
 
   if (!PW_EMAIL_PATTERN.test(email)) {
-    return loginFailure(requestUrl, next, "invalid_domain");
+    return loginFailure(publicOrigin, next, "invalid_domain");
   }
   if (
     !process.env.OVAL_AUTH_SECRET ||
     !process.env.OVAL_ACCESS_PASSWORD
   ) {
-    return loginFailure(requestUrl, next, "auth_not_configured");
+    return loginFailure(publicOrigin, next, "auth_not_configured");
   }
   if (!(await passwordsMatch(input.password))) {
-    return loginFailure(requestUrl, next, "invalid_credentials");
+    return loginFailure(publicOrigin, next, "invalid_credentials");
   }
 
-  const response = NextResponse.redirect(new URL(next, requestUrl.origin), {
+  const response = NextResponse.redirect(new URL(next, publicOrigin), {
     status: 303,
   });
   response.cookies.set(
@@ -71,8 +72,8 @@ function safeNext(value: string) {
     : DEFAULT_NEXT;
 }
 
-function loginFailure(requestUrl: URL, next: string, error: string) {
-  const login = new URL("/login", requestUrl.origin);
+function loginFailure(origin: string, next: string, error: string) {
+  const login = new URL("/login", origin);
   login.searchParams.set("next", next);
   login.searchParams.set("error", error);
   return NextResponse.redirect(login, { status: 303 });
