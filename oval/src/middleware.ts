@@ -1,12 +1,13 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isPwGoogleUser } from "@/lib/auth-policy";
+import {
+  ACCESS_SESSION_COOKIE,
+  verifyAccessSession,
+} from "@/lib/access-session";
 
 const PUBLIC_PATHS = new Set([
   "/login",
-  "/api/auth/google",
+  "/api/auth/login",
   "/api/auth/logout",
-  "/auth/callback",
   "/api/issues/reminders",
   "/api/integrations/meta/webhook",
   "/api/integrations/scheduled",
@@ -42,54 +43,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({ request });
-  const url =
-    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "";
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_KEY ||
-    process.env.SUPABASE_ANON_KEY ||
-    "";
-
-  if (!url || !key) {
-    return pathname.startsWith("/api/")
-      ? NextResponse.json(
-          { error: "Authentication is not configured" },
-          { status: 503 },
-        )
-      : redirectToLogin(request, "auth_not_configured");
-  }
-
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (items) => {
-        items.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        items.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
-        );
-      },
-    },
-  });
-
-  // getUser validates the session with Supabase Auth instead of trusting the
-  // cookie payload. The email domain is checked from the verified Auth user.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!isPwGoogleUser(user)) {
+  const session = await verifyAccessSession(
+    request.cookies.get(ACCESS_SESSION_COOKIE)?.value,
+  );
+  if (!session) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
-        { error: "A verified @pw.live Google Workspace account is required" },
+        { error: "A valid OVAL session is required" },
         { status: 401 },
       );
     }
     return redirectToLogin(request);
   }
 
-  return response;
+  return NextResponse.next({ request });
 }
 
 function redirectToLogin(request: NextRequest, error?: string) {

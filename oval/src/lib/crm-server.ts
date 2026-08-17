@@ -6,6 +6,10 @@ import { config as loadEnvironment } from "dotenv";
 import { resolve } from "path";
 import { cookies, headers } from "next/headers";
 import type { CrmMember, CrmRole } from "@/lib/crm-types";
+import {
+  ACCESS_SESSION_COOKIE,
+  verifyAccessSession,
+} from "@/lib/access-session";
 
 // The legacy OVAL workers keep server credentials in the shared secrets file.
 // Load it only on the server and never override deployment-provided variables.
@@ -48,6 +52,12 @@ export function crmSessionClient() {
 export async function requireCrmContext(roles?: CrmRole[]) {
   const admin = crmAdmin();
   if (isLocalCrmBypass()) return requireLocalCrmContext(admin, roles);
+  const passwordSession = await verifyAccessSession(
+    cookies().get(ACCESS_SESSION_COOKIE)?.value,
+  );
+  if (passwordSession) {
+    return requirePasswordCrmContext(admin, passwordSession.email, roles);
+  }
   const auth = crmSessionClient();
   const { data: { user }, error } = await auth.auth.getUser();
   if (error || !user?.email) throw new CrmError("Authentication required", 401, "unauthorized");
@@ -73,6 +83,45 @@ export async function requireCrmContext(roles?: CrmRole[]) {
   if (!member) throw new CrmError("Your account is not active in the OVAL directory", 403, "member_inactive");
   if (roles && !roles.includes(member.role)) throw new CrmError("Insufficient permission", 403, "forbidden");
   return { user, member: member as CrmMember, admin };
+}
+
+async function requirePasswordCrmContext(
+  admin: ReturnType<typeof crmAdmin>,
+  email: string,
+  roles?: CrmRole[],
+) {
+  const { data: member, error } = await admin
+    .from("crm_members")
+    .select("*, team:crm_teams(*)")
+    .eq("brand_id", DEFAULT_BRAND_ID)
+    .eq("email", email)
+    .eq("active", true)
+    .maybeSingle();
+  if (error?.code === "42P01") {
+    throw new CrmError(
+      "Issue CRM migration has not been applied",
+      503,
+      "migration_required",
+    );
+  }
+  if (error) {
+    throw new CrmError(error.message, 500, "member_lookup_failed");
+  }
+  if (!member) {
+    throw new CrmError(
+      "Your @pw.live email is not active in the OVAL directory",
+      403,
+      "member_inactive",
+    );
+  }
+  if (roles && !roles.includes(member.role)) {
+    throw new CrmError("Insufficient permission", 403, "forbidden");
+  }
+  return {
+    user: { id: member.user_id, email: member.email },
+    member: member as CrmMember,
+    admin,
+  };
 }
 
 /**
