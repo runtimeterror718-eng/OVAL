@@ -129,15 +129,21 @@ export async function GET() {
         comments: r.comments_count || 0,
       };
     })
-    // Put critical and mixed audience signals before positive brand news. Within
-    // each sentiment, stronger controversy language wins, then recency.
+    // Latest audience signals are chronological: newest published posts first
+    // and undated legacy rows last. Sentiment and controversy only break ties
+    // between posts carrying the same publication timestamp.
     .sort((a: any, b: any) => {
+      const publishedTime = (post: any) => {
+        const value = post.publishedAt ? new Date(post.publishedAt).getTime() : Number.NaN;
+        return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+      };
+      const dateDelta = publishedTime(b) - publishedTime(a);
+      if (dateDelta) return dateDelta;
       const sentimentRank = { negative: 0, neutral: 1, positive: 2 } as const;
       const sentimentDelta = sentimentRank[a.sentiment as keyof typeof sentimentRank] - sentimentRank[b.sentiment as keyof typeof sentimentRank];
       if (sentimentDelta) return sentimentDelta;
       const risk = (post: any) => (`${post.title || ""} ${post.text || ""}`.match(CONTROVERSY_RE) || []).length;
-      const riskDelta = risk(b) - risk(a);
-      return riskDelta || String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+      return risk(b) - risk(a);
     });
 
   const counts = { positive: 0, negative: 0, neutral: 0 };
