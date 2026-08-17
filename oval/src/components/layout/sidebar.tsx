@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Bell, Search, Settings, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { useTheme } from "@/components/providers/theme-provider";
+import { OvalLogo } from "@/components/brand/oval-logo";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -39,7 +40,7 @@ export function Sidebar() {
   return (
     <header className="oval-sidebar">
       <Link className="oval-sidebar-brand" href="/command-center" aria-label="OVAL overview">
-        <span className="oval-brand-mark" aria-hidden="true"><i /><i /></span>
+        <OvalLogo className="oval-brand-mark oval-logo-image" priority />
         <div>
           <p>OVAL</p>
           <span>Brand intelligence</span>

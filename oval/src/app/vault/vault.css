@@ -2,6 +2,7 @@
 .vault-topbar { position:relative; z-index:20; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:28px; min-height:86px; border-bottom:1px solid var(--vault-line); }
 .vault-brand { display:flex; align-items:center; gap:10px; color:inherit; text-decoration:none; }
 .vault-brand > span { display:grid; place-items:center; width:38px; height:38px; border-radius:13px 13px 13px 3px; background:#76fb91; font-size:19px; font-weight:700; }
+.vault-brand .vault-brand-mark { width:46px; height:34px; object-fit:contain; }
 .vault-brand strong { font-size:15px; letter-spacing:.12em; }
 .vault-topbar nav { display:flex; justify-content:center; align-items:center; gap:6px; }
 .vault-topbar nav a { display:inline-flex; align-items:center; gap:6px; padding:10px 15px; border-radius:999px; color:#555650; font-size:12px; text-decoration:none; }

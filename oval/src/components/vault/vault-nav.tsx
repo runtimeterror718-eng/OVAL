@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { Disc3, Library, Settings } from "lucide-react";
+import { OvalLogo } from "@/components/brand/oval-logo";
 
 export function VaultNav({ role, library = false }: { role?: string; library?: boolean }) {
   return <header className="vault-topbar">
-    <Link className="vault-brand" href="/audience-intelligence/overview"><span>O</span><strong>OVAL</strong></Link>
+    <Link className="vault-brand" href="/audience-intelligence/overview"><OvalLogo className="vault-brand-mark" /><strong>OVAL</strong></Link>
     <nav aria-label="Primary navigation">
       <Link href="/audience-intelligence/overview">Overview</Link>
       <Link className={!library ? "active" : ""} href="/vault"><Disc3 size={15} /> Vault</Link>

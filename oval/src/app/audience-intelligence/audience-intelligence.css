@@ -135,6 +135,7 @@
 .ai-topbar { position: relative; z-index: 5; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; min-height: 66px; padding: 10px 12px 10px 16px; border: 1px solid var(--ai-line); border-radius: 18px; background: rgba(245, 245, 242, .74); backdrop-filter: blur(22px); }
 .ai-brand-group { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
 .ai-brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #111; color: #fff; font-family: inherit; font-size: 19px; font-style: normal; font-weight: 700; }
+.ai-brand-mark.ai-brand-logo { width: 46px; height: 34px; border-radius: 0; background: transparent; object-fit: contain; }
 .ai-brand-group strong { display: block; letter-spacing: .12em; font-size: 15px; }
 .ai-brand-group small { display: block; margin-top: 2px; color: var(--ai-muted); font-size: 9px; letter-spacing: .06em; }
 .ai-source-nav { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--ai-line); border-radius: 999px; background: rgba(255,255,255,.5); }

@@ -6,6 +6,7 @@ import { ArrowUpRight, Bell, ChevronLeft, ChevronRight, LifeBuoy, Search, Sparkl
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
+import { OvalLogo } from "@/components/brand/oval-logo";
 
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
 type Ticket = { ticketId: string; status: string; group: string; category?: string; subject: string; description: string };
@@ -98,7 +99,7 @@ export function FreshdeskAudienceDashboard() {
   return <main className="audience-studio source-freshdesk fd-studio">
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
-      <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
+      <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
       <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button><button onClick={() => router.replace("/shield")}>Shield</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}</nav>
       <div className="ai-top-actions"><div className="ai-search"><Search size={16} /></div><button className="ai-icon-button ai-notification" aria-label="Freshdesk alerts"><Bell size={16} /></button><AuthProfileMenu /></div>
     </header>

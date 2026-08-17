@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowUpRight, Camera, ChevronDown, Globe2, Link2, Loader2, Plus, RefreshCw, Unplug, X } from "lucide-react";
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
+import { OvalLogo } from "@/components/brand/oval-logo";
 import "../audience-intelligence/audience-intelligence.css";
 import "./integrations.css";
 
@@ -55,7 +56,7 @@ export default function IntegrationsPage() {
   return <main className="audience-studio integrations-page">
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
-      <Link className="ai-brand-group" href="/audience-intelligence/overview"><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></Link>
+      <Link className="ai-brand-group" href="/audience-intelligence/overview"><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></Link>
       <nav className="ai-source-nav" aria-label="Primary navigation"><Link href="/audience-intelligence/overview">Overview</Link><Link href="/audience-intelligence/playstore">Play Store</Link><Link href="/audience-intelligence/freshdesk">Fresh Desk</Link><Link href="/audience-intelligence/linkedin">LinkedIn</Link><Link href="/audience-intelligence/x">X</Link><Link href="/audience-intelligence/youtube">YouTube</Link><Link href="/audience-intelligence/facebook">Facebook</Link><Link href="/audience-intelligence/instagram">Instagram</Link><Link href="/vault">Vault</Link><Link className="active" href="/integrations">Integrations</Link></nav>
       <div className="integrations-security"><span>Local admin mode</span><b>AT</b></div>
     </header>

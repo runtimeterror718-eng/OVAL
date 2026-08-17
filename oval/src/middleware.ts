@@ -6,7 +6,8 @@ import {
 
 const PUBLIC_PATHS = new Set([
   "/login",
-  "/api/auth/login",
+  "/api/auth/google",
+  "/api/auth/callback",
   "/api/auth/logout",
   "/api/issues/reminders",
   "/api/integrations/meta/webhook",

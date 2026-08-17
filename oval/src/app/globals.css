@@ -165,6 +165,7 @@
 .oval-brand-mark i { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: var(--navigation-active); }
 .oval-brand-mark i:first-child { transform: translate(-14px, -14px); }
 .oval-brand-mark i:last-child { transform: translate(14px, 14px); }
+.oval-brand-mark.oval-logo-image { width: 52px; height: 40px; overflow: visible; border-radius: 0; background: transparent; object-fit: contain; transform: none; }
 .oval-sidebar-brand p { margin: 0; color: var(--foreground); font-size: 16px; font-weight: 700; line-height: 24px; }
 .oval-sidebar-brand span { color: var(--muted-foreground); font-size: 11px; font-weight: 500; line-height: 16px; }
 .oval-sidebar-nav { display: flex; min-width: 0; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }

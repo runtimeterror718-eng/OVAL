@@ -15,6 +15,7 @@ import { PlayStoreNegativeIntelligence } from "./playstore-negative-intelligence
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
+import { OvalLogo } from "@/components/brand/oval-logo";
 
 type Channel = "playstore" | "reddit" | "linkedin" | "youtube" | "x" | "facebook" | "instagram";
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
@@ -568,7 +569,7 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
     <main className={`audience-studio source-${channel}`}>
       <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
       <header className="ai-topbar">
-        <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
+        <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
         <nav className="ai-source-nav" aria-label="Intelligence channels">
           <button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>
           <button onClick={() => router.replace("/shield")}>Shield</button>

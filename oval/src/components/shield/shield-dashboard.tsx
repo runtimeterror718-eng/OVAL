@@ -33,6 +33,7 @@ import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { shieldLiveAdapter } from "@/lib/shield-adapter";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
+import { OvalLogo } from "@/components/brand/oval-logo";
 import type {
   ShieldCaseStatus,
   ShieldCategory,
@@ -1314,7 +1315,7 @@ function ShieldNav({
         className="ai-brand-group"
         onClick={() => router.replace("/audience-intelligence/overview")}
       >
-        <span className="ai-brand-mark">O</span>
+        <OvalLogo className="ai-brand-mark ai-brand-logo" priority />
         <span>
           <strong>OVAL</strong>
           <small>AUDIENCE INTELLIGENCE</small>

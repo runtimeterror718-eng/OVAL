@@ -56,22 +56,6 @@ export async function verifyAccessSession(
   }
 }
 
-export async function passwordsMatch(candidate: string) {
-  const configured = process.env.OVAL_ACCESS_PASSWORD || "";
-  if (configured.length < 24) return false;
-  const [candidateDigest, configuredDigest] = await Promise.all([
-    digest(candidate),
-    digest(configured),
-  ]);
-  let difference = candidateDigest.length ^ configuredDigest.length;
-  const length = Math.max(candidateDigest.length, configuredDigest.length);
-  for (let index = 0; index < length; index += 1) {
-    difference |=
-      (candidateDigest[index] || 0) ^ (configuredDigest[index] || 0);
-  }
-  return difference === 0;
-}
-
 export function accessSessionMaxAge() {
   return SESSION_TTL_SECONDS;
 }
@@ -131,14 +115,6 @@ async function importSigningKey(secret: string) {
     false,
     ["sign", "verify"],
   );
-}
-
-async function digest(value: string) {
-  const result = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(value),
-  );
-  return new Uint8Array(result);
 }
 
 function encodeBase64Url(value: string) {
