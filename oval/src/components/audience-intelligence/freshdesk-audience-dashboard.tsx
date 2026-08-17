@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, Bell, ChevronLeft, ChevronRight, LifeBuoy, Search, Shield, Sparkles, TrendingUp, X } from "lucide-react";
+import { ArrowUpRight, Bell, ChevronLeft, ChevronRight, LifeBuoy, Search, Sparkles, TrendingUp, X } from "lucide-react";
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
@@ -99,7 +99,7 @@ export function FreshdeskAudienceDashboard() {
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
       <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
-      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button><button onClick={() => router.replace("/shield")}><Shield size={13} /> Shield</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}</nav>
+      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button><button onClick={() => router.replace("/shield")}>Shield</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}</nav>
       <div className="ai-top-actions"><div className="ai-search"><Search size={16} /></div><button className="ai-icon-button ai-notification" aria-label="Freshdesk alerts"><Bell size={16} /></button><AuthProfileMenu /></div>
     </header>
 

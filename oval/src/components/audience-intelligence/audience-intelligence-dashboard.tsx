@@ -8,7 +8,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  Shield,
   Sparkles,
   X,
 } from "lucide-react";
@@ -572,7 +571,7 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
         <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
         <nav className="ai-source-nav" aria-label="Intelligence channels">
           <button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>
-          <button onClick={() => router.replace("/shield")}><Shield size={13} /> Shield</button>
+          <button onClick={() => router.replace("/shield")}>Shield</button>
           {PRIMARY_CHANNELS.map((item) => <button key={item.id} className={channel === item.id ? "active" : ""} onClick={() => item.id === "freshdesk" ? router.replace("/audience-intelligence/freshdesk") : changeChannel(item.id)}>{item.label}</button>)}
         </nav>
         <div className="ai-top-actions">

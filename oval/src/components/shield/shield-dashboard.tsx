@@ -1330,7 +1330,7 @@ function ShieldNav({
           className={active ? "active shield-nav-item" : "shield-nav-item"}
           onClick={() => router.replace("/shield")}
         >
-          <Shield size={13} /> Shield
+          Shield
         </button>
         {sources.map((source) => (
           <button

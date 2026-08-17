@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Bell, Bot, ChevronLeft, ChevronRight, Search, Send, Shield, Sparkles, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Bell, Bot, ChevronLeft, ChevronRight, Search, Send, Sparkles, X } from "lucide-react";
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
@@ -162,7 +162,7 @@ export function AudienceIntelligenceOverview() {
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
       <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><span className="ai-brand-mark">O</span><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
-      <nav className="ai-source-nav" aria-label="Intelligence channels"><button className="active">Overview</button><button onClick={() => router.replace("/shield")}><Shield size={13} /> Shield</button>{overviewSources.map((source) => <button key={source} onClick={() => openSource(source)}>{SOURCES[source].label}</button>)}</nav>
+      <nav className="ai-source-nav" aria-label="Intelligence channels"><button className="active">Overview</button><button onClick={() => router.replace("/shield")}>Shield</button>{overviewSources.map((source) => <button key={source} onClick={() => openSource(source)}>{SOURCES[source].label}</button>)}</nav>
       <div className="ai-top-actions"><div className={`ai-search ${searchOpen ? "open" : ""}`}><Search size={16} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search overview signals" /><button onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setQuery(""); }}>{searchOpen ? <X size={15} /> : <span />}</button></div><button className="ai-icon-button ai-notification" onClick={() => setAssistantOpen(true)}><Bell size={16} /></button><AuthProfileMenu /></div>
     </header>
 
