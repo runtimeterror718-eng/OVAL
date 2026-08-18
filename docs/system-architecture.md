@@ -247,7 +247,7 @@ WARNING_WORDS  = ["review", "salary", "layoff", "issue", "problem"]
 
 ```
 API: Google Custom Search API (cx=610a07200f3234fe7)
-Key: AIzaSyCvjXfadLZiL8xe80gEei6McTa0qPmM2QE
+Key: <GOOGLE_API_KEY_REDACTED>
 Limit: 100 queries/day (free tier)
 
 For each query, extracts:

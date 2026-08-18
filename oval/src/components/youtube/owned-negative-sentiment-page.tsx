@@ -17,6 +17,7 @@ import {
 import { ChevronDown, ChevronRight, Loader2, Play, TrendingDown } from "lucide-react";
 import { stagger, fadeUp } from "@/lib/animations";
 import { formatNumber } from "@/lib/utils";
+import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 
 type ChannelOption = { id: string; name: string };
 type SelectOption = { value: string; label: string; count?: number };
@@ -447,11 +448,7 @@ export function OwnedNegativeSentimentPage() {
   ];
 
   if (loadingChannels) {
-    return (
-      <div className="flex min-h-[420px] items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-red-500" />
-      </div>
-    );
+    return <OvalLoadingSkeleton embedded />;
   }
 
   if (!channels.length) {

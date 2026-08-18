@@ -1,0 +1,124 @@
+.oval-login {
+  --login-ink: #0b0c0a;
+  --login-muted: #71726c;
+  --login-line: rgba(11, 12, 10, 0.14);
+  --login-paper: #ededeb;
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(18px, 3vw, 44px);
+  color: var(--login-ink);
+  background:
+    linear-gradient(rgba(11, 12, 10, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 12, 10, 0.035) 1px, transparent 1px),
+    var(--login-paper);
+  background-size: 32px 32px;
+  font-family: var(--font-sans), "Outfit", Arial, Helvetica, sans-serif;
+}
+
+.oval-login-ambient { position: absolute; border-radius: 999px; pointer-events: none; filter: blur(52px); }
+.oval-login-ambient-one { top: -12%; right: 4%; width: 480px; height: 480px; background: rgba(118, 251, 145, 0.4); }
+.oval-login-ambient-two { bottom: -18%; left: 32%; width: 390px; height: 390px; background: rgba(92, 168, 211, 0.15); }
+
+.oval-login-shell {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: min(1100px, 100%);
+  min-height: min(700px, calc(100svh - 56px));
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+  overflow: hidden;
+  border: 1px solid rgba(11, 12, 10, 0.2);
+  border-radius: 32px;
+  background: #f8f8f5;
+  box-shadow: 0 34px 100px rgba(14, 16, 12, 0.14);
+}
+
+.oval-login-story {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding: clamp(30px, 4.5vw, 56px);
+  color: #fff;
+  background:
+    radial-gradient(circle at 18% 92%, rgba(118, 251, 145, 0.55), transparent 28%),
+    radial-gradient(circle at 90% 15%, rgba(118, 251, 145, 0.16), transparent 31%),
+    #0a0b09;
+}
+
+.oval-login-story::after {
+  position: absolute;
+  right: -86px;
+  bottom: -104px;
+  width: 310px;
+  height: 310px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  box-shadow: 0 0 0 38px rgba(255, 255, 255, 0.035), 0 0 0 76px rgba(255, 255, 255, 0.025);
+  content: "";
+}
+
+.oval-login-brand { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; }
+.oval-login-brand-mark.oval-logo-image { width: 54px; height: 39px; object-fit: contain; filter: invert(1); }
+.oval-login-brand strong, .oval-login-brand small { display: block; }
+.oval-login-brand strong { font-size: 15px; font-weight: 650; letter-spacing: 0.13em; }
+.oval-login-brand small { margin-top: 2px; color: rgba(255, 255, 255, 0.55); font-size: 9px; letter-spacing: 0.07em; }
+
+.oval-login-story-copy { position: relative; z-index: 2; margin: auto 0; padding: 70px 0 44px; }
+.oval-login-story h1 { max-width: 660px; margin: 22px 0 25px; font-size: clamp(48px, 4.75vw, 72px); font-weight: 360; letter-spacing: -0.063em; line-height: 0.96; }
+.oval-login-story h1 span, .oval-login-story h1 em { display: block; }
+.oval-login-story h1 em { color: #76fb91; font-style: normal; }
+.oval-login-lede { max-width: 510px; margin: 0; color: rgba(255, 255, 255, 0.65); font-size: 15px; line-height: 1.62; }
+
+.oval-login-capabilities { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; }
+.oval-login-capabilities span { display: flex; align-items: center; gap: 7px; padding: 9px 11px; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 999px; background: rgba(255, 255, 255, 0.055); color: rgba(255, 255, 255, 0.72); font-size: 10px; backdrop-filter: blur(10px); }
+.oval-login-capabilities svg { color: #76fb91; }
+
+.oval-login-signal { position: absolute; right: 36px; bottom: 33px; display: flex; height: 44px; align-items: end; gap: 4px; opacity: 0.44; }
+.oval-login-signal i { width: 2px; height: 18px; background: #76fb91; }
+.oval-login-signal i:nth-child(2n) { height: 31px; }
+.oval-login-signal i:nth-child(3n) { height: 12px; }
+.oval-login-signal i:nth-child(5n) { height: 41px; }
+
+.oval-login-card { position: relative; overflow: hidden; background: rgba(249, 249, 246, 0.96); }
+.oval-login-card::before { position: absolute; inset: 0; background: linear-gradient(rgba(11, 12, 10, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(11, 12, 10, .035) 1px, transparent 1px); background-size: 28px 28px; content: ""; mask-image: linear-gradient(to bottom, #000, transparent 82%); }
+.oval-login-card-glow { position: absolute; top: -170px; right: -150px; width: 390px; height: 390px; border-radius: 50%; background: radial-gradient(circle, rgba(118, 251, 145, 0.72), rgba(118, 251, 145, 0.13) 51%, transparent 70%); filter: blur(8px); }
+.oval-login-card-content { position: relative; z-index: 1; display: grid; min-height: 100%; place-items: center; padding: clamp(34px, 4vw, 54px); }
+.oval-login-message { margin: 22px 0 0; padding: 11px 13px; border-radius: 12px; font-size: 11px; line-height: 1.45; }
+.oval-login-message.error { border: 1px solid rgba(185, 45, 36, 0.16); color: #a62d25; background: #fff0ed; }
+.oval-login-message.success { border: 1px solid rgba(22, 136, 68, 0.18); color: #116a35; background: rgba(118, 251, 145, 0.15); }
+
+.oval-login-auth-action { display: flex; width: min(100%, 380px); justify-content: center; }
+.oval-google-cta { display: grid; width: 100%; min-height: 60px; grid-template-columns: 24px 1fr 24px; align-items: center; gap: 12px; padding: 0 18px; border: 1px solid #111; border-radius: 15px; background: #111; color: #fff; box-shadow: 0 18px 55px rgba(14, 16, 12, 0.12); font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; transition: background 170ms ease, color 170ms ease, transform 170ms ease, box-shadow 170ms ease; }
+.oval-google-cta:hover { background: #76fb91; color: #111; box-shadow: 0 22px 64px rgba(14, 16, 12, 0.14); transform: translateY(-2px); }
+.oval-google-cta:focus-visible { outline: 4px solid rgba(118, 251, 145, 0.65); outline-offset: 4px; }
+.oval-google-cta svg { width: 22px; height: 22px; padding: 2px; border-radius: 50%; background: #fff; }
+.oval-login-card-content > .oval-login-message { position: absolute; top: 32px; right: 32px; left: 32px; margin: 0; }
+
+@media (max-width: 880px) {
+  .oval-login { display: block; overflow: auto; }
+  .oval-login-shell { min-height: auto; grid-template-columns: 1fr; }
+  .oval-login-story { min-height: 560px; }
+  .oval-login-card-content { min-height: 320px; }
+}
+
+@media (max-width: 560px) {
+  .oval-login { padding: 10px; background-size: 24px 24px; }
+  .oval-login-shell { border-radius: 24px; }
+  .oval-login-story { min-height: 520px; padding: 27px 23px; }
+  .oval-login-story-copy { padding: 58px 0 36px; }
+  .oval-login-story h1 { max-width: 100%; font-size: clamp(38px, 11.5vw, 48px); letter-spacing: -.055em; }
+  .oval-login-lede { font-size: 13px; }
+  .oval-login-capabilities { display: grid; }
+  .oval-login-capabilities span { width: max-content; }
+  .oval-login-signal { display: none; }
+  .oval-login-card-content { min-height: 280px; padding: 24px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oval-google-cta { transition: none; }
+}

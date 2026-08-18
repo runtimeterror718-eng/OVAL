@@ -5,10 +5,11 @@ import { Command } from "cmdk";
 import { useRouter } from "next/navigation";
 import {
   Home, MessageCircle, Camera, Play, Send, Search, Siren, Compass,
-  Users, Trophy, ClipboardCheck, Globe, X, Smartphone, LifeBuoy,
+  Users, Trophy, ClipboardCheck, Globe, X, Smartphone, LifeBuoy, Shield,
 } from "lucide-react";
 
 const PAGES = [
+  { label: "OVAL Shield", href: "/shield", icon: Shield, keywords: "brand content reputation protection piracy phishing impersonation domains enforcement" },
   { label: "Command Center", href: "/command-center", icon: Home, keywords: "home overview dashboard student voice command center" },
   { label: "Incidents", href: "/incidents", icon: Siren, keywords: "incidents work queue severity owner status evidence" },
   { label: "Explore", href: "/fire-tracker", icon: Compass, keywords: "explore mentions student voice search evidence" },
@@ -19,7 +20,7 @@ const PAGES = [
   { label: "Telegram Intelligence", href: "/telegram", icon: Send, keywords: "telegram channels messages fake" },
   { label: "Google Intelligence", href: "/google", icon: Globe, keywords: "google autocomplete serp trends news" },
   { label: "Play Store Intelligence", href: "/playstore", icon: Smartphone, keywords: "play store app reviews ratings versions support" },
-  { label: "Freshdesk Intelligence", href: "/freshdesk", icon: LifeBuoy, keywords: "freshdesk tickets support queue taxonomy routing sla" },
+  { label: "Freshdesk Intelligence", href: "/audience-intelligence/freshdesk", icon: LifeBuoy, keywords: "freshdesk tickets support queue taxonomy routing sla csat" },
   { label: "Creator Intelligence", href: "/creators", icon: Users, keywords: "creators threats friends influencers" },
   { label: "Competitive Intelligence", href: "/competitors", icon: Trophy, keywords: "competitors allen unacademy byju share voice" },
   { label: "Action Items", href: "/actionables", icon: ClipboardCheck, keywords: "actionables tasks actions department" },

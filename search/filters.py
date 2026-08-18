@@ -5,9 +5,67 @@ Parse and validate search parameters from user input.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from config.constants import FULFILLMENT_DEFAULT_LANGUAGES, PLATFORMS
+
+
+def _to_utc(dt: datetime | None) -> datetime | None:
+    """Coerce a datetime to timezone-aware UTC (naive is assumed UTC)."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def in_window(
+    published_at: datetime | str | None,
+    after_date: datetime | None,
+    before_date: datetime | None,
+) -> bool:
+    """True if ``published_at`` falls within [after_date, before_date].
+
+    Used by scrapers to apply an exact date-window filter on top of whatever
+    coarse filter the upstream API supports. Items with an unparseable or
+    missing date are kept (we can't prove they're out of range).
+    """
+    if after_date is None and before_date is None:
+        return True
+    if isinstance(published_at, str):
+        try:
+            published_at = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+        except ValueError:
+            return True
+    if not isinstance(published_at, datetime):
+        return True
+    published_at = _to_utc(published_at)
+    if after_date and published_at < _to_utc(after_date):
+        return False
+    if before_date and published_at > _to_utc(before_date):
+        return False
+    return True
+
+
+def reddit_time_filter(after_date: datetime | None) -> str:
+    """Map an ``after_date`` to Reddit's coarsest covering time bucket.
+
+    Reddit search has no exact date range — only hour/day/week/month/year/all.
+    Pick the smallest bucket that still covers the requested lookback, then
+    rely on ``in_window`` for the exact cut.
+    """
+    if after_date is None:
+        return "year"
+    days = (datetime.now(timezone.utc) - _to_utc(after_date)).days
+    if days <= 1:
+        return "day"
+    if days <= 7:
+        return "week"
+    if days <= 31:
+        return "month"
+    if days <= 366:
+        return "year"
+    return "all"
 
 
 @dataclass
@@ -27,6 +85,16 @@ class SearchParams:
     )
     brand_id: str | None = None
     max_results_per_platform: int = 100
+
+    @classmethod
+    def last_n_days(cls, n: int, **kwargs) -> "SearchParams":
+        """Build params with a date window covering the last ``n`` days."""
+        now = datetime.now(timezone.utc)
+        return cls(
+            after_date=now - timedelta(days=n),
+            before_date=now,
+            **kwargs,
+        )
 
     def __post_init__(self):
         # Normalize hashtags

@@ -9,26 +9,39 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CircleAlert,
+  Clock3,
   Download,
   Filter,
   Search,
+  ShieldAlert,
   Share2,
   Sparkles,
   Star,
+  TrendingDown,
+  TrendingUp,
   X,
 } from "lucide-react";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
+import { VectorChannelSummary } from "@/components/dashboard/vector-channel-summary";
+import {
+  DataTableShell,
+  PanelHeader,
+} from "@/components/ui/dashboard-primitives";
 import { fadeUp } from "@/lib/animations";
 import { useLiveData } from "@/lib/use-live-data";
 import { cn, formatNumber } from "@/lib/utils";
@@ -99,6 +112,26 @@ function displayMonth(month?: string | null) {
   return parsed.toLocaleDateString("en-IN", { month: "short" });
 }
 
+function displayMonthYear(month?: string | null) {
+  if (!month) return "Unknown";
+  const parsed = new Date(`${month}-01T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return month;
+  return parsed.toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+}
+
+function monthKeysBetween(startMonth: string, endMonth: string) {
+  const start = new Date(`${startMonth}-01T00:00:00`);
+  const end = new Date(`${endMonth}-01T00:00:00`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) return [];
+  const keys: string[] = [];
+  const cursor = new Date(start);
+  while (cursor <= end) {
+    keys.push(`${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`);
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  return keys;
+}
+
 function displayShortDate(date?: string | null) {
   if (!date) return "Unknown";
   const parsed = new Date(date);
@@ -122,7 +155,7 @@ function issueWindowLabel(days: number) {
 }
 
 function detectLatestStudentIssue(reviews: Array<Review & { commercialRisk?: { label?: string | null } }>, endDate?: string | null): LiveIssue | null {
-  const windowDays = 1;
+  const windowDays = 14;
   const windowStart = daysBefore(endDate, windowDays - 1);
   const windowEnd = endDate ? new Date(`${endDate}T23:59:59`) : new Date();
   const recentNegatives = reviews.filter((review) => {
@@ -216,18 +249,17 @@ function RatingStars({ rating = 0, size = "h-3 w-3" }: { rating?: number | null;
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn("rounded-2xl border border-slate-200 bg-white shadow-[0_8px_28px_rgba(15,23,42,0.06)]", className)}>{children}</div>;
+  return <CruipCard className={className}>{children}</CruipCard>;
 }
 
 function SectionTitle({ title, subtitle, action = "View all", onAction }: { title: string; subtitle?: string; action?: string | null; onAction?: () => void }) {
   return (
-    <div className="mb-4 flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <h2 className="truncate text-base font-black text-slate-950">{title}</h2>
-        {subtitle ? <p className="mt-1 text-xs leading-relaxed text-slate-500">{subtitle}</p> : null}
-      </div>
-      {action ? <button onClick={onAction} className="shrink-0 text-xs font-black text-violet-600">{action}</button> : null}
-    </div>
+    <PanelHeader
+      className="mb-4"
+      title={title}
+      subtitle={subtitle}
+      action={action ? <button onClick={onAction} className="text-xs font-semibold text-[var(--brand)] hover:underline">{action}</button> : null}
+    />
   );
 }
 
@@ -387,34 +419,6 @@ function SectionBand({ index, title, subtitle }: { index: string; title: string;
   );
 }
 
-function MiniKpi({
-  title,
-  value,
-  delta,
-  tone = "positive",
-  children,
-}: {
-  title: string;
-  value: string;
-  delta: string;
-  tone?: "positive" | "negative" | "neutral";
-  children?: React.ReactNode;
-}) {
-  const deltaClass = tone === "negative" ? "text-red-600" : tone === "neutral" ? "text-slate-500" : "text-emerald-600";
-  return (
-    <Card className="flex h-[132px] min-w-0 flex-col justify-between p-4">
-      <div className="flex min-w-0 items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-xs font-bold text-slate-900">{title}</p>
-          <p className="mt-3 truncate text-3xl font-black tracking-tight text-slate-950">{value}</p>
-          <p className={cn("mt-1 text-xs font-semibold", deltaClass)}>{delta}</p>
-        </div>
-        <div className="grid min-h-[86px] min-w-[92px] max-w-[116px] flex-1 place-items-center overflow-visible">{children}</div>
-      </div>
-    </Card>
-  );
-}
-
 function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () => void }) {
   const reviews = normalizeEvidenceReviews(panel.reviews);
   useEffect(() => {
@@ -441,13 +445,13 @@ function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () =
         initial={{ opacity: 0, y: 24, x: "-50%" }}
         animate={{ opacity: 1, y: 0, x: "-50%" }}
         transition={{ duration: 0.2, ease: "easeOut" }}
-        className="absolute bottom-0 left-1/2 w-full max-w-6xl rounded-t-3xl border border-slate-200 bg-white p-5 shadow-2xl md:bottom-8 md:rounded-3xl"
+        className="absolute bottom-0 left-1/2 w-full max-w-6xl rounded-t-3xl border border-slate-200 bg-white p-5 shadow-2xl dark:border-slate-800 dark:bg-slate-950 md:bottom-8 md:rounded-3xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-violet-600">Review Evidence</p>
-            <h2 className="mt-1 text-xl font-black text-slate-950">{panel.title}</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand)]">Review Evidence</p>
+            <h2 className="mt-1 text-xl font-semibold text-slate-950 dark:text-white">{panel.title}</h2>
             <p className="mt-1 text-xs text-slate-500">{panel.subtitle}</p>
           </div>
           <button onClick={onClose} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Close review evidence">
@@ -458,15 +462,15 @@ function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () =
           <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
             {panel.insights.map((insight) => (
               <div key={insight.label} className={cn("rounded-2xl border p-4", toneClass[insight.tone || "violet"])}>
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] opacity-70">{insight.label}</p>
-                <p className="mt-2 text-sm font-black leading-relaxed">{insight.value}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] opacity-70">{insight.label}</p>
+                <p className="mt-2 text-sm font-semibold leading-relaxed">{insight.value}</p>
               </div>
             ))}
           </div>
         ) : null}
         {panel.bullets?.length ? (
           <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">Agent reasoning</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Agent reasoning</p>
             <div className="mt-3 grid gap-2">
               {panel.bullets.map((bullet) => (
                 <p key={bullet} className="text-sm leading-relaxed text-slate-700">- {bullet}</p>
@@ -484,7 +488,7 @@ function EvidenceModal({ panel, onClose }: { panel: EvidencePanel; onClose: () =
                 </span>
               </div>
               <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-700">&ldquo;{review.text}&rdquo;</p>
-              <p className="mt-3 text-[11px] text-slate-500">{review.author ? `${review.author} · ` : ""}v{review.version || "Unknown"} · {displayDate(review.date)} {review.owner ? `· ${review.owner}` : ""}</p>
+              <p className="mt-3 text-[11px] text-slate-500">{review.author ? `${review.author} · ` : ""}v{review.version || "Unknown"} · {displayDate(review.date)}</p>
             </article>
           )) : (
             <p className="rounded-xl border border-dashed border-slate-200 p-6 text-sm text-slate-500 md:col-span-3">No review examples are available for this card.</p>
@@ -505,8 +509,24 @@ function tinySpark(data: any[], key: string, color: string) {
 
 function LineChartShim({ data, dataKey, color }: { data: any[]; dataKey: string; color: string }) {
   return (
-    <ComposedChart data={data} margin={{ top: 8, right: 4, left: 4, bottom: 0 }}>
-      <Line type="monotone" dataKey={dataKey} stroke={color} strokeWidth={2} dot={false} />
+    <ComposedChart data={data} margin={{ top: 8, right: 6, left: 6, bottom: 8 }}>
+      <YAxis domain={["dataMin", "dataMax"]} hide />
+      <ReferenceLine y={0} stroke="#cbd5e1" strokeWidth={1} strokeDasharray="3 3" />
+      <Tooltip
+        cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: "2 2" }}
+        contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", boxShadow: "0 12px 32px rgba(15,23,42,0.12)" }}
+        formatter={(value) => [typeof value === "number" ? value.toLocaleString("en-IN") : value, ""]}
+        labelFormatter={() => ""}
+      />
+      <Line
+        type="monotone"
+        dataKey={dataKey}
+        stroke={color}
+        strokeWidth={2.25}
+        dot={false}
+        activeDot={{ r: 4, fill: color, stroke: "white", strokeWidth: 2 }}
+        connectNulls={false}
+      />
     </ComposedChart>
   );
 }
@@ -524,40 +544,281 @@ function RadialScore({ score, color = "#22c55e" }: { score: number; color?: stri
   );
 }
 
-function classifyCommercialRisk(review: Review) {
-  const text = String(review.text || "").toLowerCase();
-  const matchers = [
+function CruipCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("rounded-2xl border border-slate-200/80 bg-white shadow-[0_18px_55px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-900", className)}>
+      {children}
+    </div>
+  );
+}
+
+function CruipStatCard({
+  title,
+  label,
+  startValue,
+  startLabel,
+  endValue,
+  endLabel,
+  delta,
+  tone = "neutral",
+  children,
+}: {
+  title: string;
+  label: string;
+  startValue: string;
+  startLabel: string;
+  endValue: string;
+  endLabel: string;
+  delta: string;
+  tone?: "positive" | "negative" | "neutral";
+  children?: React.ReactNode;
+}) {
+  const deltaClass = tone === "negative" ? "bg-red-500/15 text-red-700 dark:text-red-300" : tone === "positive" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-slate-500/15 text-slate-600 dark:text-slate-300";
+  return (
+    <CruipCard className="col-span-full flex min-h-[188px] flex-col overflow-hidden transition-colors duration-200 hover:border-slate-300 sm:col-span-6 xl:col-span-6 2xl:col-span-3">
+      <div className="flex grow flex-col gap-5 p-5">
+        <header className="flex min-h-[44px] items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="truncate text-base font-semibold leading-5 text-slate-900 dark:text-slate-100" title={title}>{title}</h2>
+            <p className="mt-1 truncate text-sm leading-5 text-slate-500 dark:text-slate-400" title={label}>{label}</p>
+          </div>
+          <span className={cn("shrink-0 rounded-full px-2 py-1 text-xs font-semibold leading-4", deltaClass)}>{delta}</span>
+        </header>
+
+        <div className="grid min-h-[66px] grid-cols-[58px_minmax(0,1fr)_58px] items-center gap-3">
+          <div className="min-w-0 text-center">
+            <p className="truncate text-lg font-semibold leading-6 text-slate-900 dark:text-slate-100" title={startValue}>{startValue}</p>
+            <p className="mt-0.5 truncate text-xs font-medium leading-4 text-slate-500 dark:text-slate-400" title={startLabel}>{startLabel}</p>
+          </div>
+          <div className="min-w-0">{children}</div>
+          <div className="min-w-0 text-center">
+            <p className="truncate text-lg font-semibold leading-6 text-slate-900 dark:text-slate-100" title={endValue}>{endValue}</p>
+            <p className="mt-0.5 truncate text-xs font-medium leading-4 text-slate-500 dark:text-slate-400" title={endLabel}>{endLabel}</p>
+          </div>
+        </div>
+      </div>
+    </CruipCard>
+  );
+}
+
+type IncidentCategory = {
+  label: string;
+  priority: "P0" | "P1" | "P2";
+  count: number;
+  share: number;
+  examples: Review[];
+};
+
+function IncidentReportSection({
+  categories,
+  chartData,
+  rangeLabel,
+  total,
+  priorTotal,
+  replyRate,
+  unrepliedCount,
+  onOpen,
+}: {
+  categories: IncidentCategory[];
+  chartData: any[];
+  rangeLabel: string;
+  total: number;
+  priorTotal: number;
+  replyRate: number;
+  unrepliedCount: number;
+  onOpen: (title: string, subtitle: string, reviews: Review[]) => void;
+}) {
+  const criticalCount = categories.filter((category) => category.priority === "P0" && category.count > 0).length;
+  const delta = total - priorTotal;
+  const deltaPositive = delta <= 0;
+  const highest = Math.max(1, ...categories.map((category) => category.count));
+  const chartRows = chartData.map((row) => ({
+    ...row,
+    lowRating: Math.round(Number(row.reviews || 0) * Number(row.lowRatingRate || 0) / 100),
+    responseGap: Math.max(0, Math.round(Number(row.reviews || 0) * (100 - Number(row.replyRate || 0)) / 100)),
+  }));
+  const statCards = [
     {
-      label: "Overselling",
-      owner: "Growth / Academic Ops",
-      keywords: ["promise", "promised", "guarantee", "guaranteed", "rank", "selection", "advertise", "advertised", "over promise", "overpromise"],
+      label: "Critical categories",
+      value: String(criticalCount),
+      detail: "P0 compliance and trust signals",
+      tone: criticalCount ? "text-red-600 bg-red-50 border-red-100" : "text-emerald-600 bg-emerald-50 border-emerald-100",
+      icon: ShieldAlert,
+      trend: criticalCount ? TrendingUp : TrendingDown,
     },
     {
-      label: "Mis-selling",
-      owner: "Sales / Compliance",
-      keywords: ["mis sell", "missell", "mis-sell", "misleading", "wrong information", "false", "fraud", "scam", "cheat", "cheated"],
+      label: "Negative incidents",
+      value: formatNumber(total),
+      detail: `${rangeLabel} graph window`,
+      tone: "text-slate-700 bg-slate-50 border-slate-200",
+      icon: CircleAlert,
+      trend: deltaPositive ? TrendingDown : TrendingUp,
     },
     {
-      label: "Batch & Course",
-      owner: "Aditya Kumar",
-      keywords: ["batch", "course", "class", "lecture", "teacher", "faculty", "syllabus", "content", "test series"],
-    },
-    {
-      label: "Payments & Refunds",
-      owner: "Aayush / Keshav",
-      keywords: ["payment", "refund", "deducted", "gateway", "transaction", "money", "paid", "subscription"],
-    },
-    {
-      label: "App Reliability",
-      owner: "Product Reliability",
-      keywords: ["video", "playback", "buffer", "crash", "login", "download", "app", "bug", "otp"],
+      label: "Unreplied negatives",
+      value: formatNumber(unrepliedCount),
+      detail: `${replyRate}% reply coverage`,
+      tone: unrepliedCount ? "text-amber-700 bg-amber-50 border-amber-100" : "text-emerald-600 bg-emerald-50 border-emerald-100",
+      icon: Clock3,
+      trend: unrepliedCount ? TrendingUp : TrendingDown,
     },
   ];
-  return matchers.find((matcher) => matcher.keywords.some((keyword) => text.includes(keyword))) || {
-    label: "General Support",
-    owner: review.owner || "Support Ops",
-    keywords: [],
-  };
+
+  return (
+    <Card className="overflow-hidden">
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
+        <div className="border-b border-slate-200 p-5 dark:border-slate-800 xl:border-b-0 xl:border-r">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-500">Incident Report</p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-950 dark:text-white">Issue categories and severity trend</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                All Play Store issue classes are visible here, ranked by negative-review volume with evidence.
+              </p>
+            </div>
+            <span className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+              {rangeLabel}
+            </span>
+          </div>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {statCards.map((stat) => {
+              const Icon = stat.icon;
+              const TrendIcon = stat.trend;
+              return (
+                <div key={stat.label} className={cn("rounded-xl border p-4", stat.tone)}>
+                  <div className="flex items-start justify-between gap-3">
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <TrendIcon className="h-4 w-4 shrink-0" />
+                  </div>
+                  <p className="mt-4 truncate text-[11px] font-semibold uppercase tracking-wide opacity-75">{stat.label}</p>
+                  <p className="mt-1 text-3xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="mt-1 truncate text-xs opacity-75">{stat.detail}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+            <div className="mb-4 flex flex-wrap items-center gap-5">
+              <span className="flex items-center gap-2 text-xs font-semibold text-slate-500"><span className="h-3 w-3 rounded-sm bg-red-500" /> Low-rating incidents</span>
+              <span className="flex items-center gap-2 text-xs font-semibold text-slate-500"><span className="h-3 w-3 rounded-sm bg-violet-500" /> Response gap</span>
+            </div>
+            <div className="h-[260px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartRows} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="incidentLow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.02} />
+                    </linearGradient>
+                    <linearGradient id="incidentGap" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.02} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid #e2e8f0", boxShadow: "0 16px 40px rgba(15,23,42,0.12)" }} />
+                  <Area type="monotone" dataKey="lowRating" stroke="#ef4444" strokeWidth={2.5} fill="url(#incidentLow)" dot={false} isAnimationActive={false} />
+                  <Area type="monotone" dataKey="responseGap" stroke="#8b5cf6" strokeWidth={2.5} fill="url(#incidentGap)" dot={false} isAnimationActive={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-950 dark:text-white">Category roster</h3>
+              <p className="mt-1 text-xs text-slate-500">Every routed class is kept visible for triage.</p>
+            </div>
+            <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", deltaPositive ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700")}>
+              {delta === 0 ? "Flat" : `${delta > 0 ? "+" : ""}${delta}`} vs prior
+            </span>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {categories.map((category) => {
+              const severityClass = category.priority === "P0"
+                ? "border-red-100 bg-red-50 text-red-700"
+                : category.priority === "P1"
+                  ? "border-amber-100 bg-amber-50 text-amber-700"
+                  : "border-slate-200 bg-slate-50 text-slate-600";
+              return (
+                <button
+                  key={category.label}
+                  type="button"
+                  onClick={() => category.examples.length ? onOpen(category.label, `${category.count} negative written reviews`, category.examples) : undefined}
+                  className="cursor-pointer rounded-xl border border-slate-200 bg-white p-3 text-left transition-colors duration-200 hover:border-violet-200 hover:bg-violet-50/40 dark:border-slate-800 dark:bg-slate-900"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-bold text-slate-900 dark:text-white">{category.label}</p>
+                        <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-bold", severityClass)}>{category.priority}</span>
+                      </div>
+                      <p className="mt-1 truncate text-xs font-medium text-slate-500">{category.count} negative {category.count === 1 ? "review" : "reviews"}</p>
+                    </div>
+                    <span className="shrink-0 text-lg font-bold text-slate-900 dark:text-white">{category.count}</span>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-violet-500" style={{ width: `${Math.max(4, (category.count / highest) * 100)}%` }} />
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-slate-500">
+                    <span>{category.share}% of incidents</span>
+                    <span>{category.examples.length ? "Open evidence" : "No current evidence"}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+const COMMERCIAL_MATCHERS = [
+  {
+    label: "Mis-selling",
+    keywords: ["mis sell", "missell", "mis-sell", "misleading", "wrong information", "false promise", "fraud", "scam", "cheat", "cheated", "looted"],
+  },
+  {
+    label: "Overselling",
+    keywords: ["promise", "promised", "guarantee", "guaranteed", "assured rank", "selection", "advertise", "advertised", "over promise", "overpromise", "false hope"],
+  },
+  {
+    label: "Payments & Refunds",
+    keywords: ["payment", "refund", "deducted", "gateway", "transaction", "money back", "not returned", "paid", "subscription", "double charge", "extra charge"],
+  },
+  {
+    label: "App Reliability",
+    keywords: ["video", "playback", "buffer", "buffering", "crash", "crashed", "login", "log in", "download", "bug", "glitch", "otp", "not opening", "lag", "hang", "loading"],
+  },
+  {
+    label: "Batch & Course",
+    keywords: ["batch", "course", "class", "lecture", "teacher", "faculty", "sir", "mam", "syllabus", "content", "test series", "dpp", "schedule", "module", "notes"],
+  },
+];
+
+// Best-match classification: score each bucket by how many of its keywords the
+// review hits, and assign the highest-scoring bucket (ties broken by matcher
+// order = severity). This is more accurate than first-match, which mislabels
+// reviews that mention several topics.
+function classifyCommercialRisk(review: Review) {
+  const text = String(review.text || "").toLowerCase();
+  let best: { label: string; keywords: string[] } | null = null;
+  let bestScore = 0;
+  for (const matcher of COMMERCIAL_MATCHERS) {
+    const score = matcher.keywords.reduce((n, kw) => (text.includes(kw) ? n + 1 : n), 0);
+    if (score > bestScore) {
+      bestScore = score;
+      best = matcher;
+    }
+  }
+  return best || { label: "General Support", keywords: [] };
 }
 
 type NewsItem = {
@@ -692,14 +953,14 @@ function CommentMarquee({ title, badge, reviews, tone, onOpen }: { title: string
 export default function PlayStorePage() {
   const { data, loading } = useLiveData<any>("/api/playstore", null, { refreshMs: 60 * 60 * 1000, noStore: true });
   const [panel, setPanel] = useState<EvidencePanel | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState("all");
   const [timeWindow, setTimeWindow] = useState<"last30" | "sixMonths" | "all">("sixMonths");
   const [reviewFilter, setReviewFilter] = useState<"all" | "negative" | "positive" | "unreplied" | "commercial">("all");
+  const [selectedPackage, setSelectedPackage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
-  const [deckClassFilter, setDeckClassFilter] = useState<string>("all");
-  const [deckFromInput, setDeckFromInput] = useState("");
-  const [deckToInput, setDeckToInput] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [trendRange, setTrendRange] = useState<"7d" | "30d" | "90d" | "all">("all");
   const toggleCategory = (label: string) => {
     setExpandedCategories((current) => {
       const next = new Set(current);
@@ -710,42 +971,94 @@ export default function PlayStorePage() {
   };
   if (loading || !data) return <PageSkeleton title="Play Store Intelligence" color="#6d5dfc" />
 
-  const activePackage = data.primaryPackage;
+  const activePackage = selectedPackage && data.apps?.[selectedPackage] ? selectedPackage : data.primaryPackage;
   const primary = data.apps?.[activePackage] || {};
-  const contract = data.contract || {};
+  const contract = data.contracts?.[activePackage] || data.contract || {};
+  const packageLiveReviews = (data.liveReviews || []).filter((review: any) => !review.packageName || review.packageName === activePackage);
   const dataRangeLabel = data.dateRange?.from && data.dateRange?.to
     ? `${displayDate(data.dateRange.from)} - ${displayDate(data.dateRange.to)}`
     : "Uploaded range";
   const currentVersion = primary.releaseComparison?.current || primary.recentVersions?.[0] || {};
   const previousVersion = primary.releaseComparison?.previous || primary.recentVersions?.[1] || {};
-  const monthCount = timeWindow === "all" ? 12 : 6;
-  const windowEnd = data.dateRange?.to ? new Date(`${data.dateRange.to}T23:59:59`) : new Date();
-  const windowStart = timeWindow === "last30" ? daysBefore(data.dateRange?.to, 29) : timeWindow === "all" ? new Date(`${data.dateRange?.from || "1970-01-01"}T00:00:00`) : daysBefore(data.dateRange?.to, 183);
+  const allMonthlyTrend = (primary.monthlyTrend || []).filter((month: any) => month.month && month.month !== "Unknown");
+  const periodOptions = Array.from(new Set(
+    Object.values(data.apps || {}).flatMap((app: any) =>
+      (app.monthlyTrend || [])
+        .map((month: any) => String(month.month || ""))
+        .filter((month: string) => month && month !== "Unknown")
+    )
+  )).sort();
+  const activePeriod = selectedPeriod === "all" || periodOptions.includes(selectedPeriod)
+    ? selectedPeriod
+    : "all";
+  const selectedWindowLabel = activePeriod === "all" ? "All time" : displayMonthYear(activePeriod);
   const isWithinSelectedWindow = (date?: string | null) => {
-    if (!date) return timeWindow !== "last30";
-    const parsed = new Date(`${date}T12:00:00`);
-    if (Number.isNaN(parsed.getTime())) return false;
-    return parsed >= windowStart && parsed <= windowEnd;
+    if (!date) return activePeriod === "all";
+    if (activePeriod === "all") return true;
+    return String(date).slice(0, 7) === activePeriod;
   };
-  const monthlyTrend = (primary.monthlyTrend || []).filter((month: any) => month.month && month.month !== "Unknown").slice(-monthCount);
-  const trendRows = timeWindow === "last30"
-    ? (primary.dailyTrend || []).filter((day: any) => isWithinSelectedWindow(day.date))
-    : monthlyTrend;
-  const kpiReviewCount = trendRows.reduce((sum: number, row: any) => sum + Number(row.reviews || 0), 0) || Number(primary.sampleSize || 0);
+  const selectedMonthlyRow = activePeriod === "all" ? null : allMonthlyTrend.find((month: any) => String(month.month) === activePeriod);
+  const trendRows = activePeriod === "all"
+    ? allMonthlyTrend
+    : selectedMonthlyRow
+      ? [selectedMonthlyRow]
+      : [];
+  const kpiReviewCount = trendRows.reduce((sum: number, row: any) => sum + Number(row.reviews || 0), 0) || (activePeriod === "all" ? Number(primary.sampleSize || 0) : 0);
   const kpiAverageRating = kpiReviewCount
     ? Number((trendRows.reduce((sum: number, row: any) => sum + Number(row.averageRating || 0) * Number(row.reviews || 0), 0) / kpiReviewCount).toFixed(2))
-    : Number(primary.averageRating || 0);
+    : activePeriod === "all" ? Number(primary.averageRating || 0) : 0;
   const kpiLowRatingCount = Math.round(trendRows.reduce((sum: number, row: any) => sum + Number(row.reviews || 0) * Number(row.lowRatingRate || 0) / 100, 0));
-  const kpiLowRatingRate = kpiReviewCount ? Number(((kpiLowRatingCount / kpiReviewCount) * 100).toFixed(1)) : Number(primary.lowRatingRate || 0);
+  const kpiLowRatingRate = kpiReviewCount ? Number(((kpiLowRatingCount / kpiReviewCount) * 100).toFixed(1)) : activePeriod === "all" ? Number(primary.lowRatingRate || 0) : 0;
   const kpiReplyCount = Math.round(trendRows.reduce((sum: number, row: any) => sum + Number(row.reviews || 0) * Number(row.replyRate || 0) / 100, 0));
-  const kpiReplyRate = kpiReviewCount ? Number(((kpiReplyCount / kpiReviewCount) * 100).toFixed(1)) : Number(primary.replyRate || 0);
+  const kpiReplyRate = kpiReviewCount ? Number(((kpiReplyCount / kpiReviewCount) * 100).toFixed(1)) : activePeriod === "all" ? Number(primary.replyRate || 0) : 0;
   const sentimentScore = Math.max(55, Math.round(100 - kpiLowRatingRate * 4));
-  const reviewTrend = trendRows.map((row: any) => ({
+  const selectedMonthDailyRows = activePeriod === "all"
+    ? []
+    : (primary.dailyTrend || []).filter((day: any) => String(day.date || "").slice(0, 7) === activePeriod);
+  const graphTrendRows = activePeriod === "all" ? allMonthlyTrend : selectedMonthDailyRows.length ? selectedMonthDailyRows : trendRows;
+  const graphRangeLabel = activePeriod === "all" ? "All time" : displayMonthYear(activePeriod);
+  const reviewTrend = graphTrendRows.map((row: any) => ({
     ...row,
     label: row.month ? displayMonth(row.month) : displayShortDate(row.date),
-    rating: Number(row.averageRating || 0),
-    sentiment: Math.max(55, Math.round(100 - Number(row.lowRatingRate || 0) * 4)),
+    rating: Number(row.reviews || 0) ? Number(row.averageRating || 0) : null,
+    sentiment: Number(row.reviews || 0) ? Math.max(55, Math.round(100 - Number(row.lowRatingRate || 0) * 4)) : null,
   }));
+  const unrepliedTrend = reviewTrend.map((row: any) => ({
+    ...row,
+    unreplied: Number(row.reviews || 0) ? Math.max(0, Math.round(Number(row.reviews || 0) * (100 - Number(row.replyRate || 0)) / 100)) : null,
+  }));
+
+  // ── Performance-trend filter (independent All-time / 90d / 30d / 7d) ──
+  const dailyTrendAll = (primary.dailyTrend || []).filter((d: any) => d.date);
+  const perfRangeDays: Record<string, number> = { "7d": 7, "30d": 30, "90d": 90, all: 0 };
+  const perfRows = (() => {
+    if (trendRange === "all") return allMonthlyTrend;                 // monthly points across all time
+    const days = perfRangeDays[trendRange];
+    const end = data.dateRange?.to ? new Date(`${data.dateRange.to}T23:59:59`) : new Date();
+    const start = new Date(end); start.setDate(start.getDate() - (days - 1));
+    const within = dailyTrendAll.filter((d: any) => {
+      const t = new Date(`${d.date}T12:00:00`);
+      return !Number.isNaN(t.getTime()) && t >= start && t <= end;
+    });
+    // fall back to monthly if daily data is sparse for this window
+    return within.length ? within : allMonthlyTrend.slice(-Math.max(1, Math.round(days / 30)));
+  })();
+  const perfTrend = perfRows.map((row: any) => ({
+    ...row,
+    label: row.month ? displayMonth(row.month) : displayShortDate(row.date),
+    rating: Number(row.reviews || 0) ? Number(row.averageRating || 0) : null,
+    sentiment: Number(row.reviews || 0) ? Math.max(55, Math.round(100 - Number(row.lowRatingRate || 0) * 4)) : null,
+  }));
+  const trendRangeOptions = [
+    { id: "all" as const, label: "All time" },
+    { id: "90d" as const, label: "90 days" },
+    { id: "30d" as const, label: "30 days" },
+    { id: "7d" as const, label: "7 days" },
+  ];
+  const perfRangeLabel = trendRangeOptions.find((o) => o.id === trendRange)?.label || "All time";
+  const firstGraphPoint = reviewTrend.find((row: any) => Number(row.reviews || 0) > 0) || reviewTrend[0] || {};
+  const latestGraphPoint = [...reviewTrend].reverse().find((row: any) => Number(row.reviews || 0) > 0) || reviewTrend[reviewTrend.length - 1] || {};
+  const latestUnrepliedPoint = [...unrepliedTrend].reverse().find((row: any) => row.unreplied != null) || unrepliedTrend[unrepliedTrend.length - 1] || {};
   const latestMonth = reviewTrend[reviewTrend.length - 1] || {};
   const previousMonth = reviewTrend[reviewTrend.length - 2] || {};
   const ratingDelta = previousMonth.rating ? (Number(latestMonth.rating || 0) - Number(previousMonth.rating || 0)).toFixed(2) : "0.00";
@@ -763,7 +1076,7 @@ export default function PlayStorePage() {
     ...(primary.positiveReviews || []),
     ...themes.flatMap((theme: any) => theme.examples || []),
     // Live API reviews go last so their richer rows (author names) win the dedup
-    ...(data.liveReviews || []),
+    ...packageLiveReviews,
   ];
   const latestReviewMap = new Map<string, Review>();
   latestReviewRows.forEach((review: any) => {
@@ -929,7 +1242,7 @@ export default function PlayStorePage() {
       existing.count += 1;
       existing.examples.push(review);
     } else {
-      acc.push({ label: review.commercialRisk.label, owner: review.commercialRisk.owner, count: 1, examples: [review] });
+      acc.push({ label: review.commercialRisk.label, count: 1, examples: [review] });
     }
     return acc;
   }, []).sort((a, b) => b.count - a.count);
@@ -947,7 +1260,6 @@ export default function PlayStorePage() {
       ...(projectMap[category.label] || { project: "SUPPORT-OPS", issueType: "Review Triage", priority: "P2" }),
     };
   });
-  const selectedWindowLabel = timeWindow === "last30" ? "Last 30 days" : timeWindow === "all" ? "All uploaded dates" : "Last 6 months";
   const opportunityRules = [
     { title: "Recorded Video Controls", detail: "High-rated users still ask for notes, three-dot menu fixes, bookmarks and recorded-video controls.", icon: Box, pattern: /recorded|video section|three-dot|notes|bookmark|streak|xp|lecture/i },
     { title: "Search & Discovery", detail: "Students praise PW but ask for easier search across teachers, batches and specific content.", icon: Search, pattern: /search|find|specific teacher|teacher|content|batch/i },
@@ -1010,8 +1322,8 @@ export default function PlayStorePage() {
   };
   const defaultDeckFrom = daysBefore(data.dateRange?.to, 13).toISOString().slice(0, 10);
   const defaultDeckTo = data.dateRange?.to || new Date().toISOString().slice(0, 10);
-  const deckFrom = deckFromInput || defaultDeckFrom;
-  const deckTo = deckToInput || defaultDeckTo;
+  const deckFrom = defaultDeckFrom;
+  const deckTo = defaultDeckTo;
   const deckFromDate = new Date(`${deckFrom}T00:00:00`);
   const deckToDate = new Date(`${deckTo}T23:59:59`);
   const deckSpanMs = Math.max(86400000, deckToDate.getTime() - deckFromDate.getTime());
@@ -1069,35 +1381,34 @@ export default function PlayStorePage() {
     .filter((item) => item.count >= 3)
     .sort((a, b) => (newsHasPriorData ? b.delta - a.delta : 0) || b.count - a.count)
     .slice(0, 6);
-  const deckCategories = deckNegatives.reduce((acc: { label: string; owner: string; reviews: Review[] }[], review) => {
+  const deckCategories = deckNegatives.reduce((acc: { label: string; reviews: Review[] }[], review) => {
     const existing = acc.find((item) => item.label === review.commercialRisk.label);
     if (existing) existing.reviews.push(review);
-    else acc.push({ label: review.commercialRisk.label, owner: review.commercialRisk.owner, reviews: [review] });
+    else acc.push({ label: review.commercialRisk.label, reviews: [review] });
     return acc;
   }, []).sort((a, b) => b.reviews.length - a.reviews.length);
-  const deckCards: DeckCard[] = [
-    {
-      kind: "summary",
-      label: "14-day negative pulse",
-      count: deckNegatives.length,
-      deltaVsPrior: priorDeckNegatives.length || deckNegatives.length ? deckNegatives.length - priorDeckNegatives.length : null,
-      topCategory: deckCategories[0]?.label,
-      reviews: deckNegatives,
-    },
-    ...deckCategories.map((category) => ({
-      kind: "category" as const,
-      label: category.label,
-      owner: category.owner,
-      count: category.reviews.length,
-      share: deckNegatives.length ? Math.round((category.reviews.length / deckNegatives.length) * 100) : 0,
-      versions: Array.from(new Set(category.reviews.map((review) => review.version).filter(Boolean))).slice(0, 4) as string[],
-      reviews: category.reviews,
-    })),
-  ];
-  const visibleDeckCards = deckClassFilter === "all"
-    ? deckCards
-    : deckCards.filter((card) => card.kind === "category" && card.label === deckClassFilter);
   const deckRangeLabel = `${displayDate(deckFrom)} - ${displayDate(deckTo)}`;
+  const incidentCategoryDefaults: Omit<IncidentCategory, "count" | "share" | "examples">[] = [
+    { label: "Mis-selling", priority: "P0" },
+    { label: "Overselling", priority: "P0" },
+    { label: "Payments & Refunds", priority: "P1" },
+    { label: "App Reliability", priority: "P1" },
+    { label: "Batch & Course", priority: "P1" },
+    { label: "General Support", priority: "P2" },
+  ];
+  const incidentCategories: IncidentCategory[] = incidentCategoryDefaults
+    .map((category) => {
+      const match = deckCategories.find((item) => item.label === category.label);
+      const examples = match?.reviews || [];
+      const count = examples.length;
+      return {
+        ...category,
+        count,
+        share: deckNegatives.length ? Math.round((count / deckNegatives.length) * 100) : 0,
+        examples,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 
   const releaseWindowStart = daysBefore(data.dateRange?.to, 30);
   const liveVersions = (primary.recentVersions || []).filter((version: any) => {
@@ -1163,7 +1474,7 @@ export default function PlayStorePage() {
       ? `${briefTopCount} of ${briefTotal} negative reviews (${briefPct}%) sit in this bucket${briefAccelerating ? `, with ${brief7d} arriving in the last 7 days` : ""}.`
       : "Students are relatively quiet right now.";
   const briefingContext = latestStudentIssue && topConcern
-    ? `Most complaints mention banners, admit-card prompts, or roll-number errors appearing before lectures load. Across the wider 14-day queue, ${briefTopLabel} still remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%).`
+    ? `${briefNatureLine}${briefSpecifics ? `: ${briefSpecifics}` : ""}. Across the wider 14-day queue, ${briefTopLabel} remains the largest negative bucket at ${briefTopCount} of ${briefTotal} reviews (${briefPct}%)${briefAccelerating ? `, with ${brief7d} arriving in the last 7 days` : ""}.`
     : topConcern
       ? `${briefNatureLine}${briefSpecifics ? `: ${briefSpecifics}` : ""}. Complaints are landing on the current release (${currentVersion.version || "latest"}).`
       : "";
@@ -1185,120 +1496,176 @@ export default function PlayStorePage() {
     }
   };
 
+  const openJiraTicket = (item: any) => {
+    const examples = (item.examples || []).slice(0, 5);
+    const summary = `[${item.priority || "P2"}] ${item.label} from Play Store reviews - ${primary.name || "PW app"}`;
+    const description = [
+      `App: ${primary.name || activePackage}`,
+      `Period: ${selectedWindowLabel}`,
+      `Project queue: ${item.project}`,
+      `Issue type: ${item.issueType}`,
+      `Suggested owner: ${item.owner}`,
+      `Evidence count: ${item.count}`,
+      "",
+      "Summary:",
+      `${item.label} is appearing in the selected Play Store review window. Please review the evidence and route to the owning team.`,
+      "",
+      "Evidence:",
+      ...examples.map((review: Review, index: number) => `${index + 1}. ${review.rating || "?"}★ · ${review.version || "Unknown version"} · ${displayDate(review.date)}\n${review.text || ""}`),
+    ].join("\n");
+    const jiraBase = (process.env.NEXT_PUBLIC_JIRA_BASE_URL || "https://physicswallah.atlassian.net").replace(/\/$/, "");
+    const params = new URLSearchParams({ summary, description });
+    window.open(`${jiraBase}/secure/CreateIssueDetails!init.jspa?${params.toString()}`, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <div className="rounded-[28px] bg-[#f6f8fc] p-3 text-slate-950 md:p-5">
+    <div className="min-h-screen rounded-[28px] bg-[linear-gradient(180deg,#f8fafc_0%,#eef4ff_42%,#f8fafc_100%)] p-1 text-slate-950 dark:text-slate-100">
       <main className="overflow-x-hidden">
-        <motion.div className="space-y-4">
+        <motion.div className="space-y-6">
           <motion.section variants={fadeUp as any}>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-[#1d1640] to-violet-950 p-6 text-white shadow-[0_24px_60px_rgba(30,20,80,0.35)] md:p-8">
-              <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-violet-600/30 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-32 left-1/3 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl" />
-              <div className="relative flex flex-wrap items-center justify-between gap-8">
-                <div className="min-w-[260px] max-w-xl">
+            <div className="relative overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#020617_0%,#1e103f_34%,#4c1d95_68%,#0b0614_100%)] p-5 text-white shadow-[0_28px_90px_rgba(30,16,63,0.34)] md:p-7">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
+              <div className="relative space-y-6">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white shadow-sm">
                       <span className="grid h-5 w-5 place-items-center overflow-hidden rounded-md bg-white p-0.5">
                         <img src="/google-play.webp" alt="Google Play" className="h-4 w-4 object-contain" />
                       </span>
                       {primary.name || "Physics Wallah"}
                     </span>
-                    <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-bold text-white/70">{dataRangeLabel}</span>
-                    {data.livePulledAt ? (
-                      <span className="flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-[11px] font-black text-emerald-300">
-                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-                        Live API · synced {new Date(data.livePulledAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
+                    <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold", agentRiskLevel === "High" ? "border-red-300/30 bg-red-400/15 text-red-100" : agentRiskLevel === "Medium" ? "border-amber-300/30 bg-amber-400/15 text-amber-100" : "border-emerald-300/30 bg-emerald-400/15 text-emerald-100")}>
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {agentRiskLevel} attention
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 xl:max-w-[560px] xl:justify-end">
+                    {data.appOptions?.length ? (
+                      <label className="inline-flex min-w-56 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm font-medium text-slate-100 backdrop-blur">
+                        <Box className="h-4 w-4 text-slate-300" />
+                        <select
+                          value={activePackage}
+                          onChange={(event) => setSelectedPackage(event.target.value)}
+                          className="w-full bg-transparent outline-none"
+                          aria-label="Select Play Store app"
+                        >
+                          {data.appOptions.map((app: any) => (
+                            <option key={app.packageName} value={app.packageName} className="text-slate-900">{app.name}</option>
+                          ))}
+                        </select>
+                      </label>
                     ) : null}
-                  </div>
-                  <p className="mt-5 text-[11px] font-black uppercase tracking-[0.3em] text-violet-300">{primary.name || "Physics Wallah"} · Play Store · {selectedWindowLabel}</p>
-                  <h2 className="mt-2 text-3xl font-black leading-tight tracking-tight md:text-4xl">{heroVerdict}</h2>
-                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/70">{heroNarrative}</p>
-                  <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-black">
-                    <span className={cn("rounded-full px-3 py-1.5", agentRiskLevel === "High" ? "bg-red-500/20 text-red-300" : agentRiskLevel === "Medium" ? "bg-amber-500/20 text-amber-300" : "bg-emerald-500/20 text-emerald-300")}>{agentRiskLevel} risk</span>
-                    <span className="rounded-full bg-white/10 px-3 py-1.5 text-white/80">{formatNumber(kpiReviewCount)} reviews analysed</span>
-                    <span className="rounded-full bg-white/10 px-3 py-1.5 text-white/80">{negative7dReviews.length} negative in last 7 days</span>
+                    <label className="inline-flex min-w-40 items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm font-medium text-slate-100 backdrop-blur">
+                      <Calendar className="h-4 w-4 text-slate-300" />
+                      <select
+                        value={activePeriod}
+                        onChange={(event) => setSelectedPeriod(event.target.value)}
+                        className="w-full bg-transparent outline-none"
+                        aria-label="Select Play Store month"
+                      >
+                        <option value="all" className="text-slate-900">All time</option>
+                        {[...periodOptions].reverse().map((month) => (
+                          <option key={month} value={month} className="text-slate-900">{displayMonthYear(month)}</option>
+                        ))}
+                      </select>
+                    </label>
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-8 md:gap-12">
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Avg rating</p>
-                    <p className="mt-1 text-5xl font-black tracking-tight">{kpiAverageRating || "--"}</p>
-                    <div className="mt-2"><RatingStars rating={kpiAverageRating} size="h-4 w-4" /></div>
-                    <p className={cn("mt-2 text-xs font-bold", Number(ratingDelta) < 0 ? "text-red-300" : "text-emerald-300")}>{Number(ratingDelta) >= 0 ? "+" : ""}{ratingDelta} vs previous month</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Current version {currentVersion.version || "Unknown"}</p>
-                    <p className="mt-1 text-5xl font-black tracking-tight">{currentVersion.averageRating || "--"}</p>
-                    <div className="mt-2"><RatingStars rating={currentVersion.averageRating} size="h-4 w-4" /></div>
-                    <p className="mt-2 text-xs font-bold text-white/60">{formatNumber(currentVersion.reviews || 0)} reviews on this release</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Sentiment</p>
-                    <div className="mx-auto mt-2 grid h-24 w-24 place-items-center rounded-full" style={{ background: `conic-gradient(#a78bfa ${Math.min(100, sentimentScore) * 3.6}deg, rgba(255,255,255,0.12) 0deg)` }}>
-                      <div className="grid h-[76px] w-[76px] place-items-center rounded-full bg-[#15102e] text-2xl font-black">{sentimentScore}</div>
+
+                <div className="max-w-5xl">
+                  <h1 className="text-3xl font-semibold leading-tight tracking-tight text-white md:text-5xl">{briefingHeadline}</h1>
+                  <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300 md:text-base">{briefingSummary}</p>
+                  {briefingContext ? <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-400 md:text-base">{briefingContext}</p> : null}
+                  {briefingQuote ? (
+                    <div className="mt-4 max-w-4xl rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm leading-6 text-slate-200">
+                      &ldquo;{briefingQuote}&rdquo;
                     </div>
-                    <p className={cn("mt-2 text-xs font-bold", sentimentDelta < 0 ? "text-red-300" : "text-emerald-300")}>{sentimentDelta >= 0 ? "+" : ""}{sentimentDelta} pts</p>
+                  ) : null}
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {latestStudentIssue ? <span className="rounded-full bg-red-400/15 px-3 py-1.5 text-xs font-semibold text-red-100">{latestStudentIssue.label}</span> : null}
+                    <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200">{briefTopLabel || "No issue"} · {briefPct}%</span>
+                    <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200">v{currentVersion.version || "latest"}</span>
+                    <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-slate-200">{selectedWindowLabel}</span>
                   </div>
-                  <div className="grid gap-3">
+                  {briefingEvidence.length ? (
                     <button
-                      onClick={() => openPanel("Critical topics", "Topics flagged critical or high severity in this window", topTopics.filter((topic: any) => topic.severity === "critical" || topic.severity === "high").flatMap((topic: any) => reviewsForTopic(topic)).slice(0, 24))}
-                      className="cursor-pointer rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition-colors duration-200 hover:bg-white/10"
+                      type="button"
+                      onClick={() => openPanel(latestStudentIssue?.label || briefTopLabel || "Latest issue evidence", executiveBrief, briefingEvidence)}
+                      className="mt-5 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
                     >
-                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/50">Critical topics</p>
-                      <p className="mt-1 text-2xl font-black">{criticalTopicCount}</p>
+                      Read evidence <ChevronRight className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => openPanel("Unreplied negative reviews", `${unrepliedNegatives.length} negative written reviews with no developer reply · ${selectedWindowLabel}`, unrepliedNegatives)}
-                      className="cursor-pointer rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition-colors duration-200 hover:bg-white/10"
-                    >
-                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/50">Unreplied negatives</p>
-                      <p className="mt-1 text-2xl font-black">{formatNumber(unrepliedNegatives.length)}</p>
-                    </button>
-                  </div>
+                  ) : null}
                 </div>
+
               </div>
             </div>
           </motion.section>
 
-          <motion.section variants={fadeUp as any}>
-            <Card className="p-5">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" /> Live briefing
-                </span>
-                <span className="text-xs font-bold text-slate-500">Latest student issue first{data.livePulledAt ? ` · synced ${new Date(data.livePulledAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}` : ""}</span>
-              </div>
-              <div className="max-w-4xl space-y-2">
-                <p className="text-base font-black leading-snug text-slate-900">{briefingHeadline}</p>
-                <p className="text-sm leading-relaxed text-slate-700">{briefingSummary}</p>
-                {briefingContext ? <p className="text-sm leading-relaxed text-slate-500">{briefingContext}</p> : null}
-                {briefingQuote ? (
-                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-relaxed text-slate-700">
-                    <span className="font-semibold text-slate-500">Recent signal:</span> &nbsp;&ldquo;{briefingQuote}&rdquo;
-                  </div>
-                ) : null}
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                {latestStudentIssue ? <span className="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-black text-red-700">{latestStudentIssue.label}</span> : null}
-                <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{latestStudentIssue ? `${latestStudentIssue.count} reports · ${latestStudentIssue.windowLabel}` : `${briefTopLabel || "No issue"} · ${briefPct}%`}</span>
-                <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">{brief7d} negative · last 7 days</span>
-                <span className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-700">Current release {currentVersion.version || "--"}</span>
-                {latestStudentIssue?.latestDate ? <span className="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-black text-amber-700">Latest review {displayDate(latestStudentIssue.latestDate)}</span> : null}
-                {briefTopFaculty ? <span className="rounded-lg bg-violet-50 px-3 py-1.5 text-xs font-black text-violet-700">Faculty: {briefTopFaculty.label}</span> : null}
-                {briefingEvidence.length ? (
-                  <button
-                    type="button"
-                    onClick={() => openPanel(latestStudentIssue?.label || briefTopLabel || "Latest issue evidence", executiveBrief, briefingEvidence)}
-                    className="ml-auto cursor-pointer rounded-lg border border-violet-200 bg-white px-3 py-1.5 text-xs font-black text-violet-600 transition-colors duration-200 hover:bg-violet-50"
-                  >
-                    Read the evidence <ChevronRight className="inline h-3.5 w-3.5" />
-                  </button>
-                ) : null}
-              </div>
-            </Card>
-          </motion.section>
+          <motion.div variants={fadeUp as any}>
+            <VectorChannelSummary
+              platform="playstore"
+              accent="#6366f1"
+              fallbackHeadline={briefingHeadline}
+              fallbackSummary={`${formatNumber(kpiReviewCount)} reviews are in the selected evidence window, including ${formatNumber(kpiLowRatingCount)} low-rating reviews (${kpiLowRatingRate}%). ${briefingSummary}`}
+            />
+          </motion.div>
 
           <motion.section variants={fadeUp as any}>
+            <div className="grid grid-cols-12 gap-6">
+              <CruipStatCard
+                title="Total Reviews"
+                label={selectedWindowLabel}
+                startValue={formatNumber(firstGraphPoint.reviews || 0)}
+                startLabel={firstGraphPoint.label || "Start"}
+                endValue={formatNumber(latestGraphPoint.reviews || 0)}
+                endLabel={latestGraphPoint.label || "Current"}
+                delta={activePeriod === "all" ? `${allMonthlyTrend.length} mo` : displayMonth(activePeriod)}
+                tone="neutral"
+              >
+                {tinySpark(reviewTrend, "reviews", "#6366f1")}
+              </CruipStatCard>
+              <CruipStatCard
+                title="Average Rating"
+                label="Star trend"
+                startValue={firstGraphPoint.rating ? String(firstGraphPoint.rating) : "--"}
+                startLabel={firstGraphPoint.label || "Start"}
+                endValue={latestGraphPoint.rating ? String(latestGraphPoint.rating) : String(kpiAverageRating || "--")}
+                endLabel={latestGraphPoint.label || "Current"}
+                delta={`${Number(ratingDelta) >= 0 ? "+" : ""}${ratingDelta}`}
+                tone={Number(ratingDelta) < 0 ? "negative" : "positive"}
+              >
+                {tinySpark(reviewTrend, "rating", "#8b5cf6")}
+              </CruipStatCard>
+              <CruipStatCard
+                title="Sentiment Score"
+                label="Review quality"
+                startValue={firstGraphPoint.sentiment ? String(firstGraphPoint.sentiment) : "--"}
+                startLabel={firstGraphPoint.label || "Start"}
+                endValue={latestGraphPoint.sentiment ? String(latestGraphPoint.sentiment) : String(sentimentScore)}
+                endLabel={latestGraphPoint.label || "Current"}
+                delta={`${sentimentDelta >= 0 ? "+" : ""}${sentimentDelta} pts`}
+                tone={sentimentDelta < 0 ? "negative" : "positive"}
+              >
+                {tinySpark(reviewTrend, "sentiment", "#22c55e")}
+              </CruipStatCard>
+              <CruipStatCard
+                title="Unreplied Negatives"
+                label="Needs response"
+                startValue={formatNumber(unrepliedTrend.find((row: any) => row.unreplied != null)?.unreplied || 0)}
+                startLabel={unrepliedTrend.find((row: any) => row.unreplied != null)?.label || "Start"}
+                endValue={formatNumber(latestUnrepliedPoint.unreplied ?? unrepliedNegatives.length)}
+                endLabel={latestUnrepliedPoint.label || "Current"}
+                delta={`${unrepliedNegativeRate}%`}
+                tone={unrepliedNegatives.length > 0 ? "negative" : "positive"}
+              >
+                {tinySpark(unrepliedTrend, "unreplied", "#f59e0b")}
+              </CruipStatCard>
+            </div>
+          </motion.section>
+
+          <motion.section variants={fadeUp as any} className="space-y-6">
             <CommentMarquee
               title="Negative Comments"
               badge={`Last 14 days · ${marqueeNegatives.length}`}
@@ -1306,9 +1673,6 @@ export default function PlayStorePage() {
               reviews={marqueeNegatives}
               onOpen={(review) => openPanel("Negative review detail", `Posted ${displayDate(review.date)} · App version ${review.version || "Unknown"}`, [review])}
             />
-          </motion.section>
-
-          <motion.section variants={fadeUp as any}>
             <CommentMarquee
               title="What Students Love"
               badge={`Last 14 days · ${marqueePositives.length}`}
@@ -1318,79 +1682,100 @@ export default function PlayStorePage() {
             />
           </motion.section>
 
-          <motion.section variants={fadeUp as any}>
-            <FlashDeck
-              cards={visibleDeckCards}
-              subtitle={`Negative written reviews · ${deckRangeLabel} · swipe or use arrows`}
-              toolbar={
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <button
-                    onClick={() => setDeckClassFilter("all")}
-                    className={cn(
-                      "cursor-pointer rounded-full px-3 py-1.5 text-[11px] font-black transition-colors duration-200",
-                      deckClassFilter === "all" ? "bg-violet-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                    )}
-                  >
-                    All classes
-                  </button>
-                  {deckCategories.map((category) => (
+          <motion.section variants={fadeUp as any} className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(360px,0.65fr)]">
+            <Card className="overflow-hidden p-5">
+              <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Performance trend</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">Ratings, volume, and sentiment</h2>
+                  <div className="mt-3 flex flex-wrap gap-4 text-xs font-semibold text-slate-500">
+                    <span className="flex items-center gap-2"><span className="h-2 w-4 rounded-full bg-blue-500" /> Review volume</span>
+                    <span className="flex items-center gap-2"><span className="h-2 w-4 rounded-full bg-violet-500" /> Avg rating</span>
+                    <span className="flex items-center gap-2"><span className="h-2 w-4 rounded-full bg-emerald-500" /> Sentiment</span>
+                  </div>
+                </div>
+                <div className="flex shrink-0 rounded-lg border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+                  {trendRangeOptions.map((option) => (
                     <button
-                      key={category.label}
-                      onClick={() => setDeckClassFilter(deckClassFilter === category.label ? "all" : category.label)}
+                      key={option.id}
+                      type="button"
+                      onClick={() => setTrendRange(option.id)}
                       className={cn(
-                        "cursor-pointer rounded-full px-3 py-1.5 text-[11px] font-black transition-colors duration-200",
-                        deckClassFilter === category.label ? "bg-violet-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                        "rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors",
+                        trendRange === option.id
+                          ? "bg-white text-violet-700 shadow-sm dark:bg-slate-900 dark:text-violet-300"
+                          : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                       )}
                     >
-                      {category.label} · {category.reviews.length}
+                      {option.label}
                     </button>
                   ))}
-                  <span className="flex-1" />
-                  <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                    From
-                    <input
-                      type="date"
-                      value={deckFrom}
-                      max={deckTo}
-                      onChange={(event) => setDeckFromInput(event.target.value)}
-                      aria-label="Filter negative comments from date"
-                      className="cursor-pointer rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-bold text-slate-700"
-                    />
-                  </label>
-                  <label className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                    To
-                    <input
-                      type="date"
-                      value={deckTo}
-                      min={deckFrom}
-                      max={defaultDeckTo}
-                      onChange={(event) => setDeckToInput(event.target.value)}
-                      aria-label="Filter negative comments to date"
-                      className="cursor-pointer rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-bold text-slate-700"
-                    />
-                  </label>
-                  {(deckFromInput || deckToInput || deckClassFilter !== "all") ? (
-                    <button
-                      onClick={() => {
-                        setDeckFromInput("");
-                        setDeckToInput("");
-                        setDeckClassFilter("all");
-                      }}
-                      className="cursor-pointer rounded-lg border border-violet-200 bg-white px-2.5 py-1.5 text-[11px] font-black text-violet-600 transition-colors duration-200 hover:bg-violet-50"
-                    >
-                      Reset
-                    </button>
-                  ) : null}
                 </div>
-              }
-              onOpen={(card) => openPanel(
-                card.kind === "summary" ? "All negative comments" : card.label,
-                `${card.count} negative written reviews · ${deckRangeLabel}`,
-                card.reviews
-              )}
-            />
+              </div>
+              <div className="h-[360px]">
+                {perfTrend.length ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={perfTrend} margin={{ top: 8, right: 18, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#e2e8f0" />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="left" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="right" orientation="right" domain={[1, 5]} tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} tickFormatter={(value) => `${value}★`} />
+                    <YAxis yAxisId="sentiment" hide domain={[0, 100]} />
+                    <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid #e2e8f0", boxShadow: "0 16px 40px rgba(15,23,42,0.12)" }} />
+                    <Bar yAxisId="left" dataKey="reviews" fill="#60a5fa" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                    <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#7c3aed" strokeWidth={2.8} dot={{ r: 4, strokeWidth: 2, fill: "#fff" }} connectNulls={false} isAnimationActive={false} />
+                    <Line yAxisId="sentiment" type="monotone" dataKey="sentiment" stroke="#10b981" strokeWidth={2.8} dot={false} connectNulls={false} isAnimationActive={false} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-sm text-slate-400">No review data in the {perfRangeLabel.toLowerCase()} window.</div>
+                )}
+              </div>
+            </Card>
+
+            <Card className="flex min-h-[420px] flex-col p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-500">Issue clustering</p>
+                  <h2 className="mt-1 text-xl font-semibold tracking-tight text-slate-950 dark:text-white">Issue clusters by volume</h2>
+                </div>
+                <span className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">{deckNegatives.length} incidents</span>
+              </div>
+              <div className="mt-5 grid flex-1 gap-3">
+                {incidentCategories.map((category) => {
+                  const priorityClass = category.priority === "P0"
+                    ? "bg-red-50 text-red-700"
+                    : category.priority === "P1"
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-slate-100 text-slate-600";
+                  return (
+                    <button
+                      key={category.label}
+                      type="button"
+                      onClick={() => category.examples.length ? openPanel(category.label, `${category.count} negative written reviews`, category.examples) : undefined}
+                      className="cursor-pointer rounded-2xl border border-slate-200 bg-white p-3 text-left transition-colors duration-200 hover:border-cyan-200 hover:bg-cyan-50/40"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2">
+                            <p className="truncate text-sm font-semibold text-slate-950">{category.label}</p>
+                            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold", priorityClass)}>{category.priority}</span>
+                          </div>
+                          <p className="mt-1 truncate text-xs text-slate-500">{category.share}% of negative reviews</p>
+                        </div>
+                        <p className="text-xl font-semibold text-slate-950">{category.count}</p>
+                      </div>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                        <div className="h-full rounded-full bg-cyan-500" style={{ width: `${Math.max(4, category.share)}%` }} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </Card>
           </motion.section>
 
+          <div className="hidden">
           {reviewNews.length ? (
             <motion.section variants={fadeUp as any}>
               <Card className="p-4">
@@ -1506,64 +1891,11 @@ export default function PlayStorePage() {
                 >
                   <Share2 className="h-4 w-4" /> {shareCopied ? "Link copied" : "Share"}
                 </button>
-                {data.livePulledAt ? (
-                  <span className="ml-auto flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-xs font-black text-emerald-700">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                    Last synced {new Date(data.livePulledAt).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
-                    {data.liveReviews?.length ? <span className="font-bold text-emerald-600">· {formatNumber(data.liveReviews.length)} live reviews</span> : null}
-                  </span>
-                ) : null}
               </div>
             </Card>
           </motion.section>
 
           <SectionBand index="01" title="Pulse" subtitle="How students rate and feel about the app right now" />
-
-          <motion.section variants={fadeUp as any} className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-              <MiniKpi title="Total Reviews" value={formatNumber(kpiReviewCount)} delta={timeWindow === "last30" ? "Last 30 calendar days" : `${monthlyTrend.length} uploaded months`}>
-                {tinySpark(reviewTrend, "reviews", "#2563eb")}
-              </MiniKpi>
-              <MiniKpi
-                title="Average Rating"
-                value={String(kpiAverageRating || "--")}
-                delta={`${Number(ratingDelta) >= 0 ? "+" : ""}${ratingDelta} vs previous month`}
-                tone={Number(ratingDelta) < 0 ? "negative" : "positive"}
-              >
-                <div className="mt-5"><RatingStars rating={kpiAverageRating} size="h-4 w-4" /></div>
-                {tinySpark(reviewTrend, "rating", "#8b5cf6")}
-              </MiniKpi>
-              <MiniKpi
-                title="Sentiment Score"
-                value={String(sentimentScore)}
-                delta={previousMonth.sentiment ? `${sentimentDelta >= 0 ? "+" : ""}${sentimentDelta} pts vs previous` : "No prior period"}
-                tone={sentimentDelta < 0 ? "negative" : sentimentDelta > 0 ? "positive" : "neutral"}
-              >
-                <RadialScore score={sentimentScore} />
-              </MiniKpi>
-              <MiniKpi
-                title="Critical Topics"
-                value={String(criticalTopicCount)}
-                delta={`${formatNumber(negativeCount)} low ratings · ${kpiLowRatingRate}%`}
-                tone={criticalTopicCount > 0 ? "negative" : "positive"}
-              >
-                <ResponsiveContainer width="100%" height={58}>
-                  <BarChart data={topTopics.slice(0, 12)}>
-                    <Bar dataKey="mentions" fill="#ef4444" radius={[2, 2, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </MiniKpi>
-              <MiniKpi title="Response Coverage" value={`${kpiReplyRate}%`} delta={`${formatNumber(kpiReplyCount)} replies estimated`} tone="neutral">
-                <RadialScore score={kpiReplyRate} color="#2563eb" />
-              </MiniKpi>
-              <MiniKpi
-                title="Unreplied Negatives"
-                value={formatNumber(unrepliedNegatives.length)}
-                delta={`${unrepliedNegativeRate}% of negative comments`}
-                tone={unrepliedNegatives.length > 0 ? "negative" : "positive"}
-              >
-                {tinySpark(reviewTrend, "sentiment", "#22c55e")}
-              </MiniKpi>
-          </motion.section>
 
           <div className="space-y-4">
               <div className="space-y-4">
@@ -1578,7 +1910,7 @@ export default function PlayStorePage() {
                           <span className="flex items-center gap-2"><span className="h-2 w-4 rounded-full bg-emerald-500" /> Sentiment Score</span>
                         </div>
                       </div>
-                      <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-600">{selectedWindowLabel}</span>
+                      <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-black text-slate-600">{graphRangeLabel}</span>
                     </div>
                     <div className="h-[300px]">
                       <ResponsiveContainer width="100%" height={300}>
@@ -1650,13 +1982,13 @@ export default function PlayStorePage() {
                         return (
                           <button
                             key={topic.id || topic.name}
-                            onClick={() => openPanel(topic.name, `${topic.mentions} mentions · Owner: ${topic.businessOwner}`, reviewsForTopic(topic))}
+                            onClick={() => openPanel(topic.name, `${topic.mentions} mentions`, reviewsForTopic(topic))}
                             className="w-full rounded-xl border border-slate-100 bg-slate-50 p-3 text-left hover:border-violet-200 hover:bg-violet-50/40"
                           >
                             <div className="flex items-center justify-between gap-3">
                               <div className="min-w-0">
                                 <p className="truncate text-xs font-black text-slate-900">{index + 1}. {topic.name}</p>
-                                <p className="mt-0.5 truncate text-[10px] font-medium text-slate-500">{topic.businessOwner || "Owner not assigned"} · {topic.severity || "medium"}</p>
+                                <p className="mt-0.5 truncate text-[10px] font-medium text-slate-500">{topic.mentions} mentions · {topic.severity || "medium"}</p>
                               </div>
                               <p className="shrink-0 text-xs font-black text-slate-700">{formatNumber(topic.mentions || 0)}</p>
                             </div>
@@ -1734,7 +2066,7 @@ export default function PlayStorePage() {
                             <div className="flex items-start justify-between gap-3">
                               <div>
                                 <p className="text-sm font-black text-slate-950">{category.label}</p>
-                                <p className="mt-1 text-xs font-semibold text-slate-500">Owner: {category.owner}</p>
+                                <p className="mt-1 text-xs font-semibold text-slate-500">{category.count} negative {category.count === 1 ? "review" : "reviews"}</p>
                               </div>
                               <span className="rounded-full bg-white px-2.5 py-1 text-xs font-black text-violet-700">{category.count}</span>
                             </div>
@@ -1772,7 +2104,9 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
-                <SectionBand index="03" title="Release Intelligence" subtitle="Which app versions are generating praise or pain" />
+          </div>
+
+                <SectionBand index="01" title="Release Intelligence" subtitle="Which app versions are generating praise or pain" />
 
                 <motion.section variants={fadeUp as any}>
                   <Card className="p-4">
@@ -1830,7 +2164,7 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
-                <SectionBand index="04" title="Ownership & Action" subtitle="Who needs to act next" />
+                <SectionBand index="02" title="Actionables" subtitle="Owner-ready tickets from the filtered review evidence" />
 
                 <motion.section variants={fadeUp as any}>
                   <Card className="p-4">
@@ -1852,10 +2186,10 @@ export default function PlayStorePage() {
                           </div>
                           <div className="mt-3 flex gap-2">
                             <button
-                              onClick={() => openPanel(`${item.project}: ${item.label}`, `Jira draft · ${item.issueType} · Assignee: ${item.owner}`, item.examples)}
+                              onClick={() => openJiraTicket(item)}
                               className="flex-1 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 hover:bg-violet-100"
                             >
-                              Create Jira draft
+                              Create JIRA ticket
                             </button>
                             <button
                               onClick={() => openPanel(item.label, `${item.count} comments routed to ${item.owner}`, item.examples)}
@@ -1870,6 +2204,7 @@ export default function PlayStorePage() {
                   </Card>
                 </motion.section>
 
+                <div className="hidden">
                 <SectionBand index="05" title="Journey & Opportunities" subtitle="Where the experience breaks and what to build next" />
 
                 <motion.section variants={fadeUp as any}>
@@ -1963,7 +2298,7 @@ export default function PlayStorePage() {
 
                   <Card className="flex min-h-[320px] flex-col p-4 min-[1700px]:col-span-2">
                     <SectionTitle title="Actionable AI Recommendations" subtitle="Owner-ready fixes from the review evidence" />
-                    <div className="min-h-0 flex-1 overflow-x-auto rounded-xl border border-slate-100">
+                    <DataTableShell className="min-h-0 flex-1">
                       <table className="w-full min-w-[620px] text-left text-xs">
                         <thead className="bg-slate-50 text-slate-500">
                           <tr>
@@ -1984,7 +2319,7 @@ export default function PlayStorePage() {
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                    </DataTableShell>
                   </Card>
 
                   <Card className="flex min-h-[320px] flex-col p-4">
@@ -2052,7 +2387,7 @@ export default function PlayStorePage() {
 
                 <Card className="p-4">
                   <h3 className="text-sm font-black">Cohort Snapshot</h3>
-                  <div className="mt-3 overflow-hidden rounded-xl border border-slate-100">
+                  <DataTableShell className="mt-3">
                     <table className="w-full text-left text-[11px]">
                       <thead className="bg-slate-50 text-slate-500">
                         <tr>
@@ -2080,14 +2415,15 @@ export default function PlayStorePage() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
+                  </DataTableShell>
                 </Card>
               </motion.section>
+              </div>
           </div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-3 text-xs text-slate-500">
               <span>All times in IST</span>
               <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-emerald-500" /> Data through {displayDate(data.dateRange?.to)}</span>
-              <span>Source: Play Console export + live Reviews API</span>
+              <span>Source: Play Store review data</span>
             </div>
         </motion.div>
       </main>

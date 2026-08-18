@@ -75,8 +75,8 @@ const config: Config = {
         "tremor-metric": ["1.875rem", { lineHeight: "2.25rem" }],
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
-        serif: ["Merriweather", "Georgia", "ui-serif", "serif"],
+        sans: ["var(--font-sans)", "Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["var(--font-sans)", "Outfit", "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },
   },

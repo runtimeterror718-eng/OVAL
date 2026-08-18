@@ -4,6 +4,8 @@ import { ragQuery, isRAGEnabled } from "@/lib/rag";
 import { isDemoMode, demoReddit } from "@/lib/demo-data";
 import { buildMonthlyTrend, buildTopicClusters } from "@/lib/social-analytics";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
+import { discoverRedditPosts } from "@/lib/reddit-discovery";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -168,6 +170,11 @@ const GOOGLE_INDEXED_REDDIT_FALLBACK = [
 ] as const;
 
 function isPWSpecificPost(post: any): boolean {
+  // Posts in PW's own subreddits are inherently on-topic — keep them all,
+  // even when a short title ("Help", "MARKS") carries no brand keyword.
+  const sub = String(post?.subreddit_name || "").toLowerCase().replace(/\s+/g, "");
+  if (sub === "physicswallah" || sub === "physicswala") return true;
+
   const text = [
     post?.post_title,
     post?.post_body,
@@ -186,15 +193,16 @@ async function getBrandIds(sb: any): Promise<string[]> {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("reddit", async () => {
   if (isDemoMode()) return NextResponse.json(demoReddit);
   const sb = createClient(url, key);
   const brandIds = await getBrandIds(sb);
   if (!brandIds.length) return NextResponse.json({ live: false });
   const brandId = brandIds[0];
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [postsRes, mentionsRes, embStatsRes, ragInsight] = await Promise.all([
-    sb.from("reddit_posts").select("*").in("brand_id", brandIds).gte("created_at", since).order("created_at", { ascending: false }).limit(150),
+  const [postsRes, mentionsRes, embStatsRes, ragInsight, discovery] = await Promise.all([
+    sb.from("reddit_posts").select("*").in("brand_id", brandIds).gte("created_at", since).order("created_at", { ascending: false }).limit(1000),
     sb.from("mentions").select("sentiment_label, sentiment_score, scraped_at").in("brand_id", brandIds).eq("platform", "reddit").gte("published_at", since).order("scraped_at", { ascending: true }).limit(500),
     // LLM-classified sentiment from embeddings (Reddit only)
     sb.from("mention_embeddings").select("sentiment_label").eq("brand_id", brandId).eq("platform", "reddit").not("sentiment_label", "is", null),
@@ -215,28 +223,60 @@ Provide:
 Be specific — this is data-driven intelligence, not speculation.`,
         })
       : Promise.resolve(null),
+    discoverRedditPosts().catch(() => ({
+      posts: [],
+      providers: {
+        google: { configured: Boolean(process.env.GOOGLE_API_KEY && process.env.GOOGLE_CSE_ID), ok: false, count: 0, error: "unavailable" },
+        exa: { configured: Boolean(process.env.EXA_API_KEY), ok: false, count: 0, error: "unavailable" },
+      },
+      fetchedAt: new Date().toISOString(),
+    })),
   ]);
 
   const livePosts = (postsRes.data || []).filter(isPWSpecificPost);
-  const mergedPosts = [...livePosts];
-  const seenPostIds = new Set(mergedPosts.map((post: any) => post.post_id).filter(Boolean));
+  const mergedPosts: any[] = [...livePosts, ...discovery.posts];
+  // Keep the recent, previously verified Google-indexed archive in the same
+  // 90-day evidence window. This is useful when the configured Programmable
+  // Search Engine returns no Reddit pages, while still excluding stale leads.
+  const discoverySince = Date.now() - 90 * 86400000;
+  const seenPostIds = new Set<string>(mergedPosts.map((post: any) => post.post_id).filter(Boolean));
   for (const fallbackPost of GOOGLE_INDEXED_REDDIT_FALLBACK) {
-    if (seenPostIds.has(fallbackPost.post_id)) continue;
+    const createdAt = new Date(fallbackPost.created_at).getTime();
+    if (createdAt < discoverySince || seenPostIds.has(fallbackPost.post_id)) continue;
     mergedPosts.push(fallbackPost);
     seenPostIds.add(fallbackPost.post_id);
   }
-  const posts = mergedPosts.slice(0, 50);
-  const postIds = posts.map((post: any) => post.post_id).filter(Boolean);
+  const postsByUrl = new Map<string, any>();
+  for (const post of mergedPosts) {
+    const key = String(post.post_url || post.post_id || "").replace(/[?#].*$/, "").replace(/\/$/, "").toLowerCase();
+    if (!key) continue;
+    const existing = postsByUrl.get(key);
+    if (!existing || (!existing.created_at && post.created_at) || (!existing.post_body && post.post_body)) postsByUrl.set(key, post);
+  }
+  const posts = Array.from(postsByUrl.values()).sort((a: any, b: any) => {
+    const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return bTime - aTime;
+  });
+  const livePostIds = new Set(livePosts.map((post: any) => post.post_id).filter(Boolean));
+  const postIds = posts.map((post: any) => post.post_id).filter((postId: string) => livePostIds.has(postId));
   const commentsRes = postIds.length
     ? await sb
         .from("reddit_comments")
         .select("comment_body, comment_author, comment_score, post_id, comment_depth, created_at, scraped_at, comment_sentiment_label")
         .in("post_id", postIds)
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(500)
+        .order("comment_score", { ascending: false })
+        .limit(2000)
     : { data: [] };
   const comments = commentsRes.data || [];
+
+  // Group top comments per post so each post can display its discussion.
+  const commentsByPost: Record<string, any[]> = {};
+  for (const c of comments) {
+    const pid = c.post_id;
+    if (!pid) continue;
+    (commentsByPost[pid] ||= []).push(c);
+  }
   const mentions = mentionsRes.data || [];
   const embStats = embStatsRes.data || [];
 
@@ -317,8 +357,8 @@ Be specific — this is data-driven intelligence, not speculation.`,
       fetchedAtValues: [...posts.map((post: any) => post.scraped_at), ...comments.map((comment: any) => comment.scraped_at), ...mentions.map((mention: any) => mention.scraped_at)],
       publishedAtValues: [...posts.map((post: any) => post.created_at), ...comments.map((comment: any) => comment.created_at)],
       limitations: [
-        "Current Reddit fetch quality depends on Reddit OAuth availability; RSS fallback can miss some conversations.",
-        "Live scraped posts are restricted to the last 30 days and PW-specific matches; Google-indexed Reddit fallback fills gaps when live Reddit is blocked.",
+        "Stored Reddit coverage depends on Reddit OAuth or Devvit availability; external discovery cannot retrieve every comment thread.",
+        "The view combines stored Reddit records with PW-specific Reddit pages discovered through Google Search and Exa over the last 90 days.",
         "Comments are scoped to the PW-specific posts shown in this dataset.",
       ],
     }),
@@ -370,11 +410,13 @@ Be specific — this is data-driven intelligence, not speculation.`,
       topSubreddit: topSub === "N/A" ? "N/A" : `r/${topSub}`,
       sentimentSource: hasVisibleSentiment ? "visible-30d-pw-posts" : (embTotal > 0 ? "llm-classified" : "rule-based"),
       totalEmbeddings: embTotal,
-      window: "last 30 days",
+      window: "last 90 days",
       liveScrapedPosts: livePosts.length,
-      googleFallbackPosts: posts.filter((post: any) => post.source_label).length,
+      googleDiscoveredPosts: posts.filter((post: any) => String(post.source_label || "").startsWith("Google Search")).length,
+      exaDiscoveredPosts: posts.filter((post: any) => String(post.source_label || "").startsWith("Exa")).length,
+      googleFallbackPosts: posts.filter((post: any) => String(post.source_label || "").includes("fallback")).length,
     },
-    posts: posts.slice(0, 20).map(p => ({
+    posts: posts.map(p => ({
       subreddit: p.subreddit_name,
       title: p.post_title,
       snippet: (p.post_body || "").slice(0, 150),
@@ -384,6 +426,13 @@ Be specific — this is data-driven intelligence, not speculation.`,
       source: p.source_label || "Live Reddit scrape",
       url: p.post_url,
       createdAt: p.created_at,
+      topComments: (commentsByPost[p.post_id] || []).slice(0, 8).map((c: any) => ({
+        author: c.comment_author,
+        body: c.comment_body,
+        score: c.comment_score,
+        sentiment: c.comment_sentiment_label || "neutral",
+        createdAt: c.created_at,
+      })),
     })),
     sentimentTrend: weeklyScores,
     monthlyTrend,
@@ -391,6 +440,33 @@ Be specific — this is data-driven intelligence, not speculation.`,
     clusters,
     totalComments: comments.length,
     subredditBreakdown: Object.entries(subCounts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count })),
+    meta: {
+      window: "last 90 days",
+      generatedAt: new Date().toISOString(),
+      totalPosts: posts.length,
+      totalComments: comments.length,
+      liveSources: Array.from(new Set(livePosts.map((p: any) => (p.raw_data?.source || "reddit").toString()))),
+      discovery: discovery.providers,
+      discoveryFetchedAt: discovery.fetchedAt,
+    },
+    // Fetch/pull activity log — one row per subreddit×source pull batch, from
+    // the stored posts' own timestamps (real ingestion record, not fabricated).
+    pullLog: Object.values(
+      livePosts.reduce((acc: Record<string, any>, p: any) => {
+        const sub = p.subreddit_name || "unknown";
+        const src = (p.raw_data?.source || "reddit-api").toString();
+        const key = `${sub}::${src}`;
+        const scraped = p.scraped_at || p.created_at;
+        if (!acc[key]) acc[key] = { subreddit: sub, source: src, posts: 0, comments: 0, firstPost: p.created_at, lastPost: p.created_at, pulledAt: scraped };
+        const row = acc[key];
+        row.posts += 1;
+        row.comments += Number(p.num_comments || 0);
+        if (p.created_at && p.created_at < row.firstPost) row.firstPost = p.created_at;
+        if (p.created_at && p.created_at > row.lastPost) row.lastPost = p.created_at;
+        if (scraped && scraped > row.pulledAt) row.pulledAt = scraped;
+        return acc;
+      }, {})
+    ).sort((a: any, b: any) => b.posts - a.posts),
     rag: ragInsight ? {
       enabled: true,
       analysis: ragInsight.answer,
@@ -399,5 +475,6 @@ Be specific — this is data-driven intelligence, not speculation.`,
       avgSimilarity: ragInsight.metadata.avgSimilarity,
       sentimentBreakdown: ragInsight.metadata.sentimentBreakdown,
     } : { enabled: false },
+  });
   });
 }

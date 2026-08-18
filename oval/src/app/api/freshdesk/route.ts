@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 import insights from "@/data/freshdesk-insights.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 
 export const dynamic = "force-static";
 
 export async function GET() {
+  return cachedIntelligenceResponse("freshdesk", async () => {
   const ticketSignals: TextSignal[] = [
     ...((insights as any).activeExamples || []).map((ticket: any) => ({
       id: ticket.ticketId,
@@ -35,7 +37,7 @@ export async function GET() {
       generatedAt: (insights as any).generatedAt,
       limitations: [
         "Built from uploaded Freshdesk CSV export, not live Freshdesk API.",
-        "The export has no created-at/resolved-at/SLA fields, so this is a queue composition snapshot, not latency trend analysis.",
+        "This CSV includes timestamps, but one export is still a queue composition snapshot rather than a trend or SLA recovery analysis.",
         "Support sentiment is inferred from issue type and urgency language; no CSAT/reopen fields are present.",
       ],
     }),
@@ -65,5 +67,6 @@ export async function GET() {
     live: true,
     contract,
     ...insights,
+  });
   });
 }

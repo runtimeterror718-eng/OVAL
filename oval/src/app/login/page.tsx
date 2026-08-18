@@ -1,111 +1,71 @@
-"use client";
+import { ArrowUpRight, Check } from "lucide-react";
+import { OvalLogo } from "@/components/brand/oval-logo";
+import "./login.css";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Lock, Mail } from "lucide-react";
+const DEFAULT_NEXT = "/audience-intelligence/overview";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+const ERROR_MESSAGES: Record<string, string> = {
+  google_not_configured: "Google sign-in has not been configured for this environment.",
+  google_unavailable: "Google sign-in is currently unavailable. Please try again.",
+  google_callback_failed: "Google could not verify this sign-in. Please try again.",
+  google_domain_denied: "Use a Google account issued on the @pw.live domain.",
+};
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setError(null);
-    setSubmitting(true);
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      if (response.ok) {
-        router.push("/playstore");
-        router.refresh();
-        return;
-      }
-      const payload = await response.json().catch(() => ({}));
-      setError(payload.error || "Login failed. Please try again.");
-    } catch {
-      setError("Could not reach the server. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams?: { next?: string; error?: string };
+}) {
+  const next = safeNext(searchParams?.next);
+  const error = searchParams?.error ? ERROR_MESSAGES[searchParams.error] : null;
 
   return (
-    <div className="grid min-h-screen place-items-center bg-gradient-to-br from-slate-950 via-[#1d1640] to-violet-950 p-4">
-      <div className="w-full max-w-md">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
-          <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white p-1.5">
-              <Image src="/google-play.webp" alt="Google Play" width={32} height={32} className="h-8 w-8 object-contain" />
-            </span>
-            <div>
-              <h1 className="text-lg font-black text-white">OVAL · Play Store Intelligence</h1>
-              <p className="text-xs text-white/60">Restricted preview - PW team access only</p>
-            </div>
+    <main className="oval-login" id="main-content">
+      <div className="oval-login-ambient oval-login-ambient-one" />
+      <div className="oval-login-ambient oval-login-ambient-two" />
+
+      <section className="oval-login-shell">
+        <article className="oval-login-story">
+          <header className="oval-login-brand" aria-label="OVAL Brand Intelligence">
+            <OvalLogo className="oval-login-brand-mark oval-logo-image" priority />
+            <span><strong>OVAL</strong><small>BRAND INTELLIGENCE</small></span>
+          </header>
+
+          <div className="oval-login-story-copy">
+            <h1><span>What people say today</span><span>shapes what happens</span><em>tomorrow</em></h1>
+            <p className="oval-login-lede">Unified brand intelligence to analyze social sentiment, detect public backlash, block unauthorized piracy, and eliminate brand fraud in real time.</p>
           </div>
 
-          <form onSubmit={submit} className="mt-8 space-y-4">
-            <label className="block">
-              <span className="text-[11px] font-black uppercase tracking-[0.16em] text-white/50">PW email ID</span>
-              <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 focus-within:border-violet-400">
-                <Mail className="h-4 w-4 shrink-0 text-white/40" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="you@pw.live"
-                  autoComplete="email"
-                  className="w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/30"
-                />
-              </div>
-            </label>
-            <label className="block">
-              <span className="text-[11px] font-black uppercase tracking-[0.16em] text-white/50">Access password</span>
-              <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 focus-within:border-violet-400">
-                <Lock className="h-4 w-4 shrink-0 text-white/40" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Shared access password"
-                  autoComplete="current-password"
-                  className="w-full bg-transparent text-sm font-semibold text-white outline-none placeholder:text-white/30"
-                />
-              </div>
-            </label>
-            {error ? (
-              <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-2.5 text-xs font-bold text-red-300">{error}</p>
-            ) : null}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full cursor-pointer rounded-xl bg-violet-600 px-4 py-3 text-sm font-black text-white transition-colors duration-200 hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {submitting ? "Checking..." : "Open dashboard"}
-            </button>
-          </form>
+          <div className="oval-login-capabilities" aria-label="Platform capabilities">
+            <span><Check size={13} /> Cross-channel listening</span>
+            <span><Check size={13} /> Semantic issue discovery</span>
+            <span><Check size={13} /> Evidence-led decisions</span>
+          </div>
+          <div className="oval-login-signal" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+        </article>
 
-          <p className="mt-6 text-center text-[11px] leading-relaxed text-white/40">
-            Only @pw.live email IDs are allowed. Need the access password?{" "}
-            <a
-              href="https://slack.com/app_redirect?channel=D0391KS8R33"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="cursor-pointer font-black text-violet-300 underline decoration-violet-400/40 underline-offset-2 transition-colors duration-200 hover:text-violet-200"
-            >
-              Contact Abhishek on Slack
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
+        <section className="oval-login-card" aria-label="Google sign in">
+          <div className="oval-login-card-glow" />
+          <div className="oval-login-card-content">
+            {error ? <p className="oval-login-message error" role="alert">{error}</p> : null}
+
+            <div className="oval-login-auth-action">
+              <a className="oval-google-cta" href={`/api/auth/google?next=${encodeURIComponent(next)}`} aria-label="Sign in with Google">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.7A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14a6 6 0 0 1 0-3.9V7.4H3a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A9.7 9.7 0 0 0 3 7.4l3.4 2.7A6 6 0 0 1 12 5.9Z"/></svg>
+                <span>Sign in with Google</span>
+                <ArrowUpRight size={17} />
+              </a>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
   );
+}
+
+function safeNext(value: unknown) {
+  const candidate = String(value || DEFAULT_NEXT);
+  return candidate.startsWith("/") && !candidate.startsWith("//")
+    ? candidate
+    : DEFAULT_NEXT;
 }

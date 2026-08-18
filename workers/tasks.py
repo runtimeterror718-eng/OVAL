@@ -6,6 +6,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+
+import httpx
 
 from workers.celery_app import app
 from brand.monitor import get_monitored_brands
@@ -847,3 +850,43 @@ def send_weekly_report():
             send_email_report(brand["name"], report)
         except Exception:
             logger.exception("Weekly report failed for %s", brand["name"])
+
+
+@app.task(bind=True, max_retries=2, default_retry_delay=60, name="workers.tasks.process_shield_crawl_queue")
+def process_shield_crawl_queue(self, max_jobs: int = 5):
+    """Drain a bounded number of persisted Shield jobs; each claim is idempotent."""
+    from shield.worker import process_next_job
+
+    output = []
+    for _ in range(max(1, min(max_jobs, 20))):
+        result = _run_async(process_next_job())
+        output.append(result)
+        if result.get("status") in {"idle", "contended"}:
+            break
+    return output
+
+
+@app.task(bind=True, max_retries=2, default_retry_delay=300, name="workers.tasks.run_gati_scheduled_discovery")
+def run_gati_scheduled_discovery(self, max_results: int = 50):
+    """Trigger the private, idempotent Gati discovery workflow."""
+    base_url = os.getenv("OVAL_INTERNAL_URL", "http://127.0.0.1:3001").rstrip("/")
+    token = os.getenv("SHIELD_TRIGGER_TOKEN", "")
+    if not token:
+        raise RuntimeError("SHIELD_TRIGGER_TOKEN is required for Gati scheduling")
+    try:
+        response = httpx.post(
+            f"{base_url}/api/shield/gati/scheduled",
+            headers={"x-shield-trigger-token": token},
+            json={
+                "threatType": "all",
+                "dateScope": "30d",
+                "maxResults": max(1, min(int(max_results), 100)),
+                "sources": ["exa", "certificate_transparency", "oval_social"],
+            },
+            timeout=300,
+        )
+        response.raise_for_status()
+        return response.json()
+    except Exception as exc:
+        logger.exception("Gati scheduled discovery failed")
+        raise self.retry(exc=exc)

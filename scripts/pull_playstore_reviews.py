@@ -28,10 +28,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 KEY_PATH = REPO_ROOT / "secrets" / "playstore-service-account.json"
 LIVE_PATH = REPO_ROOT / "oval" / "src" / "data" / "playstore-live-reviews.json"
 LOG_PATH = REPO_ROOT / "oval" / "src" / "data" / "playstore-pull-log.json"
-PACKAGE = "xyz.penpencil.physicswala"
 SCOPE = "https://www.googleapis.com/auth/androidpublisher"
-BASE_URL = f"https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{PACKAGE}/reviews"
 MAX_LOG_ENTRIES = 100
+BATCH_SIZE = 500
 
 SUPABASE_TABLE = os.getenv("PLAYSTORE_REVIEWS_TABLE", "playstore_reviews")
 
@@ -46,12 +45,19 @@ def _load_env_file(path: Path) -> None:
         key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
+        if key and not os.environ.get(key):
             os.environ[key] = value
 
 
 _load_env_file(REPO_ROOT / "oval" / ".env.local")
+_load_env_file(REPO_ROOT / "secrets" / ".env.keys")
 _load_env_file(REPO_ROOT / ".env")
+
+PLAYSTORE_PACKAGES = [
+    package.strip()
+    for package in os.getenv("PLAYSTORE_PACKAGES", "xyz.penpencil.physicswala,ai.ncert.physicswala").split(",")
+    if package.strip()
+]
 
 
 def _token() -> str:
@@ -91,16 +97,17 @@ def _normalize(review: dict) -> dict | None:
     }
 
 
-def fetch_all() -> list[dict]:
+def fetch_all(package: str) -> list[dict]:
     token = _token()
     headers = {"Authorization": f"Bearer {token}"}
     reviews: list[dict] = []
     page_token: str | None = None
+    base_url = f"https://androidpublisher.googleapis.com/androidpublisher/v3/applications/{package}/reviews"
     while True:
         params: dict = {"maxResults": 100}
         if page_token:
             params["token"] = page_token
-        resp = requests.get(BASE_URL, headers=headers, params=params, timeout=30)
+        resp = requests.get(base_url, headers=headers, params=params, timeout=30)
         resp.raise_for_status()
         payload = resp.json()
         for raw in payload.get("reviews", []):
@@ -142,7 +149,7 @@ def _supabase_credentials() -> tuple[str | None, str | None]:
 
 def _supabase_row(review: dict) -> dict:
     return {
-        "package_name": PACKAGE,
+        "package_name": review.get("packageName") or "xyz.penpencil.physicswala",
         "review_id": review.get("reviewId"),
         "author": review.get("author"),
         "rating": review.get("rating"),
@@ -169,30 +176,34 @@ def _upsert_supabase(reviews: list[dict]) -> dict:
         return {"enabled": bool(url and key), "upserted": 0, "error": None}
     try:
         endpoint = f"{url.rstrip('/')}/rest/v1/{SUPABASE_TABLE}"
-        response = requests.post(
-            endpoint,
-            params={"on_conflict": "review_id"},
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/json",
-                "Prefer": "resolution=merge-duplicates",
-            },
-            json=rows,
-            timeout=60,
-        )
-        response.raise_for_status()
-        return {"enabled": True, "upserted": len(rows), "error": None}
+        upserted = 0
+        for start in range(0, len(rows), BATCH_SIZE):
+            batch = rows[start:start + BATCH_SIZE]
+            response = requests.post(
+                endpoint,
+                params={"on_conflict": "review_id"},
+                headers={
+                    "apikey": key,
+                    "Authorization": f"Bearer {key}",
+                    "Content-Type": "application/json",
+                    "Prefer": "resolution=merge-duplicates",
+                },
+                json=batch,
+                timeout=60,
+            )
+            response.raise_for_status()
+            upserted += len(batch)
+        return {"enabled": True, "upserted": upserted, "error": None}
     except Exception as err:  # noqa: BLE001 - keep local cache alive if Supabase fails
         return {"enabled": True, "upserted": 0, "error": str(err)[:300]}
 
 
-def pull_once() -> dict:
+def pull_once_for_package(package: str) -> dict:
     pulled_at = datetime.now(timezone.utc).isoformat()
     store = _load_json(LIVE_PATH, {"reviews": {}})
     existing = store.get("reviews", {})
     try:
-        fetched = fetch_all()
+        fetched = fetch_all(package)
     except requests.HTTPError as err:
         status = err.response.status_code if err.response is not None else "?"
         detail = ""
@@ -203,37 +214,40 @@ def pull_once() -> dict:
         message = f"HTTP {status}: {detail or err}"
         if status == 403:
             message += " (service account not yet authorized in Play Console, or permission still propagating)"
-        _append_log({"pulledAt": pulled_at, "status": "error", "fetched": 0, "new": 0, "updated": 0,
+        _append_log({"pulledAt": pulled_at, "package": package, "status": "error", "fetched": 0, "new": 0, "updated": 0,
                      "totalStored": len(existing), "message": message})
-        print(f"[pull] ERROR {message}")
+        print(f"[pull] {package} ERROR {message}")
         return {"status": "error", "message": message}
     except Exception as err:  # noqa: BLE001 - log and surface any pull failure
-        _append_log({"pulledAt": pulled_at, "status": "error", "fetched": 0, "new": 0, "updated": 0,
+        _append_log({"pulledAt": pulled_at, "package": package, "status": "error", "fetched": 0, "new": 0, "updated": 0,
                      "totalStored": len(existing), "message": str(err)[:300]})
-        print(f"[pull] ERROR {err}")
+        print(f"[pull] {package} ERROR {err}")
         return {"status": "error", "message": str(err)}
 
     new_count = 0
     updated_count = 0
     for review in fetched:
+        review["packageName"] = package
         rid = review["reviewId"]
-        if rid not in existing:
+        local_key = f"{package}:{rid}"
+        if local_key not in existing:
             new_count += 1
-            existing[rid] = review
-        elif existing[rid].get("date") != review.get("date") or existing[rid].get("replied") != review.get("replied"):
+            existing[local_key] = review
+        elif existing[local_key].get("date") != review.get("date") or existing[local_key].get("replied") != review.get("replied"):
             updated_count += 1
-            existing[rid] = review
+            existing[local_key] = review
 
-    supabase_result = _upsert_supabase(list(existing.values()))
+    supabase_result = _upsert_supabase(fetched)
 
     store = {
-        "package": PACKAGE,
+        "packages": PLAYSTORE_PACKAGES,
         "lastPulledAt": pulled_at,
         "reviews": existing,
     }
     LIVE_PATH.write_text(json.dumps(store, indent=1))
     _append_log({
         "pulledAt": pulled_at,
+        "package": package,
         "status": "ok",
         "fetched": len(fetched),
         "new": new_count,
@@ -245,13 +259,22 @@ def pull_once() -> dict:
     suffix = f" supabase_upserted={supabase_result['upserted']}" if supabase_result["enabled"] else " supabase=disabled"
     if supabase_result["error"]:
         suffix += f" supabase_error={supabase_result['error']}"
-    print(f"[pull] ok fetched={len(fetched)} new={new_count} updated={updated_count} total={len(existing)}{suffix}")
+    print(f"[pull] {package} ok fetched={len(fetched)} new={new_count} updated={updated_count} total={len(existing)}{suffix}")
     return {
         "status": "ok",
+        "package": package,
         "fetched": len(fetched),
         "new": new_count,
         "updated": updated_count,
         "supabase_upserted": supabase_result["upserted"],
+    }
+
+
+def pull_once() -> dict:
+    results = [pull_once_for_package(package) for package in PLAYSTORE_PACKAGES]
+    return {
+        "status": "ok" if all(result.get("status") == "ok" for result in results) else "partial",
+        "results": results,
     }
 
 

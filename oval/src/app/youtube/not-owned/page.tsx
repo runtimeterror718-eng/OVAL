@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, CalendarDays, ExternalLink, Eye, Flame, MessageCircle, Play, Search, ThumbsUp } from "lucide-react";
 import RAGInsight from "@/components/dashboard/rag-insight";
 import { PageSkeleton } from "@/components/ui/page-skeleton";
+import { VectorChannelSummary } from "@/components/dashboard/vector-channel-summary";
 import { fadeUp, stagger } from "@/lib/animations";
 import { useLiveData } from "@/lib/use-live-data";
 import { cn, formatNumber } from "@/lib/utils";
@@ -58,6 +59,15 @@ export default function YouTubePage() {
       <motion.div variants={fadeUp as any}>
         <div className="flex items-center gap-3"><Play className="h-5 w-5 text-red-500" /><h1 className="text-2xl font-bold tracking-tight">YouTube Intelligence</h1></div>
         <p className="mt-0.5 text-sm text-muted-foreground">Shorts, videos, comments, and creator narratives students are actually watching.</p>
+      </motion.div>
+
+      <motion.div variants={fadeUp as any}>
+        <VectorChannelSummary
+          platform="youtube"
+          accent="#FF0000"
+          fallbackHeadline="Complaint-led creator videos are leading the YouTube conversation, while positive exam-prep momentum remains visible."
+          fallbackSummary={`${formatNumber(stats.totalVideos || 0)} videos across ${formatNumber(stats.totalChannels || 0)} channels have been captured, including ${formatNumber(stats.prRiskCount || 0)} items requiring PR review.`}
+        />
       </motion.div>
 
       <motion.section variants={fadeUp as any} className="rounded-2xl border border-red-200 bg-card p-5 dark:border-red-800/40">

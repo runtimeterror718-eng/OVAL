@@ -9,6 +9,7 @@ Auth: None for RSS | Text-only (no transcription needed)
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import Any
 from urllib.parse import quote_plus
 
@@ -17,9 +18,21 @@ import trafilatura
 
 from scrapers.base import BaseScraper
 from search.engine import register_searcher
-from search.filters import SearchParams
+from search.filters import SearchParams, in_window
 
 logger = logging.getLogger(__name__)
+
+
+def _parse_rss_date(published: str | None) -> datetime | None:
+    """Parse an RSS pubDate (RFC 822, e.g. 'Thu, 21 May 2026 07:00:00 GMT')."""
+    if not published:
+        return None
+    from email.utils import parsedate_to_datetime
+
+    try:
+        return parsedate_to_datetime(published)
+    except (TypeError, ValueError):
+        return None
 
 
 class SEONewsScraper(BaseScraper):
@@ -30,12 +43,23 @@ class SEONewsScraper(BaseScraper):
         import asyncio
 
         query = " ".join(params.keywords)
+        # Google News RSS honors the after:/before: query operators (YYYY-MM-DD),
+        # giving a real date window instead of just "latest news".
+        if params.after_date:
+            query += f" after:{params.after_date.date().isoformat()}"
+        if params.before_date:
+            query += f" before:{params.before_date.date().isoformat()}"
         rss_url = f"https://news.google.com/rss/search?q={quote_plus(query)}&hl=en"
         results = []
 
         def _fetch():
             feed = feedparser.parse(rss_url)
             for entry in feed.entries[: params.max_results_per_platform]:
+                # Exact-window guard in case RSS returns out-of-range entries.
+                published = entry.get("published")
+                published_dt = _parse_rss_date(published)
+                if published and not in_window(published_dt, params.after_date, params.before_date):
+                    continue
                 # Extract full article text
                 full_text = ""
                 try:
@@ -55,7 +79,9 @@ class SEONewsScraper(BaseScraper):
                     "shares": 0,
                     "comments_count": 0,
                     "source_url": entry.get("link", ""),
-                    "published_at": entry.get("published"),
+                    # Normalize to ISO-8601 so the unified mentions table and
+                    # fulfillment's datetime.fromisoformat() stay consistent.
+                    "published_at": published_dt.isoformat() if published_dt else None,
                     "language": "en",
                     "raw_data": dict(entry),
                 })

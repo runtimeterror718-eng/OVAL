@@ -66,12 +66,14 @@ class ProxyPool:
 
     def next(self) -> str:
         with self._lock:
+            if not self._proxies:
+                return ""  # no proxy configured → caller falls back to direct route
             proxy = self._proxies[self._idx % len(self._proxies)]
             self._idx += 1
             return proxy
 
     def random(self) -> str:
-        return random.choice(self._proxies)
+        return random.choice(self._proxies) if self._proxies else ""
 
 
 _proxy_pool = ProxyPool()
@@ -435,6 +437,120 @@ def _parse_api_media(item: dict, source_account: str = "") -> dict[str, Any]:
     }
 
 
+def _parse_web_profile_node(node: dict, source_account: str = "") -> dict[str, Any]:
+    """Parse a timeline node from web_profile_info into our standard format.
+
+    web_profile_info uses GraphQL field names (edge_*, *_timestamp) rather than
+    the v1 feed API names, so it needs its own parser.
+    """
+    shortcode = node.get("shortcode", "")
+    cap_edges = node.get("edge_media_to_caption", {}).get("edges", [])
+    caption_text = cap_edges[0]["node"]["text"] if cap_edges else ""
+    hashtags = re.findall(r"#(\w+)", caption_text)
+
+    is_video = node.get("is_video", False)
+    product_type = node.get("product_type", "")
+    typename = node.get("__typename", "")
+    if product_type == "clips" or typename == "GraphSidecar" and is_video:
+        content_type = "reel" if product_type == "clips" else "video"
+    elif typename == "GraphSidecar":
+        content_type = "carousel"
+    elif is_video:
+        content_type = "video"
+    else:
+        content_type = "image"
+
+    views = node.get("video_view_count", 0) or 0
+    likes = node.get("edge_liked_by", {}).get("count", 0) or node.get("edge_media_preview_like", {}).get("count", 0) or 0
+    comments = node.get("edge_media_to_comment", {}).get("count", 0) or 0
+
+    taken_at = node.get("taken_at_timestamp", 0) or 0
+    published_date = (
+        datetime.fromtimestamp(taken_at, tz=timezone.utc).isoformat() if taken_at else None
+    )
+    owner = node.get("owner", {})
+
+    return {
+        "post_id": shortcode or str(node.get("id", "")),
+        "account_name": owner.get("username", "") or source_account,
+        "caption_text": caption_text,
+        "like_count": likes,
+        "comment_count": comments,
+        "media_type": content_type,
+        "published_date": published_date,
+        "hashtags": hashtags,
+        "post_url": f"https://www.instagram.com/{'reel' if content_type == 'reel' else 'p'}/{shortcode}/",
+        "video_views": views,
+        "reel_plays": views if content_type == "reel" else 0,
+        "video_duration": round(node.get("video_duration", 0) or 0),
+        "thumbnail_url": node.get("display_url", ""),
+        "raw_data": {
+            "pk": str(node.get("id", "")),
+            "code": shortcode,
+            "source_account": source_account,
+            "user_id": str(owner.get("id", "")),
+            "source": "web_profile_info",
+        },
+    }
+
+
+def _scrape_profile_direct(
+    username: str,
+    max_posts: int = 30,
+    after_ts: float | None = None,
+    before_ts: float | None = None,
+) -> list[dict[str, Any]]:
+    """Direct (no-proxy) fallback: pull recent posts from web_profile_info.
+
+    Used when the proxied v1 feed API is blocked (e.g. proxy auth 407). Returns
+    the ~12 most recent timeline posts IG embeds in the profile payload, filtered
+    to the date window. Uses exponential backoff for transient blocks.
+    """
+    from scrapers.base import fetch_with_backoff
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ),
+        "X-IG-App-ID": "936619743392459",
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept": "*/*",
+    }
+    resp = fetch_with_backoff(
+        "https://www.instagram.com/api/v1/users/web_profile_info/",
+        params={"username": username}, headers=headers, label=f"ig-direct@{username}",
+    )
+    if resp is None or resp.status_code != 200:
+        logger.warning(
+            "IG direct fallback failed for @%s (%s)",
+            username, resp.status_code if resp else "no-response",
+        )
+        return []
+
+    try:
+        user = resp.json()["data"]["user"]
+    except (KeyError, ValueError, TypeError):
+        logger.warning("IG direct fallback: unexpected payload for @%s", username)
+        return []
+
+    edges = user.get("edge_owner_to_timeline_media", {}).get("edges", [])
+    posts: list[dict[str, Any]] = []
+    for edge in edges:
+        node = edge.get("node", {})
+        taken_at = node.get("taken_at_timestamp", 0) or 0
+        if after_ts is not None and taken_at and taken_at < after_ts:
+            continue
+        if before_ts is not None and taken_at and taken_at > before_ts:
+            continue
+        posts.append(_parse_web_profile_node(node, source_account=username))
+        if len(posts) >= max_posts:
+            break
+
+    logger.info("Scraped @%s via direct fallback: %d posts", username, len(posts))
+    return posts
+
+
 def _caption_mentions_pw(caption: str, hashtags: list[str]) -> bool:
     """Check if caption/hashtags mention PW in any form.
 
@@ -497,13 +613,24 @@ def _scrape_profile(
     username: str,
     rate_limiter: AdaptiveRateLimiter,
     max_posts: int = 30,
+    after_ts: float | None = None,
+    before_ts: float | None = None,
 ) -> list[dict[str, Any]]:
     """Scrape recent posts from a profile via IG's v1 feed API.
 
     Uses curl_cffi (Chrome TLS fingerprint) + Indian residential proxy.
     This combination bypasses all layers of IG's anti-bot detection.
+
+    When ``after_ts`` is set, the feed (newest-first) is paginated until a post
+    older than the window is seen, then stops. Posts outside [after_ts,
+    before_ts] are dropped. ``max_posts`` still caps total returned posts.
     """
     proxy = _proxy_pool.next()
+    # No proxy configured → skip the proxied path entirely and use the direct route.
+    if not proxy:
+        logger.info("No proxy configured; using direct route for @%s", username)
+        return _scrape_profile_direct(username, max_posts=max_posts, after_ts=after_ts, before_ts=before_ts)
+
     proxy_label = proxy.split("@")[1] if "@" in proxy else proxy
     logger.info("Using proxy %s for @%s", proxy_label, username)
 
@@ -517,15 +644,20 @@ def _scrape_profile(
             return []
         logger.info("Profile @%s loaded: user_id=%s", username, user_id)
     except Exception as e:
-        logger.warning("Could not get user ID for @%s: %s", username, e)
-        return []
+        # Proxy dead / blocked (e.g. 407) — fall back to the direct, proxy-less
+        # web_profile_info route, which also carries recent timeline posts.
+        logger.warning("Proxied route failed for @%s (%s); trying direct fallback", username, e)
+        return _scrape_profile_direct(username, max_posts=max_posts, after_ts=after_ts, before_ts=before_ts)
 
     # Step 2: Paginate through the feed
     posts = []
     max_id = ""
     pages = 0
+    # A date window may need deeper pagination than the default recent-posts cap.
+    max_pages = 20 if after_ts is not None else 5
+    reached_window_end = False
 
-    while len(posts) < max_posts and pages < 5:
+    while len(posts) < max_posts and pages < max_pages and not reached_window_end:
         rate_limiter.wait()
 
         params = {"count": "33"}
@@ -552,6 +684,14 @@ def _scrape_profile(
                 break
 
             for item in items:
+                taken_at = item.get("taken_at", 0) or 0
+                # Feed is newest-first: once we drop below the window start,
+                # every subsequent post is older — stop paginating.
+                if after_ts is not None and taken_at and taken_at < after_ts:
+                    reached_window_end = True
+                    break
+                if before_ts is not None and taken_at and taken_at > before_ts:
+                    continue  # too new (pinned/future-dated) — skip but keep going
                 parsed = _parse_api_media(item, source_account=username)
                 posts.append(parsed)
                 if len(posts) >= max_posts:
@@ -566,6 +706,11 @@ def _scrape_profile(
             rate_limiter.report_error()
             logger.warning("Feed API error for @%s: %s", username, e)
             break
+
+    # If the proxied feed yielded nothing (soft block), try the direct route.
+    if not posts:
+        logger.info("Proxied feed empty for @%s; trying direct fallback", username)
+        return _scrape_profile_direct(username, max_posts=max_posts, after_ts=after_ts, before_ts=before_ts)
 
     logger.info("Scraped @%s: %d posts (via %s)", username, len(posts), proxy_label)
     return posts
@@ -849,6 +994,9 @@ class InstagramScraper(BaseScraper):
 
         max_per = max(params.max_results_per_platform // max(len(accounts), 1), 20)
 
+        after_ts = params.after_date.timestamp() if params.after_date else None
+        before_ts = params.before_date.timestamp() if params.before_date else None
+
         # --- STEP 1: Scrape all accounts (with delay between accounts) ---
         all_posts: list[dict] = []
         for i, username in enumerate(accounts):
@@ -864,7 +1012,7 @@ class InstagramScraper(BaseScraper):
             elif username in ECOSYSTEM_ACCOUNTS:
                 source_type = "ecosystem"
 
-            posts = _scrape_profile(username, self._rate_limiter, max_posts=max_per)
+            posts = _scrape_profile(username, self._rate_limiter, max_posts=max_per, after_ts=after_ts, before_ts=before_ts)
             for p in posts:
                 p["source_type"] = source_type
                 p.setdefault("raw_data", {})["source_type"] = source_type
@@ -991,6 +1139,8 @@ class InstagramScraper(BaseScraper):
         enable_reel_transcription: bool = True,
         enable_llm_triage: bool = True,
         enable_comment_classification: bool = True,
+        after_date: datetime | None = None,
+        before_date: datetime | None = None,
     ) -> dict[str, Any]:
         """
         Full 3-layer pipeline:
@@ -1004,6 +1154,8 @@ class InstagramScraper(BaseScraper):
             platforms=["instagram"],
             brand_id=brand_id,
             max_results_per_platform=max_posts_per_account * max(len(accounts or []), 1),
+            after_date=after_date,
+            before_date=before_date,
         )
         params._ig_accounts = accounts or []
 
@@ -1184,7 +1336,15 @@ def main():
     parser.add_argument("--keywords", default="", help="Extra keywords for filtering")
     parser.add_argument("--max-posts", type=int, default=30, help="Max posts per account")
     parser.add_argument("--max-comments", type=int, default=30, help="Max comments per post")
+    parser.add_argument("--days", type=int, default=0,
+                        help="Backfill window in days (0 = recent posts only)")
     args = parser.parse_args()
+
+    from datetime import timedelta
+    after_date = before_date = None
+    if args.days > 0:
+        before_date = datetime.now(timezone.utc)
+        after_date = before_date - timedelta(days=args.days)
 
     accounts = [a.strip() for a in args.accounts.split(",") if a.strip()]
     hashtags = [h.strip() for h in args.hashtags.split(",") if h.strip()]
@@ -1211,6 +1371,7 @@ def main():
     print(f"  PW keywords: {len(PW_MENTION_KEYWORDS)} built-in + {len(keywords)} custom")
     print(f"  Max posts/account: {args.max_posts}")
     print(f"  Max comments/post: {args.max_comments}")
+    print(f"  Window:     {f'last {args.days}d' if args.days > 0 else 'recent posts'}")
     print(f"  LLM Triage: ON | Reel Whisper: ON | Comment Classification: ON")
     print(f"{'='*60}")
     print()
@@ -1236,6 +1397,8 @@ def main():
             accounts=accounts,
             max_posts_per_account=args.max_posts,
             max_comments_per_post=args.max_comments,
+            after_date=after_date,
+            before_date=before_date,
         ))
     finally:
         loop.run_until_complete(scraper.close())
