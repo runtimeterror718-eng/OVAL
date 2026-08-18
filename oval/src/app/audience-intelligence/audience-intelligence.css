@@ -401,6 +401,7 @@
 .ai-comment-list article > footer a:hover { text-decoration: underline; }
 .ai-comment-compact { padding: 16px 18px !important; }
 .ai-comment-compact .ai-comment-preview { display: -webkit-box; overflow: hidden; font-size: 13px; line-height: 1.55; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.ai-comment-compact .ai-comment-preview.is-full { display: block; overflow: visible; white-space: pre-wrap; -webkit-box-orient: initial; -webkit-line-clamp: unset; }
 .ai-comment-empty { background: rgba(255,255,255,.55) !important; }
 .ai-comment-pagination { position: sticky; bottom: -28px; display: flex; align-items: center; justify-content: center; gap: 7px; margin: 20px -34px -34px; padding: 16px 34px; border-top: 1px solid var(--ai-line); background: rgba(248,248,245,.94); backdrop-filter: blur(14px); }
 .ai-comment-pagination button { display: inline-grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid var(--ai-line); border-radius: 50%; background: #fff; color: #1d1e1b; font-size: 11px; font-weight: 700; cursor: pointer; }
