@@ -1,4 +1,5 @@
 export const ACCESS_SESSION_COOKIE = "oval_access_session";
+export const AUTH_NEXT_COOKIE = "oval_auth_next";
 export const PW_EMAIL_PATTERN = /^[a-z0-9._%+-]+@pw\.live$/i;
 
 const SESSION_TTL_SECONDS = 60 * 60 * 12;

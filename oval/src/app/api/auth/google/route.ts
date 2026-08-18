@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { resolvePublicOrigin } from "@/lib/access-session";
+import { AUTH_NEXT_COOKIE, resolvePublicOrigin } from "@/lib/access-session";
 import { createOAuthClient } from "@/lib/supabase-oauth";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   if (!oauth) return loginFailure(origin, next, "google_not_configured");
 
   const callback = new URL("/api/auth/callback", origin);
-  callback.searchParams.set("next", next);
   const { data, error } = await oauth.client.auth.signInWithOAuth({
     provider: "google",
     options: {
@@ -27,7 +26,15 @@ export async function GET(request: NextRequest) {
   });
 
   if (error || !data.url) return loginFailure(origin, next, "google_unavailable");
-  return oauth.applyCookies(NextResponse.redirect(data.url));
+  const response = oauth.applyCookies(NextResponse.redirect(data.url));
+  response.cookies.set(AUTH_NEXT_COOKIE, next, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 10,
+  });
+  return response;
 }
 
 function safeNext(value: string | null) {
