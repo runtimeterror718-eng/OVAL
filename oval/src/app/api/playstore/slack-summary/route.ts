@@ -10,7 +10,7 @@ let deliveryLock: Promise<any> | null = null;
 
 function isAuthorized(request: Request) {
   const expected = process.env.PLAYSTORE_SLACK_TRIGGER_TOKEN;
-  if (!expected) return true;
+  if (!expected) return false;
   const auth = request.headers.get("authorization") || "";
   return auth === `Bearer ${expected}`;
 }
