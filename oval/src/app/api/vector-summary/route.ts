@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 import semanticArtifact from "@/data/semantic-clusters.json";
 
 export const dynamic = "force-dynamic";
@@ -99,6 +100,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ live: false, error: "Unsupported platform" }, { status: 400 });
   }
 
+  return cachedIntelligenceResponse(`vector-summary:${platform}`, async () => {
+
   const baseUrl = String(process.env.QDRANT_URL || process.env.SECRET_QDRANT_URL || "").replace(/\/$/, "");
   const apiKey = process.env.QDRANT_API_KEY || process.env.SECRET_QDRANT_API_KEY || "";
   const collection = process.env.QDRANT_COLLECTION || DEFAULT_COLLECTION;
@@ -153,4 +156,5 @@ export async function GET(request: Request) {
   } catch {
     return localResponse(platform, "qdrant_unavailable");
   }
+  });
 }

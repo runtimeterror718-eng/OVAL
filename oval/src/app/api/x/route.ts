@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import semanticClusters from "@/data/semantic-clusters.json";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -11,7 +12,7 @@ const X_QUERY = '(PhysicsWallah OR "Physics Wallah" OR "PW Skills" OR "PW Vidyap
 const X_CRITICAL_QUERY = '(PhysicsWallah OR "Physics Wallah" OR "PW Skills" OR "PW Vidyapeeth" OR "PW OnlyIAS" OR "PW app" OR "PW batch" OR "Alakh Pandey") (scam OR fraud OR refund OR toxic OR worst OR bad OR issue OR problem OR crash OR misleading OR layoff OR fired OR termination OR complaint OR cheat OR fake OR unpaid OR overpriced OR waste OR delay OR buffering OR "not working" OR disappointed OR controversy OR criticism) -is:retweet';
 const NEGATIVE = /scam|fraud|refund|toxic|worst|bad|poor|issue|problem|crash|mislead|layoff|fired|termination|complaint|cheat|fake|unpaid|overpriced|waste|delay|buffer|not working|disappoint|controvers|critici/i;
 const POSITIVE = /great|good|best|excellent|proud|success|congrat|inspiring|growth|achievement|helpful|affordable|love/i;
-const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 
 type XPost = { id: string; author: string; text: string; createdAt?: string; url?: string; likes: number; reposts: number; replies: number; sentiment: "positive" | "neutral" | "negative" };
 type LiveResult = { posts: XPost[]; targeted: XPost[]; generalCount: number };
@@ -146,6 +147,7 @@ async function recentPosts(token: string): Promise<LiveResult> {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("x", async () => {
   const token = process.env.X_BEARER_TOKEN || process.env.TWITTER_BEARER_TOKEN || "";
   if (token) {
     try {
@@ -169,4 +171,5 @@ export async function GET() {
   }
   const stored = await persistedPosts();
   return NextResponse.json(buildPayload(stored.posts, stored.source, !stored.posts.length));
+  });
 }

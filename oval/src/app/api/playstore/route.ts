@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import insights from "@/data/playstore-insights.json";
 import monthlyHistory from "@/data/playstore-monthly-history.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 export const dynamic = "force-dynamic";
 
@@ -341,6 +342,7 @@ async function readSupabaseLiveReviews() {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("playstore", async () => {
   const livePayload = await readSupabaseLiveReviews();
   const allReviews = livePayload.allReviews || [];
   const liveReviews = livePayload.liveReviews || [];
@@ -465,10 +467,11 @@ export async function GET() {
     liveReviews,
     livePulledAt: livePayload.livePulledAt,
     liveSource: livePayload.liveSource,
-    liveRefreshCadenceHours: 1,
+    liveRefreshCadenceHours: 6,
   }), {
     headers: {
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
     },
+  });
   });
 }

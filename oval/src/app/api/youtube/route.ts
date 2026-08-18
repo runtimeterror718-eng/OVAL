@@ -4,6 +4,7 @@ import { ragQuery, isRAGEnabled } from "@/lib/rag";
 import { isDemoMode, demoYoutube } from "@/lib/demo-data";
 import { buildMonthlyTrend, buildTopicClusters, isPwOwnedName } from "@/lib/social-analytics";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -187,6 +188,7 @@ async function getBrandIds(sb: any): Promise<string[]> {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("youtube", async () => {
   if (isDemoMode()) return NextResponse.json(demoYoutube);
   const sb = createClient(url, key);
   const brandIds = await getBrandIds(sb);
@@ -492,5 +494,6 @@ Use only current evidence from the provided window. Prioritize recency and mater
       avgSimilarity: ragInsight.metadata.avgSimilarity,
       sentimentBreakdown: ragInsight.metadata.sentimentBreakdown,
     } : { enabled: false },
+  });
   });
 }

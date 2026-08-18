@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 import insights from "@/data/freshdesk-insights.json";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 
 export const dynamic = "force-static";
 
 export async function GET() {
+  return cachedIntelligenceResponse("freshdesk", async () => {
   const ticketSignals: TextSignal[] = [
     ...((insights as any).activeExamples || []).map((ticket: any) => ({
       id: ticket.ticketId,
@@ -65,5 +67,6 @@ export async function GET() {
     live: true,
     contract,
     ...insights,
+  });
   });
 }

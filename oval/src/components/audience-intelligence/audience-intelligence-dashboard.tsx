@@ -14,6 +14,7 @@ import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
 import { OvalLogo } from "@/components/brand/oval-logo";
+import { loadIntelligenceJson } from "@/lib/intelligence-browser-cache";
 
 type Channel = "playstore" | "reddit" | "linkedin" | "youtube" | "x" | "facebook" | "instagram";
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
@@ -505,12 +506,30 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
   useEffect(() => {
     let cancelled = false;
     setLoading(true); setError(""); setRaw(null); setSemantic(null); setClusterIndex(0);
+    const primaryUrl = channel === "facebook" || channel === "instagram" ? `/api/owned-social/${channel}` : `/api/${channel}`;
+    const semanticUrl = `/api/vector-summary?platform=${channel}`;
+    const ownedUrl = channel === "linkedin" || channel === "x" ? `/api/owned-social/${channel}` : null;
+    const applyFeeds = (data: any, semanticData: any, ownedData: any) => {
+      if (cancelled) return;
+      setRaw((channel === "linkedin" || channel === "x") ? mergeOwnedEvidence(channel, data, ownedData) : data);
+      setSemantic(semanticData);
+    };
     Promise.all([
-      fetch(channel === "facebook" || channel === "instagram" ? `/api/owned-social/${channel}` : `/api/${channel}`, { cache: "no-store" }).then((response) => { if (!response.ok) throw new Error(`${response.status}`); return response.json(); }),
-      fetch(`/api/vector-summary?platform=${channel}`, { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
-      channel === "linkedin" || channel === "x" ? fetch(`/api/owned-social/${channel}`, { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null) : Promise.resolve(null),
+      loadIntelligenceJson<any>(primaryUrl),
+      loadIntelligenceJson<any>(semanticUrl).catch(() => ({ data: null, refreshedAt: 0, refresh: undefined })),
+      ownedUrl ? loadIntelligenceJson<any>(ownedUrl).catch(() => ({ data: null, refreshedAt: 0, refresh: undefined })) : Promise.resolve({ data: null, refreshedAt: 0, refresh: undefined }),
     ])
-      .then(([data, semanticData, ownedData]) => { if (!cancelled) { setRaw((channel === "linkedin" || channel === "x") ? mergeOwnedEvidence(channel, data, ownedData) : data); setSemantic(semanticData); } })
+      .then(([primary, semanticFeed, ownedFeed]) => {
+        applyFeeds(primary.data, semanticFeed.data, ownedFeed.data);
+        const refreshes = [primary.refresh, semanticFeed.refresh, ownedFeed.refresh];
+        if (refreshes.some(Boolean)) {
+          Promise.all([
+            primary.refresh?.catch(() => primary.data) || primary.data,
+            semanticFeed.refresh?.catch(() => semanticFeed.data) || semanticFeed.data,
+            ownedFeed.refresh?.catch(() => ownedFeed.data) || ownedFeed.data,
+          ]).then(([data, semanticData, ownedData]) => applyFeeds(data, semanticData, ownedData));
+        }
+      })
       .catch(() => { if (!cancelled) setError(`The ${channel} feed could not be loaded.`); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };

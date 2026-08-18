@@ -9,6 +9,7 @@ import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
 import { OvalLogo } from "@/components/brand/oval-logo";
+import { loadIntelligenceJson } from "@/lib/intelligence-browser-cache";
 
 type SourceId = "playstore" | "linkedin" | "youtube" | "freshdesk" | "reddit" | "x" | "facebook" | "instagram";
 type Reading = { label: string; value: number; tone: "positive" | "neutral" | "negative" };
@@ -59,15 +60,16 @@ export function AudienceIntelligenceOverview() {
   useEffect(() => {
     let cancelled = false;
     Promise.all(overviewSources.map(async (source) => {
-      const response = await fetch(sourceEndpoint(source), { cache: "no-store" });
-      if (!response.ok) throw new Error(source);
-      return [source, await response.json()] as const;
+      const result = await loadIntelligenceJson<any>(sourceEndpoint(source));
+      if (result.refresh) result.refresh.then((data) => { if (!cancelled) setFeeds((current) => ({ ...current, [source]: data })); }).catch(() => undefined);
+      return [source, result.data] as const;
     })).then((entries) => { if (!cancelled) setFeeds(Object.fromEntries(entries)); })
       .catch(() => { if (!cancelled) setError("One or more live intelligence feeds could not be loaded."); })
       .finally(() => { if (!cancelled) setLoading(false); });
     Promise.all(overviewSources.map(async (source) => {
-      const response = await fetch(`/api/vector-summary?platform=${source}`, { cache: "no-store" });
-      return [source, response.ok ? await response.json() : null] as const;
+      const result = await loadIntelligenceJson<any>(`/api/vector-summary?platform=${source}`).catch(() => ({ data: null, refreshedAt: 0, refresh: undefined }));
+      if (result.refresh) result.refresh.then((data: any) => { if (!cancelled) setSemanticFeeds((current) => ({ ...current, [source]: data })); }).catch(() => undefined);
+      return [source, result.data] as const;
     })).then((entries) => { if (!cancelled) setSemanticFeeds(Object.fromEntries(entries)); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, []);

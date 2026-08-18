@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 // LinkedIn Intelligence API — reads Exa-sourced posts about Physics Wallah from
 // linkedin_posts (ingested via scripts/ingest_linkedin_exa.py) and returns a
@@ -77,6 +78,7 @@ async function getBrandIds(sb: any): Promise<string[]> {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("linkedin", async () => {
   if (!url || !key) return NextResponse.json({ live: false });
   const sb = createClient(url, key);
   const brandIds = await getBrandIds(sb);
@@ -207,6 +209,7 @@ export async function GET() {
     },
     summary,
     posts,
+  });
   });
 }
 

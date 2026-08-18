@@ -5,6 +5,7 @@ import { isDemoMode, demoReddit } from "@/lib/demo-data";
 import { buildMonthlyTrend, buildTopicClusters } from "@/lib/social-analytics";
 import { buildChannelContract, buildSourceStatus, buildSupervisedTopics, fromRuleClusters, summarizeSentiment, type TextSignal } from "@/lib/channel-intelligence";
 import { discoverRedditPosts } from "@/lib/reddit-discovery";
+import { cachedIntelligenceResponse } from "@/lib/intelligence-server-cache";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const key = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -192,6 +193,7 @@ async function getBrandIds(sb: any): Promise<string[]> {
 }
 
 export async function GET() {
+  return cachedIntelligenceResponse("reddit", async () => {
   if (isDemoMode()) return NextResponse.json(demoReddit);
   const sb = createClient(url, key);
   const brandIds = await getBrandIds(sb);
@@ -473,5 +475,6 @@ Be specific — this is data-driven intelligence, not speculation.`,
       avgSimilarity: ragInsight.metadata.avgSimilarity,
       sentimentBreakdown: ragInsight.metadata.sentimentBreakdown,
     } : { enabled: false },
+  });
   });
 }

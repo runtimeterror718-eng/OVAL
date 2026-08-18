@@ -7,6 +7,7 @@ import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
 import { OvalLogo } from "@/components/brand/oval-logo";
+import { loadIntelligenceJson } from "@/lib/intelligence-browser-cache";
 
 type Period = "today" | "yesterday" | "7d" | "30d" | "month";
 type Ticket = { ticketId: string; status: string; group: string; category?: string; subject: string; description: string };
@@ -63,10 +64,18 @@ export function FreshdeskAudienceDashboard() {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      fetch("/api/freshdesk", { cache: "no-store" }).then((response) => { if (!response.ok) throw new Error("Freshdesk feed unavailable"); return response.json(); }),
-      fetch("/api/vector-summary?platform=freshdesk", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).catch(() => null),
+      loadIntelligenceJson<any>("/api/freshdesk"),
+      loadIntelligenceJson<any>("/api/vector-summary?platform=freshdesk").catch(() => ({ data: null, refreshedAt: 0, refresh: undefined })),
     ]).then(([freshdesk, semanticData]) => {
-      if (!cancelled) { setData(freshdesk); setSemantic(semanticData); }
+      if (!cancelled) { setData(freshdesk.data); setSemantic(semanticData.data); }
+      if (freshdesk.refresh || semanticData.refresh) {
+        Promise.all([
+          freshdesk.refresh?.catch(() => freshdesk.data) || freshdesk.data,
+          semanticData.refresh?.catch(() => semanticData.data) || semanticData.data,
+        ]).then(([freshdeskData, semanticFeed]) => {
+          if (!cancelled) { setData(freshdeskData); setSemantic(semanticFeed); }
+        });
+      }
     }).catch((reason) => { if (!cancelled) setError(reason.message || "Freshdesk feed unavailable"); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
