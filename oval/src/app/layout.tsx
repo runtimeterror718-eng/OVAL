@@ -15,8 +15,45 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "OVAL — Brand Intelligence Platform",
-  description: "See what they say before it spreads. Brand intelligence across Instagram, Reddit, YouTube, Telegram, and Google.",
+  metadataBase: new URL("https://oval.run"),
+  title: "OVAL - Brand Intelligence",
+  applicationName: "OVAL",
+  description:
+    "Unified brand intelligence to analyze social sentiment, detect public backlash, block unauthorized piracy, and eliminate brand fraud in real time.",
+  icons: {
+    icon: [{ url: "/brand/oval-favicon.png", type: "image/png", sizes: "512x512" }],
+    shortcut: "/brand/oval-favicon.png",
+    apple: [{ url: "/brand/oval-favicon.png", sizes: "512x512", type: "image/png" }],
+  },
+  openGraph: {
+    title: "OVAL - Brand Intelligence",
+    description:
+      "What people say today shapes what happens tomorrow. Understand conversations, detect risk, and protect the brand in real time.",
+    url: "https://oval.run",
+    siteName: "OVAL",
+    locale: "en_IN",
+    type: "website",
+    images: [
+      {
+        url: "/brand/oval-share-mark.png",
+        width: 1507,
+        height: 1044,
+        alt: "OVAL Brand Intelligence mark",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OVAL - Brand Intelligence",
+    description:
+      "What people say today shapes what happens tomorrow. Brand intelligence for conversations, risk, and protection.",
+    images: ["/brand/oval-share-mark.png"],
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
 };
 
 export default function RootLayout({

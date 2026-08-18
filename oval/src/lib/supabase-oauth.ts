@@ -30,7 +30,13 @@ export function createOAuthClient(request: NextRequest) {
     client,
     applyCookies(response: NextResponse) {
       changes.forEach(({ name, value, options }) => {
-        response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2]);
+        response.cookies.set(name, value, {
+          ...options,
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+        } as Parameters<typeof response.cookies.set>[2]);
       });
       return response;
     },

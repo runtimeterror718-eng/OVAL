@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { ArrowUpRight, Check } from "lucide-react";
 import { OvalLogo } from "@/components/brand/oval-logo";
 import "./login.css";
 
@@ -26,13 +26,13 @@ export default function LoginPage({
 
       <section className="oval-login-shell">
         <article className="oval-login-story">
-          <header className="oval-login-brand" aria-label="OVAL Audience Intelligence">
+          <header className="oval-login-brand" aria-label="OVAL Brand Intelligence">
             <OvalLogo className="oval-login-brand-mark oval-logo-image" priority />
-            <span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span>
+            <span><strong>OVAL</strong><small>BRAND INTELLIGENCE</small></span>
           </header>
 
           <div className="oval-login-story-copy">
-            <h1>They’re talking.<br />They’re stealing.<br />Stop both.</h1>
+            <h1><span>What people say today</span><span>shapes what happens</span><em>tomorrow</em></h1>
             <p className="oval-login-lede">Unified brand intelligence to analyze social sentiment, detect public backlash, block unauthorized piracy, and eliminate brand fraud in real time.</p>
           </div>
 
@@ -49,11 +49,13 @@ export default function LoginPage({
           <div className="oval-login-card-content">
             {error ? <p className="oval-login-message error" role="alert">{error}</p> : null}
 
-            <a className="oval-google-cta" href={`/api/auth/google?next=${encodeURIComponent(next)}`} aria-label="Sign in with Google">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.7A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14a6 6 0 0 1 0-3.9V7.4H3a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A9.7 9.7 0 0 0 3 7.4l3.4 2.7A6 6 0 0 1 12 5.9Z"/></svg>
-              <span>Sign in with Google</span>
-              <i aria-hidden="true" />
-            </a>
+            <div className="oval-login-auth-action">
+              <a className="oval-google-cta" href={`/api/auth/google?next=${encodeURIComponent(next)}`} aria-label="Sign in with Google">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.6h3.3c1.9-1.8 2.9-4.4 2.9-7.5Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.3l-3.3-2.6c-.9.6-2.1 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3v2.7A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14a6 6 0 0 1 0-3.9V7.4H3a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A9.7 9.7 0 0 0 3 7.4l3.4 2.7A6 6 0 0 1 12 5.9Z"/></svg>
+                <span>Sign in with Google</span>
+                <ArrowUpRight size={17} />
+              </a>
+            </div>
           </div>
         </section>
       </section>

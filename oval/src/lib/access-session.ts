@@ -86,6 +86,7 @@ export function resolvePublicOrigin(request: Request) {
     return `${forwardedProto === "https" ? "https" : "http"}://${host}`;
   }
 
+  if (process.env.NODE_ENV === "production") return "https://oval.run";
   return new URL(request.url).origin;
 }
 

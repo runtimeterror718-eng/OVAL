@@ -1,54 +1,58 @@
-# OVAL shared-password authentication
+# OVAL Google Workspace authentication
 
-OVAL currently uses a temporary shared-password gate. Users enter an email with
-the `@pw.live` domain and the private OVAL access password. The server issues a
-signed, HTTP-only session cookie that expires after 12 hours.
+OVAL uses Google OAuth through Supabase Auth. Only identities whose verified
+email address ends in `@pw.live` receive an OVAL application session.
 
-## Application flow
+## Security boundary
 
-1. `/login` posts the email and password to `POST /api/auth/login`.
-2. The server validates the `@pw.live` email format and compares the configured
-   password using constant-time digest comparison.
-3. A successful login receives a signed, secure, HTTP-only cookie.
-4. Middleware verifies the signature and expiry for every protected page and
-   API request.
-5. CRM and Shield operations additionally require the entered email to match an
-   active `crm_members` directory record; the shared password does not grant a
-   role or elevate permissions.
-6. Logout expires the session cookie immediately.
+1. `/login` starts OAuth through `GET /api/auth/google`.
+2. Supabase creates a PKCE authorization request and stores its verifier in a
+   secure, HTTP-only, same-site cookie.
+3. Google returns to `/api/auth/callback`; the server exchanges the code and
+   reads the verified Google identity from Supabase.
+4. The server independently validates the returned email against the exact
+   `@pw.live` domain. The Google `hd` parameter is only an account-selection
+   hint and is never treated as authorization.
+5. OVAL issues a signed, secure, HTTP-only cookie with a 12-hour expiry.
+6. Middleware validates the signature and expiry for every protected page and
+   API route. Unauthenticated API calls receive `401`; pages redirect to login.
+7. CRM and Shield operations can apply additional directory- and role-based
+   authorization after the platform session has been verified.
 
-The `hd` authorization parameter only improves Google account selection. It is
-not the security boundary; OVAL verifies the returned Workspace domain on the
-server.
-
-## Environment
-
-The application requires these server-only values:
+## Required server-only configuration
 
 ```text
-OVAL_ACCESS_PASSWORD=<at least 24 random characters>
-OVAL_AUTH_SECRET=<at least 32 random characters, separate from the password>
+NEXT_PUBLIC_APP_URL=https://oval.run
+NEXT_PUBLIC_SUPABASE_URL=<Supabase project URL>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<publishable or anon key>
+OVAL_AUTH_SECRET=<at least 32 random characters>
 ```
 
-Never prefix either value with `NEXT_PUBLIC_`, commit them, print them in logs,
-or reuse the access password as the signing secret.
+The Supabase URL and publishable/anon key are designed to be public. The OVAL
+signing secret and any Supabase service-role key must remain server-only and
+must never use a `NEXT_PUBLIC_` prefix.
+
+Supabase Auth must enable Google and allow this production callback:
+
+```text
+https://oval.run/api/auth/callback
+```
+
+Use the equivalent loopback callback only for local development.
 
 ## Verification checklist
 
-- A syntactically valid `@pw.live` email and correct password reaches the
-  requested protected page.
-- A personal Gmail address is rejected.
-- A wrong password is rejected without revealing which field failed.
-- A logged-out request to a platform page redirects to `/login` and preserves
-  the intended destination.
-- Logout expires the browser session.
-- Protected APIs return `401` without a valid signed session.
-- CRM and Shield return `403` when the entered email is absent or inactive in
-  the OVAL directory.
+- A Google identity with a verified `@pw.live` address reaches the requested
+  protected page.
+- A personal Gmail or other non-PW domain is rejected after callback.
+- A logged-out platform request redirects to `/login` and preserves its safe
+  relative destination.
+- Protected API routes return `401` without a valid signed session.
+- Authentication cookies are secure and HTTP-only in production.
+- Logout clears both the OVAL application session and Supabase OAuth session.
+- No OAuth client secret, service-role key, or signing secret appears in
+  browser JavaScript, API responses, logs, or Git.
 
-This gate validates the email format, not mailbox ownership. Restore Google
-Workspace SSO or another identity provider before treating it as durable
-employee identity verification.
-
-Private scheduler and webhook endpoints remain outside browser-session auth;
-each continues to validate its own trigger token or provider signature.
+Frontend JavaScript and browser-initiated request URLs remain inspectable in
+developer tools by design. Security depends on server-side authorization and
+secret isolation, not on hiding browser traffic.

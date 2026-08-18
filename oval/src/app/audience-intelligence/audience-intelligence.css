@@ -144,7 +144,7 @@
 .ai-source-nav button.active { background: #111; color: #fff; }
 .ai-top-actions { position: relative; display: flex; justify-self: end; align-items: center; gap: 8px; }
 .ai-icon-button, .ai-avatar { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--ai-line); border-radius: 50%; background: rgba(255,255,255,.72); cursor: pointer; }
-.ai-avatar { border: 0; background: #ef9f76; font-size: 10px; font-weight: 700; }
+.ai-avatar { border: 0; background: #ef9f76; font-size: 14px; font-weight: 700; text-transform: uppercase; }
 .ai-auth-menu { position: relative; }
 .ai-auth-menu > summary { list-style: none; }
 .ai-auth-menu > summary::-webkit-details-marker { display: none; }
@@ -162,8 +162,11 @@
   background: #fff;
   box-shadow: 0 18px 50px rgba(0,0,0,.12);
 }
-.ai-auth-menu > div strong { font-size: 12px; }
-.ai-auth-menu > div small { color: #777; font-size: 10px; }
+.ai-auth-menu > div strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; }
+.ai-auth-menu > div small { overflow: hidden; color: #777; font-size: 10px; text-overflow: ellipsis; }
+.ai-auth-menu-label { color: #8b8c85; font-size: 8px; font-weight: 700; letter-spacing: .12em; }
+.ai-auth-menu-status { display: flex; align-items: center; gap: 6px; margin-top: 7px; color: #55564f; font-size: 10px; }
+.ai-auth-menu-status i { width: 7px; height: 7px; border-radius: 50%; background: #36c85f; }
 .ai-auth-menu form { margin-top: 8px; }
 .ai-auth-menu form button {
   width: 100%;

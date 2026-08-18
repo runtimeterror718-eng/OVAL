@@ -4,10 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
-  Bell,
   ChevronLeft,
   ChevronRight,
-  Search,
   Sparkles,
   X,
 } from "lucide-react";
@@ -79,12 +77,12 @@ type Model = {
   analysis?: DeepAnalysis;
 };
 
-const PRIMARY_CHANNELS: { id: Exclude<Channel, "reddit"> | "freshdesk"; label: string }[] = [
+const PRIMARY_CHANNELS: { id: Exclude<Channel, "facebook" | "instagram"> | "freshdesk"; label: string }[] = [
   { id: "playstore", label: "Play Store" },
   { id: "freshdesk", label: "Fresh Desk" },
   { id: "linkedin", label: "LinkedIn" },
   { id: "x", label: "X" },
-  { id: "instagram", label: "Instagram" },
+  { id: "reddit", label: "Reddit" },
   { id: "youtube", label: "YouTube" },
 ];
 
@@ -230,7 +228,7 @@ function normalizeReddit(data: any): Model {
       name: cluster.name,
       count: number(cluster.mentions),
       share: number(cluster.mentions) / total * 100,
-      summary: `${cluster.name} is a ${cluster.sentiment || "mixed"} stored Reddit cluster spanning ${fmt(number(cluster.mentions))} community mentions.`,
+      summary: `${cluster.name} is a ${cluster.sentiment || "mixed"} Reddit cluster spanning ${fmt(number(cluster.mentions))} community mentions across stored and discovered evidence.`,
       sentiment: cluster.sentiment,
       evidence: matchingPosts.length ? matchingPosts.map((item: any, i: number) => asEvidence(item, i, "reddit")) : (cluster.evidence || []).map((text: string, i: number) => asEvidence({ text, sentiment: cluster.sentiment, subreddit: stats.topSubreddit }, i, "reddit")),
       children: children.map((item: any) => ({ ...item, share: matchingPosts.length ? item.count / matchingPosts.length * 100 : 0 })),
@@ -238,13 +236,13 @@ function normalizeReddit(data: any): Model {
   });
   const health = clamp(100 - number(stats.negativeCount) / total * 100);
   return {
-    channel: "reddit", name: "Reddit", eyebrow: "COMMUNITY INTELLIGENCE · LIVE THREADS",
-    headline: "What the community is debating.",
-    description: `${fmt(number(stats.totalMentions))} posts reveal recurring student decisions, unresolved doubts and narratives forming across public communities.`,
+    channel: "reddit", name: "Reddit", eyebrow: "",
+    headline: "What students say when brands aren’t listening.",
+    description: "",
     score: health, scoreMax: 100, scoreLabel: "Community health", scoreNote: `${stats.sentiment || "Mixed"} · ${stats.topSubreddit || "Reddit"} leads volume`,
     total: number(stats.totalMentions), totalLabel: "posts analysed", issues, evidence, versions: (data?.monthlyTrend || []).map((v: any) => ({ name: v.label || v.month, score: v.count ? clamp(100 - number(v.negatives) / number(v.count) * 100) : 0, count: number(v.count) })),
     sentiment: { positive: number(stats.positiveCount), neutral: number(stats.neutralCount), negative: number(stats.negativeCount) },
-    sourceNote: `Live Reddit evidence · ${stats.window || data?.meta?.window || "current window"}`,
+    sourceNote: `Reddit evidence · ${fmt(number(stats.liveScrapedPosts))} stored · ${fmt(number(stats.googleDiscoveredPosts) + number(stats.googleFallbackPosts))} Google-indexed · ${fmt(number(stats.exaDiscoveredPosts))} Exa · ${stats.window || data?.meta?.window || "current window"}`,
   };
 }
 
@@ -469,7 +467,7 @@ function filterModel(base: Model, period: Period, query: string, sourceFilter: S
   } : undefined;
   return {
     ...base,
-    description,
+    description: base.channel === "reddit" ? "" : description,
     score,
     scoreNote: evidence.length ? `${fmt(sentiment.negative)} critical · ${fmt(sentiment.positive)} positive in this window` : "No dated signals in this window",
     total: evidence.length,
@@ -489,15 +487,13 @@ function MiniBars({ seed = 0 }: { seed?: number }) {
 export function AudienceIntelligenceDashboard({ initialChannel }: { initialChannel: Channel }) {
   const router = useRouter();
   const [channel, setChannel] = useState<Channel>(initialChannel);
-  const [period, setPeriod] = useState<Period>("30d");
+  const [period, setPeriod] = useState<Period>("month");
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [raw, setRaw] = useState<any>(null);
   const [semantic, setSemantic] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const query = "";
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [selectedEvidence, setSelectedEvidence] = useState<Evidence | null>(null);
   const [ratingOpen, setRatingOpen] = useState(false);
@@ -530,7 +526,6 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
     return safeB - safeA || a.id.localeCompare(b.id);
   }), [model?.evidence]);
   const currentCluster = model?.issues[Math.min(clusterIndex, Math.max(0, (model?.issues.length || 1) - 1))];
-  const negativeAlerts = (model?.evidence || []).filter((item) => item.sentiment === "negative").slice(0, 3);
   const evidenceSentimentCounts = useMemo(() => evidence.reduce((counts, item) => {
     const sentiment = item.sentiment === "positive" || item.sentiment === "negative" ? item.sentiment : "neutral";
     counts[sentiment] += 1;
@@ -561,7 +556,7 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
 
   const changeChannel = (next: Channel) => {
     if (next === "youtube") { openPwYtVerse(); return; }
-    setChannel(next); setPeriod("30d"); setQuery(""); setSourceFilter("all");
+    setChannel(next); setPeriod("month"); setSourceFilter("all");
     router.replace(`/audience-intelligence/${next}`);
   };
 
@@ -569,28 +564,25 @@ export function AudienceIntelligenceDashboard({ initialChannel }: { initialChann
     <main className={`audience-studio source-${channel}`}>
       <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
       <header className="ai-topbar">
-        <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
+        <button className="ai-brand-group" onClick={() => changeChannel("playstore")} aria-label="Open OVAL Play Store intelligence"><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>BRAND INTELLIGENCE</small></span></button>
         <nav className="ai-source-nav" aria-label="Intelligence channels">
           <button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>
-          <button onClick={() => router.replace("/shield")}>Shield</button>
           {PRIMARY_CHANNELS.map((item) => <button key={item.id} className={channel === item.id ? "active" : ""} onClick={() => item.id === "freshdesk" ? router.replace("/audience-intelligence/freshdesk") : changeChannel(item.id)}>{item.label}</button>)}
+          <button onClick={() => router.replace("/shield")}>Shield</button>
         </nav>
         <div className="ai-top-actions">
-          <div className={`ai-search ${searchOpen ? "open" : ""}`}><Search size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search audience evidence" aria-label="Search audience evidence" /> <button onClick={() => { setSearchOpen(!searchOpen); if (searchOpen) setQuery(""); }} aria-label="Toggle search">{searchOpen ? <X size={15} /> : <span />}</button></div>
-          <button className="ai-icon-button ai-notification" onClick={() => setNotificationsOpen(!notificationsOpen)} aria-label="Open critical alerts"><Bell size={16} /></button>
           <AuthProfileMenu />
-          {notificationsOpen && <div className="ai-notification-popover"><div><strong>Critical signals</strong><button onClick={() => setNotificationsOpen(false)}><X size={14} /></button></div>{negativeAlerts.length ? negativeAlerts.map((item) => <button key={item.id} onClick={() => { setSelectedEvidence(item); setNotificationsOpen(false); }}><span>{item.author}</span><p>{short(item.text, 90)}</p></button>) : <p>No critical evidence in this feed.</p>}</div>}
         </div>
       </header>
 
       {loading ? <OvalLoadingSkeleton embedded /> : error || !model ? <section className="ai-loading"><p>{error || "No data available."}</p><button onClick={() => location.reload()}>Retry</button></section> : <>
         <section className="ai-hero">
-          <div><p className="ai-eyebrow">{model.eyebrow}</p><h1>{channel === "playstore" ? <>What the rating<br /><em>isn’t telling you.</em></> : channel === "x" ? <>What Hashtags <em>are saying ?</em></> : <>{model.headline.split(" ").slice(0, -1).join(" ")} <em>{model.headline.split(" ").at(-1)}</em></>}</h1><p className="ai-hero-copy">{model.description}</p></div>
+          <div>{model.eyebrow ? <p className="ai-eyebrow">{model.eyebrow}</p> : null}<h1>{channel === "playstore" ? <>What the rating<br /><em>isn’t telling you.</em></> : channel === "x" ? <>What Hashtags <em>are saying ?</em></> : <>{model.headline.split(" ").slice(0, -1).join(" ")} <em>{model.headline.split(" ").at(-1)}</em></>}</h1>{model.description ? <p className="ai-hero-copy">{model.description}</p> : null}</div>
           <button className="ai-hero-score" onClick={() => setRatingOpen(true)}>
             <span className="ai-score-meta"><span>{model.scoreLabel}</span><b>LIVE</b></span><strong>{model.score.toFixed(model.scoreMax === 5 ? 2 : 0)}</strong><small>/{model.scoreMax}</small><span className="ai-gauge"><i style={{ width: `${clamp(model.score / model.scoreMax * 100)}%` }} /></span><p>{model.scoreNote}</p><ArrowUpRight size={18} />
           </button>
         </section>
-        <section className="ai-filter-row"><span>Evidence window</span><div className="ai-filters">{PERIODS.map((item) => <button key={item.id} className={period === item.id ? "active" : ""} onClick={() => { setPeriod(item.id); setClusterIndex(0); setSelectedIssue(null); setSelectedEvidence(null); setRatingOpen(false); }}>{item.label}</button>)}</div><p><strong>{fmt(evidence.length)}</strong> matching signals</p></section>
+        <section className="ai-filter-row"><span>Evidence window</span><div className="ai-filters">{PERIODS.map((item) => <button key={item.id} className={period === item.id ? "active" : ""} onClick={() => { setPeriod(item.id); setClusterIndex(0); setSelectedIssue(null); setSelectedEvidence(null); setRatingOpen(false); }}>{item.label}</button>)}</div>{channel !== "reddit" ? <p><strong>{fmt(evidence.length)}</strong> matching signals</p> : null}</section>
         {(["linkedin", "x", "instagram"] as Channel[]).includes(channel) && <section className="ai-source-filter"><span>Evidence source</span><div>{(["all", "owned", "external"] as SourceFilter[]).map((source) => <button key={source} className={sourceFilter === source ? "active" : ""} onClick={() => { setSourceFilter(source); setSelectedIssue(null); setSelectedEvidence(null); }}>{source === "all" ? "All evidence" : source === "owned" ? "Official channels" : "External mentions"}</button>)}</div></section>}
 
         <section className="ai-section-block">

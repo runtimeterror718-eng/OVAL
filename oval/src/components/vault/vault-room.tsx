@@ -27,7 +27,7 @@ export function VaultRoom() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [focused, setFocused] = useState(false);
-  const period = (search.get("period") || "30d") as EvidencePeriod;
+  const period = (search.get("period") || "month") as EvidencePeriod;
   const archived = Boolean(search.get("archive"));
   const query = search.toString();
 

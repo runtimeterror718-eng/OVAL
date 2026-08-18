@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowUpRight, Bell, ChevronLeft, ChevronRight, LifeBuoy, Search, Sparkles, TrendingUp, X } from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight, LifeBuoy, Sparkles, TrendingUp, X } from "lucide-react";
 import { OvalLoadingSkeleton } from "@/components/ui/page-skeleton";
 import { openPwYtVerse } from "@/lib/youtube-navigation";
 import { AuthProfileMenu } from "@/components/auth/auth-profile-menu";
@@ -21,8 +21,8 @@ const PERIODS: { id: Period; label: string }[] = [
   { id: "month", label: "Month Wise" },
 ];
 
-const NAV = ["playstore", "freshdesk", "linkedin", "x", "instagram", "youtube"] as const;
-const LABELS: Record<(typeof NAV)[number], string> = { playstore: "Play Store", freshdesk: "Fresh Desk", linkedin: "LinkedIn", x: "X", instagram: "Instagram", youtube: "YouTube" };
+const NAV = ["playstore", "freshdesk", "linkedin", "x", "reddit", "youtube"] as const;
+const LABELS: Record<(typeof NAV)[number], string> = { playstore: "Play Store", freshdesk: "Fresh Desk", linkedin: "LinkedIn", x: "X", reddit: "Reddit", youtube: "YouTube" };
 
 const ISSUE_COPY: Record<string, { summary: string; pm: string; em: string; action: string }> = {
   "Uncategorized / Needs Routing": { summary: "Tickets have enough learner context to require action, but lack a dependable L1/L2 route.", pm: "Support Operations", em: "Routing Automation EM", action: "Classify and route the oldest unassigned cohort before adding new taxonomy." },
@@ -56,7 +56,7 @@ export function FreshdeskAudienceDashboard() {
   const [semantic, setSemantic] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [period, setPeriod] = useState<Period>("30d");
+  const [period, setPeriod] = useState<Period>("month");
   const [selected, setSelected] = useState<Category | null>(null);
   const [commentPage, setCommentPage] = useState(0);
 
@@ -99,9 +99,9 @@ export function FreshdeskAudienceDashboard() {
   return <main className="audience-studio source-freshdesk fd-studio">
     <div className="ai-ambient ai-ambient-one" /><div className="ai-ambient ai-ambient-two" />
     <header className="ai-topbar">
-      <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>AUDIENCE INTELLIGENCE</small></span></button>
-      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button><button onClick={() => router.replace("/shield")}>Shield</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}</nav>
-      <div className="ai-top-actions"><div className="ai-search"><Search size={16} /></div><button className="ai-icon-button ai-notification" aria-label="Freshdesk alerts"><Bell size={16} /></button><AuthProfileMenu /></div>
+      <button className="ai-brand-group" onClick={() => router.replace("/audience-intelligence/overview")}><OvalLogo className="ai-brand-mark ai-brand-logo" priority /><span><strong>OVAL</strong><small>BRAND INTELLIGENCE</small></span></button>
+      <nav className="ai-source-nav" aria-label="Intelligence channels"><button onClick={() => router.replace("/audience-intelligence/overview")}>Overview</button>{NAV.map((source) => <button key={source} className={source === "freshdesk" ? "active" : ""} onClick={() => source === "youtube" ? openPwYtVerse() : router.replace(`/audience-intelligence/${source}`)}>{LABELS[source]}</button>)}<button onClick={() => router.replace("/shield")}>Shield</button></nav>
+      <div className="ai-top-actions"><AuthProfileMenu /></div>
     </header>
 
     {loading ? <OvalLoadingSkeleton embedded /> : error || !model ? <section className="ai-loading"><p>{error || "Freshdesk data is unavailable."}</p><button onClick={() => location.reload()}>Retry</button></section> : <>

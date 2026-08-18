@@ -14,7 +14,6 @@ import {
 import {
   AlertTriangle,
   ArrowUpRight,
-  Bell,
   Copy,
   Download,
   ExternalLink,
@@ -144,7 +143,7 @@ type MetricKey =
   | "enforcement";
 
 const initialFilters: FilterState = {
-  period: "7d",
+  period: "month",
   threat: "all",
   platform: "all",
   severity: "all",
@@ -1306,7 +1305,7 @@ function ShieldNav({
     { id: "freshdesk", label: "Fresh Desk" },
     { id: "linkedin", label: "LinkedIn" },
     { id: "x", label: "X" },
-    { id: "instagram", label: "Instagram" },
+    { id: "reddit", label: "Reddit" },
     { id: "youtube", label: "YouTube" },
   ];
   return (
@@ -1318,7 +1317,7 @@ function ShieldNav({
         <OvalLogo className="ai-brand-mark ai-brand-logo" priority />
         <span>
           <strong>OVAL</strong>
-          <small>AUDIENCE INTELLIGENCE</small>
+          <small>BRAND INTELLIGENCE</small>
         </span>
       </button>
       <nav className="ai-source-nav" aria-label="Intelligence channels">
@@ -1326,12 +1325,6 @@ function ShieldNav({
           onClick={() => router.replace("/audience-intelligence/overview")}
         >
           Overview
-        </button>
-        <button
-          className={active ? "active shield-nav-item" : "shield-nav-item"}
-          onClick={() => router.replace("/shield")}
-        >
-          Shield
         </button>
         {sources.map((source) => (
           <button
@@ -1345,18 +1338,14 @@ function ShieldNav({
             {source.label}
           </button>
         ))}
+        <button
+          className={active ? "active shield-nav-item" : "shield-nav-item"}
+          onClick={() => router.replace("/shield")}
+        >
+          Shield
+        </button>
       </nav>
       <div className="ai-top-actions">
-        <div className="ai-search">
-          <Search size={16} />
-        </div>
-        <button
-          className="ai-icon-button ai-notification"
-          aria-label="Shield alerts"
-        >
-          <Bell size={16} />
-          <i />
-        </button>
         <AuthProfileMenu />
       </div>
     </header>
